@@ -921,7 +921,26 @@ body::after {
 .boot-closer { color: var(--amber-lt); font-weight: 700; margin-top: 1em; }
 .boot-sub    { color: var(--text); }
 .boot-prompt {
-  margin-top: 1.6em; color: var(--text-faint);
+  margin-top: 1.6em; text-align: center;
+}
+.boot-enter-btn {
+  font-family: var(--font-m);
+  font-size: 14px; font-weight: 700; letter-spacing: .18em;
+  color: var(--amber-lt);
+  background: rgba(191,126,28,.08);
+  border: 1px solid var(--amber-dk);
+  border-radius: 4px;
+  padding: 14px 34px;
+  cursor: pointer;
+  animation: boot-pulse 1.6s ease-in-out infinite;
+}
+.boot-enter-btn:active { background: rgba(191,126,28,.18); }
+@keyframes boot-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(191,126,28,.0); }
+  50%      { box-shadow: 0 0 18px 0 rgba(191,126,28,.35); }
+}
+.boot-hint {
+  margin-top: 10px; color: var(--text-faint); font-size: 11px;
   animation: boot-blink 1.2s steps(2) infinite;
 }
 @keyframes boot-blink { 50% { opacity: .25; } }
@@ -2260,7 +2279,10 @@ body::after {
   <div id="boot-overlay" role="status" aria-label="Loading You Didn't Die, Now What?">
     <div class="boot-term">
       <div id="boot-lines"></div>
-      <div id="boot-prompt" class="boot-prompt" hidden>[ click anywhere to continue ]<span class="boot-cursor"></span></div>
+      <div id="boot-prompt" class="boot-prompt" hidden>
+      <button id="boot-enter" class="boot-enter-btn" type="button">TAP TO ENTER</button>
+      <div class="boot-hint">or tap anywhere</div>
+    </div>
     </div>
   </div>
 
@@ -8684,15 +8706,8 @@ function runBootSequence() {
     ["line", "mounting optimism", "NOT FOUND", "fail"],
     ["line", "loading regrets_final_FINAL_v3.zip", "OK (3.2 GB)", "ok"],
     ["line", "calibrating will_to_live", "7%", "warn"],
-    ["line", "locating nearest exit", "TIMEOUT", "fail"],
-    ["line", "importing survival_instincts", "CORRUPTED \u2014 substituting sarcasm", "warn"],
     ["line", "brewing coffee", "FAILED (no water, no power, no beans)", "fail"],
-    ["line", "downloading hope", "404", "fail"],
     ["line", "unpacking trauma", "OK (do not open)", "ok"],
-    ["line", "checking vital signs", "present. good enough.", "ok"],
-    ["line", "syncing excuses", "12,408 found", "warn"],
-    ["line", "defragmenting denial", "OK", "ok"],
-    ["line", "patching dignity", "SKIPPED BY USER", "warn"],
     ["line", "locating clean water", "you'll learn how. that's the point.", "ok"],
     ["blank"],
     ["closer", "CONGRATULATIONS. SOMETHING WENT CATASTROPHICALLY WRONG."],
@@ -8750,7 +8765,7 @@ function runBootSequence() {
     if (finished) return;
     if (idx >= seq.length) { showPrompt(); return; }
     renderLine(seq[idx++]);
-    timer = setTimeout(step, 200 + Math.random() * 200);
+    timer = setTimeout(step, 140 + Math.random() * 120);
   };
 
   overlay.addEventListener("click", () => { finished ? dismiss() : showPrompt(); });
