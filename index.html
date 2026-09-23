@@ -77,10 +77,39 @@
   --white:       #d6ffe0;
 }
 [data-theme="crt"] body::after {
-  content: ""; position: fixed; inset: 0; z-index: 19999; pointer-events: none;
-  background: repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px);
+  content: ""; position: fixed; inset: 0; z-index: 20001; pointer-events: none;
+  background:
+    linear-gradient(to bottom,
+      transparent 0%, rgba(0,255,65,.035) 46%,
+      rgba(0,255,65,.07) 50%, rgba(0,255,65,.035) 54%, transparent 100%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px);
+  background-size: 100% 140px, auto;
+  animation: crt-roll 9s linear infinite, crt-flicker 4s steps(12) infinite;
 }
-[data-theme="crt"] .boot-term { text-shadow: 0 0 8px rgba(0,255,65,.35); }
+/* Vignette: curved-tube darkness at the edges */
+[data-theme="crt"] body::before {
+  content: ""; position: fixed; inset: 0; z-index: 20002; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,.42) 100%);
+}
+@keyframes crt-roll {
+  from { background-position: 0 -140px, 0 0; }
+  to   { background-position: 0  140px, 0 0; }
+}
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .96; }
+}
+/* Phosphor bloom on text */
+[data-theme="crt"] #screen,
+[data-theme="crt"] .drawer-body,
+[data-theme="crt"] .article-body,
+[data-theme="crt"] .boot-term {
+  text-shadow: 0 0 7px rgba(0,255,65,.30);
+}
+[data-theme="crt"] #boot-overlay { background: #070b1d; }
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="crt"] body::after { animation: none; }
+}
 [data-theme="crt"] .topbar-logo em,
 [data-theme="crt"] .boot-closer,
 [data-theme="crt"] .article-body h3.content-heading {
