@@ -2445,7 +2445,7 @@ body::after {
     </nav>
 
     <div class="topbar-end">
-      <button id="theme-btn" aria-label="Toggle CRT phosphor theme"><span class="theme-icon">◐</span><span>CRT</span></button>
+      <button id="theme-btn" aria-label="Switch to CRT phosphor theme"><span class="theme-icon">◐</span><span class="theme-label">CRT</span></button>
       <button id="panic-btn" aria-label="Open Panic Mode">
         <span class="panic-icon">⚠</span>
         <span>PANIC</span>
@@ -8777,20 +8777,21 @@ function applyTheme(name) {
   document.documentElement.dataset.theme = name;
   try { localStorage.setItem("yddnw_theme", name); } catch (e) {}
   const b = document.getElementById("theme-btn");
-  if (b) b.classList.toggle("on", name === "crt");
+  if (b) {
+    b.classList.toggle("on", name === "crt");
+    const label = b.querySelector(".theme-label");
+    if (label) label.textContent = name === "crt" ? "MILITAIRE" : "CRT";
+    b.setAttribute("aria-label", name === "crt" ? "Switch to military theme" : "Switch to CRT phosphor theme");
+  }
 }
 function initTheme() {
   let t = "amber";
   try { t = localStorage.getItem("yddnw_theme") || "amber"; } catch (e) {}
   if (t !== "crt") t = "amber";
-  document.documentElement.dataset.theme = t;
-  const b = document.getElementById("theme-btn");
-  if (b) {
-    b.classList.toggle("on", t === "crt");
-    b.addEventListener("click", () => {
-      applyTheme(document.documentElement.dataset.theme === "crt" ? "amber" : "crt");
-    });
-  }
+  applyTheme(t);
+  document.getElementById("theme-btn")?.addEventListener("click", () => {
+    applyTheme(document.documentElement.dataset.theme === "crt" ? "amber" : "crt");
+  });
 }
 
 function runBootSequence() {
