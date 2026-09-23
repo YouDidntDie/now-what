@@ -886,14 +886,10 @@ body::after {
   .topbar-logo { font-size: 14px; }
   .nav-tab { padding: 5px 8px; font-size: 9px; }
   .article-title { font-size: 26px; }
-  /* Keep the topbar actions on-screen: drop the wordmark (drawer has it),
-     hide status text, icon-only action buttons */
+  /* Mobile: nav lives in the drawer; topbar keeps menu + action buttons */
   #topbar { gap: 6px; padding: 0 8px; overflow: hidden; }
-  .topbar-logo, .topbar-rule { display: none; }
+  .topbar-logo, .topbar-rule, .topbar-tabs { display: none; }
   .topbar-end { flex-shrink: 0; margin-left: auto; }
-  .status-text { display: none; }
-  #theme-btn span:last-child, #panic-btn span:last-child { display: none; }
-  #theme-btn, #panic-btn { padding: 4px 8px; margin-left: 0; }
 }
 
 /* ── Article content formatting ─────────────────────────────────────────── */
