@@ -5,40 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>You Didn't Die, Now What? — Survival Encyclopedia</title>
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#0a0e0a">
+  <meta name="theme-color" content="#060806">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="YouDidntDie">  <style>
 /* ═══════════════════════════════════════════════════════════════════════════
    YOU DIDN'T DIE, NOW WHAT? — Survival Encyclopedia
-   Design: expedition terminal  ·  not retro-futuristic, not military HUD
-   Palette: deep forest · muted charcoal · warm amber · off-white
+   Design: phosphor terminal  ·  monochrome, user-chosen phosphor color
+   Palette: black · phosphor (green/amber/white/cyan/orange/red) · red reserved for alerts
    Fonts: Barlow Condensed (headings) · IBM Plex Sans (body) · IBM Plex Mono (UI chrome)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Tokens ─────────────────────────────────────────────────────────────── */
 :root {
-  --bg:          #171b15;
-  --bg2:         #1d2219;
-  --bg3:         #242b1f;
-  --bg4:         #2b3226;
-  --bg5:         #333b2d;
-  --border:      #343c2e;
-  --border2:     #45503c;
-  --text:        #c2b99e;
-  --text-dim:    #7a7060;
-  --text-faint:  #4a4840;
-  --amber:       #bf7e1c;
-  --amber-lt:    #d49630;
-  --amber-pale:  rgba(191,126,28,.10);
-  --amber-dk:    #7a4e0a;
-  --green:       #4a7842;
-  --green-lt:    #65965a;
-  --green-pale:  rgba(74,120,66,.14);
-  --red:         #884040;
-  --red-lt:      #b25656;
-  --red-pale:    rgba(136,64,64,.14);
-  --white:       #e8e0ce;
+  /* Phosphor terminal: one hue, chosen by the user. Everything derives
+     from --phosphor via color-mix; only --red stays independent (alerts). */
+  --phosphor:    #00ff41;
+  --bg:          #060806;
+  --bg2:         color-mix(in srgb, var(--phosphor) 6%,  #060806);
+  --bg3:         color-mix(in srgb, var(--phosphor) 10%, #060806);
+  --bg4:         color-mix(in srgb, var(--phosphor) 14%, #060806);
+  --bg5:         color-mix(in srgb, var(--phosphor) 19%, #060806);
+  --border:      color-mix(in srgb, var(--phosphor) 22%, #060806);
+  --border2:     color-mix(in srgb, var(--phosphor) 38%, #060806);
+  --text:        var(--phosphor);
+  --text-dim:    color-mix(in srgb, var(--phosphor) 72%, black);
+  --text-faint:  color-mix(in srgb, var(--phosphor) 45%, black);
+  --amber:       color-mix(in srgb, var(--phosphor) 78%, white);
+  --amber-lt:    color-mix(in srgb, var(--phosphor) 58%, white);
+  --amber-pale:  color-mix(in srgb, var(--phosphor) 10%, transparent);
+  --amber-dk:    color-mix(in srgb, var(--phosphor) 55%, black);
+  --green:       color-mix(in srgb, var(--phosphor) 85%, black);
+  --green-lt:    color-mix(in srgb, var(--phosphor) 65%, white);
+  --green-pale:  color-mix(in srgb, var(--phosphor) 12%, transparent);
+  --red:         #a02020;
+  --red-lt:      #ff6b6b;
+  --red-pale:    rgba(255,80,80,.14);
+  --white:       color-mix(in srgb, var(--phosphor) 85%, white);
 
   --topbar-h:    48px;
   --drawer-w:    272px;
@@ -51,43 +54,19 @@
   --font-m: ui-monospace, 'Cascadia Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
-/* ── CRT theme (green phosphor, pre-Claude homage) ────────────────────────
-   Opt-in via the topbar toggle. Default theme stays untouched. */
-[data-theme="crt"] {
-  --bg:          #0a0e27;
-  --bg2:         #0e1533;
-  --bg3:         #142052;
-  --bg4:         #1a2847;
-  --bg5:         #22325a;
-  --border:      #1e4a2a;
-  --border2:     #2a6a3a;
-  --text:        #00ff41;
-  --text-dim:    #00c833;
-  --text-faint:  #007a26;
-  --amber:       #ff6b35;
-  --amber-lt:    #ff8c5a;
-  --amber-pale:  rgba(255,107,53,.10);
-  --amber-dk:    #a03d12;
-  --green:       #00d838;
-  --green-lt:    #4dff7c;
-  --green-pale:  rgba(0,255,65,.12);
-  --red:         #a02020;
-  --red-lt:      #ff6b6b;
-  --red-pale:    rgba(255,80,80,.14);
-  --white:       #d6ffe0;
-}
-[data-theme="crt"] body::after {
+/* ── Phosphor terminal overlays (always on) ───────────────────────────── */
+body::after {
   content: ""; position: fixed; inset: 0; z-index: 20001; pointer-events: none;
   background:
     linear-gradient(to bottom,
-      transparent 0%, rgba(0,255,65,.035) 46%,
-      rgba(0,255,65,.07) 50%, rgba(0,255,65,.035) 54%, transparent 100%),
+      transparent 0%, color-mix(in srgb, var(--phosphor) 8%, transparent) 46%,
+      color-mix(in srgb, var(--phosphor) 16%, transparent) 50%, color-mix(in srgb, var(--phosphor) 8%, transparent) 54%, transparent 100%),
     repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px);
   background-size: 100% 140px, auto;
   animation: crt-roll 9s linear infinite, crt-flicker 4s steps(12) infinite;
 }
 /* Vignette: curved-tube darkness at the edges */
-[data-theme="crt"] body::before {
+body::before {
   content: ""; position: fixed; inset: 0; z-index: 20002; pointer-events: none;
   background: radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,.42) 100%);
 }
@@ -100,31 +79,31 @@
   50%      { opacity: .96; }
 }
 /* Phosphor bloom on text */
-[data-theme="crt"] #screen,
-[data-theme="crt"] .drawer-body,
-[data-theme="crt"] .article-body,
-[data-theme="crt"] .boot-term {
-  text-shadow: 0 0 7px rgba(0,255,65,.30);
+#screen,
+.drawer-body,
+.article-body,
+.boot-term {
+  text-shadow: 0 0 7px color-mix(in srgb, var(--phosphor) 30%, transparent);
 }
-[data-theme="crt"] #boot-overlay { background: #070b1d; }
+
 @media (prefers-reduced-motion: reduce) {
-  [data-theme="crt"] body::after { animation: none; }
+  body::after { animation: none; }
 }
-[data-theme="crt"] .topbar-logo em,
-[data-theme="crt"] .boot-closer,
-[data-theme="crt"] .article-body h3.content-heading {
-  text-shadow: 0 0 12px rgba(255,140,90,.55);
+.topbar-logo em,
+.boot-closer,
+.article-body h3.content-heading {
+  text-shadow: 0 0 12px color-mix(in srgb, var(--phosphor) 55%, transparent);
 }
-#theme-btn {
-  display: flex; align-items: center; gap: 5px;
-  padding: 4px 10px; margin-left: 8px;
-  font-family: var(--font-m); font-size: 10px; letter-spacing: .12em;
-  color: var(--text-faint);
-  background: transparent; border: 1px solid var(--border2);
-  border-radius: var(--radius); cursor: pointer;
+/* Phosphor picker (drawer) */
+.phosphor-row { display: flex; gap: 10px; padding: 8px 16px 14px; flex-wrap: wrap; }
+.phosphor-swatch {
+  width: 26px; height: 26px; border-radius: 50%; padding: 0;
+  background: var(--c); border: 2px solid var(--border2);
+  box-shadow: 0 0 10px var(--c); cursor: pointer;
+  transition: transform 160ms, border-color 160ms;
 }
-#theme-btn.on { color: var(--green-lt); border-color: var(--green); }
-#theme-btn .theme-icon { font-size: 11px; }
+.phosphor-swatch:hover { transform: scale(1.15); }
+.phosphor-swatch.active { border-color: #fff; }
 
 /* ── Reset ──────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -978,7 +957,7 @@ body::after {
 /* ── Boot sequence overlay ─────────────────────────────────────────────── */
 #boot-overlay {
   position: fixed; inset: 0; z-index: 20000;
-  background: #10130e;
+  background: #050705;
   display: flex; align-items: center; justify-content: center;
   padding: 24px;
   cursor: pointer;
@@ -2419,7 +2398,17 @@ body::after {
       <div class="drawer-item" data-nav="profile">
         <span class="di">◉</span> Profile
       </div>
-      
+
+      <div class="drawer-section">Phosphor</div>
+      <div class="phosphor-row">
+        <button class="phosphor-swatch" data-color="#00ff41" style="--c:#00ff41" aria-label="Green phosphor"></button>
+        <button class="phosphor-swatch" data-color="#ffb000" style="--c:#ffb000" aria-label="Amber phosphor"></button>
+        <button class="phosphor-swatch" data-color="#e8f0e8" style="--c:#e8f0e8" aria-label="White phosphor"></button>
+        <button class="phosphor-swatch" data-color="#33ddff" style="--c:#33ddff" aria-label="Cyan phosphor"></button>
+        <button class="phosphor-swatch" data-color="#ff8c2e" style="--c:#ff8c2e" aria-label="Orange phosphor"></button>
+        <button class="phosphor-swatch" data-color="#ff4444" style="--c:#ff4444" aria-label="Red phosphor"></button>
+      </div>
+
     </div>
   </nav>
 
@@ -2445,7 +2434,6 @@ body::after {
     </nav>
 
     <div class="topbar-end">
-      <button id="theme-btn" aria-label="Switch to CRT phosphor theme"><span class="theme-icon">◐</span><span class="theme-label">CRT</span></button>
       <button id="panic-btn" aria-label="Open Panic Mode">
         <span class="panic-icon">⚠</span>
         <span>PANIC</span>
@@ -8772,26 +8760,20 @@ function updateHeader() {
 // (bible §13). Full sequence on first visit, short version on repeat
 // visits within the session. Click/keypress skips. Honors
 // prefers-reduced-motion. Never traps the user: hard fallback at 15s.
-// ── Theme: default amber vs opt-in CRT phosphor ────────────────────────────
-function applyTheme(name) {
-  document.documentElement.dataset.theme = name;
-  try { localStorage.setItem("yddnw_theme", name); } catch (e) {}
-  const b = document.getElementById("theme-btn");
-  if (b) {
-    b.classList.toggle("on", name === "crt");
-    const label = b.querySelector(".theme-label");
-    if (label) label.textContent = name === "crt" ? "MILITAIRE" : "CRT";
-    b.setAttribute("aria-label", name === "crt" ? "Switch to military theme" : "Switch to CRT phosphor theme");
-  }
+// ── Phosphor: single monochrome hue for the whole terminal, user-chosen ────
+function setPhosphor(hex) {
+  document.documentElement.style.setProperty("--phosphor", hex);
+  try { localStorage.setItem("yddnw_phosphor", hex); } catch (e) {}
+  document.querySelectorAll(".phosphor-swatch").forEach(s =>
+    s.classList.toggle("active", s.dataset.color.toLowerCase() === hex.toLowerCase()));
 }
-function initTheme() {
-  let t = "amber";
-  try { t = localStorage.getItem("yddnw_theme") || "amber"; } catch (e) {}
-  if (t !== "crt") t = "amber";
-  applyTheme(t);
-  document.getElementById("theme-btn")?.addEventListener("click", () => {
-    applyTheme(document.documentElement.dataset.theme === "crt" ? "amber" : "crt");
-  });
+function initPhosphor() {
+  let p = "#00ff41";
+  try { p = localStorage.getItem("yddnw_phosphor") || p; } catch (e) {}
+  if (!/^#[0-9a-f]{6}$/i.test(p)) p = "#00ff41";
+  setPhosphor(p);
+  document.querySelectorAll(".phosphor-swatch").forEach(s =>
+    s.addEventListener("click", () => setPhosphor(s.dataset.color)));
 }
 
 function runBootSequence() {
@@ -9847,7 +9829,7 @@ function initPanicMode() {
   });
 }
 
-initTheme();
+initPhosphor();
 runBootSequence();
 init();
 initPanicMode();
