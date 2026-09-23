@@ -51,6 +51,52 @@
   --font-m: ui-monospace, 'Cascadia Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
+/* ── CRT theme (green phosphor, pre-Claude homage) ────────────────────────
+   Opt-in via the topbar toggle. Default theme stays untouched. */
+[data-theme="crt"] {
+  --bg:          #0a0e27;
+  --bg2:         #0e1533;
+  --bg3:         #142052;
+  --bg4:         #1a2847;
+  --bg5:         #22325a;
+  --border:      #1e4a2a;
+  --border2:     #2a6a3a;
+  --text:        #00ff41;
+  --text-dim:    #00c833;
+  --text-faint:  #007a26;
+  --amber:       #ff6b35;
+  --amber-lt:    #ff8c5a;
+  --amber-pale:  rgba(255,107,53,.10);
+  --amber-dk:    #a03d12;
+  --green:       #00d838;
+  --green-lt:    #4dff7c;
+  --green-pale:  rgba(0,255,65,.12);
+  --red:         #a02020;
+  --red-lt:      #ff6b6b;
+  --red-pale:    rgba(255,80,80,.14);
+  --white:       #d6ffe0;
+}
+[data-theme="crt"] body::after {
+  content: ""; position: fixed; inset: 0; z-index: 19999; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px);
+}
+[data-theme="crt"] .boot-term { text-shadow: 0 0 8px rgba(0,255,65,.35); }
+[data-theme="crt"] .topbar-logo em,
+[data-theme="crt"] .boot-closer,
+[data-theme="crt"] .article-body h3.content-heading {
+  text-shadow: 0 0 12px rgba(255,140,90,.55);
+}
+#theme-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; margin-left: 8px;
+  font-family: var(--font-m); font-size: 10px; letter-spacing: .12em;
+  color: var(--text-faint);
+  background: transparent; border: 1px solid var(--border2);
+  border-radius: var(--radius); cursor: pointer;
+}
+#theme-btn.on { color: var(--green-lt); border-color: var(--green); }
+#theme-btn .theme-icon { font-size: 11px; }
+
 /* ── Reset ──────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -2366,6 +2412,7 @@ body::after {
     </nav>
 
     <div class="topbar-end">
+      <button id="theme-btn" aria-label="Toggle CRT phosphor theme"><span class="theme-icon">◐</span><span>CRT</span></button>
       <button id="panic-btn" aria-label="Open Panic Mode">
         <span class="panic-icon">⚠</span>
         <span>PANIC</span>
@@ -8692,6 +8739,27 @@ function updateHeader() {
 // (bible §13). Full sequence on first visit, short version on repeat
 // visits within the session. Click/keypress skips. Honors
 // prefers-reduced-motion. Never traps the user: hard fallback at 15s.
+// ── Theme: default amber vs opt-in CRT phosphor ────────────────────────────
+function applyTheme(name) {
+  document.documentElement.dataset.theme = name;
+  try { localStorage.setItem("yddnw_theme", name); } catch (e) {}
+  const b = document.getElementById("theme-btn");
+  if (b) b.classList.toggle("on", name === "crt");
+}
+function initTheme() {
+  let t = "amber";
+  try { t = localStorage.getItem("yddnw_theme") || "amber"; } catch (e) {}
+  if (t !== "crt") t = "amber";
+  document.documentElement.dataset.theme = t;
+  const b = document.getElementById("theme-btn");
+  if (b) {
+    b.classList.toggle("on", t === "crt");
+    b.addEventListener("click", () => {
+      applyTheme(document.documentElement.dataset.theme === "crt" ? "amber" : "crt");
+    });
+  }
+}
+
 function runBootSequence() {
   const overlay = document.getElementById("boot-overlay");
   if (!overlay) return;
@@ -9745,6 +9813,7 @@ function initPanicMode() {
   });
 }
 
+initTheme();
 runBootSequence();
 init();
 initPanicMode();
