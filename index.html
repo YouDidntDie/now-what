@@ -896,6 +896,40 @@ body::after {
 }
 .article-body ul ul.content-list { margin: .4em 0 .2em; }
 
+/* ── Boot sequence overlay ─────────────────────────────────────────────── */
+#boot-overlay {
+  position: fixed; inset: 0; z-index: 20000;
+  background: #10130e;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  cursor: pointer;
+  transition: opacity .6s ease;
+}
+#boot-overlay.boot-done { opacity: 0; pointer-events: none; }
+.boot-term {
+  width: min(620px, 100%);
+  font-family: var(--font-m);
+  font-size: 13px; line-height: 1.9;
+  color: var(--text-dim);
+  user-select: none; -webkit-user-select: none;
+}
+.boot-line { white-space: pre-wrap; overflow-wrap: break-word; }
+.boot-line .st-ok   { color: var(--green-lt); }
+.boot-line .st-fail { color: var(--red-lt); }
+.boot-line .st-warn { color: var(--amber-lt); }
+.boot-head   { color: var(--text-faint); }
+.boot-closer { color: var(--amber-lt); font-weight: 700; margin-top: 1em; }
+.boot-sub    { color: var(--text); }
+.boot-prompt {
+  margin-top: 1.6em; color: var(--text-faint);
+  animation: boot-blink 1.2s steps(2) infinite;
+}
+@keyframes boot-blink { 50% { opacity: .25; } }
+.boot-cursor::after {
+  content: "\258c"; color: var(--amber);
+  animation: boot-blink 1s steps(2) infinite;
+}
+
 /* ── Gear card updates for real data ────────────────────────────────────── */
 .gear-tags {
   display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
@@ -2221,6 +2255,14 @@ body::after {
 </style>
 </head>
 <body>
+
+  <!-- ── Boot sequence overlay ─────────────────────────────────────────── -->
+  <div id="boot-overlay" role="status" aria-label="Loading You Didn't Die, Now What?">
+    <div class="boot-term">
+      <div id="boot-lines"></div>
+      <div id="boot-prompt" class="boot-prompt" hidden>[ click anywhere to continue ]<span class="boot-cursor"></span></div>
+    </div>
+  </div>
 
   <!-- ── PWA: Offline indicator ──────────────────────────────────────────── -->
   <div id="offline-badge" style="display:none">
@@ -8623,6 +8665,106 @@ function updateHeader() {
   if (title) { const el = document.getElementById("site-title"); if (el) el.textContent = title; }
 }
 
+// ── Boot sequence ─────────────────────────────────────────────────────────
+// Absurd-toned loading screen in the guide's survival-corporate voice
+// (bible §13). Full sequence on first visit, short version on repeat
+// visits within the session. Click/keypress skips. Honors
+// prefers-reduced-motion. Never traps the user: hard fallback at 15s.
+function runBootSequence() {
+  const overlay = document.getElementById("boot-overlay");
+  if (!overlay) return;
+  const linesEl = document.getElementById("boot-lines");
+  const promptEl = document.getElementById("boot-prompt");
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const FULL = [
+    ["head", "YDDNW FIELD OS v2.6.1 \u2014 \u201cmorning after\u201d build"],
+    ["head", "(c) You Didn't Die Systems \u00b7 all rights reserved \u00b7 most of them"],
+    ["blank"],
+    ["line", "mounting optimism", "NOT FOUND", "fail"],
+    ["line", "loading regrets_final_FINAL_v3.zip", "OK (3.2 GB)", "ok"],
+    ["line", "calibrating will_to_live", "7%", "warn"],
+    ["line", "locating nearest exit", "TIMEOUT", "fail"],
+    ["line", "importing survival_instincts", "CORRUPTED \u2014 substituting sarcasm", "warn"],
+    ["line", "brewing coffee", "FAILED (no water, no power, no beans)", "fail"],
+    ["line", "downloading hope", "404", "fail"],
+    ["line", "unpacking trauma", "OK (do not open)", "ok"],
+    ["line", "checking vital signs", "present. good enough.", "ok"],
+    ["line", "syncing excuses", "12,408 found", "warn"],
+    ["line", "defragmenting denial", "OK", "ok"],
+    ["line", "patching dignity", "SKIPPED BY USER", "warn"],
+    ["line", "locating clean water", "you'll learn how. that's the point.", "ok"],
+    ["blank"],
+    ["closer", "CONGRATULATIONS. SOMETHING WENT CATASTROPHICALLY WRONG."],
+    ["sub", "Here's what you need to do next."]
+  ];
+  const QUICK = [
+    ["head", "YDDNW FIELD OS v2.6.1 \u2014 welcome back"],
+    ["blank"],
+    ["line", "resuming denial", "OK", "ok"],
+    ["line", "will_to_live", "still 7%", "warn"],
+    ["line", "coffee", "still none", "fail"],
+    ["blank"],
+    ["closer", "BACK AGAIN, HUH. GOOD. YOU'LL NEED IT."]
+  ];
+
+  let seq;
+  try { seq = sessionStorage.getItem("yddnw_booted") ? QUICK : FULL; }
+  catch (e) { seq = FULL; }
+
+  const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const renderLine = (spec) => {
+    const div = document.createElement("div");
+    const kind = spec[0];
+    if (kind === "blank") { div.className = "boot-line"; div.innerHTML = "&nbsp;"; }
+    else if (kind === "line") {
+      const label = spec[1], status = spec[2], cls = spec[3];
+      const dots = ".".repeat(Math.max(2, 42 - label.length));
+      div.className = "boot-line";
+      div.innerHTML = esc("> " + label + " " + dots + " ") + '<span class="st-' + cls + '">' + esc(status) + "</span>";
+    } else {
+      div.className = "boot-line boot-" + kind;
+      div.textContent = spec[1];
+    }
+    linesEl.appendChild(div);
+  };
+
+  let idx = 0, finished = false, timer = null;
+  document.body.style.overflow = "hidden";
+
+  const showPrompt = () => {
+    if (finished) return;
+    finished = true;
+    if (timer) clearTimeout(timer);
+    promptEl.hidden = false;
+    try { sessionStorage.setItem("yddnw_booted", "1"); } catch (e) {}
+  };
+  const dismiss = () => {
+    if (!overlay.parentNode) return;
+    if (timer) clearTimeout(timer);
+    overlay.classList.add("boot-done");
+    document.body.style.overflow = "";
+    setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 700);
+  };
+  const step = () => {
+    if (finished) return;
+    if (idx >= seq.length) { showPrompt(); return; }
+    renderLine(seq[idx++]);
+    timer = setTimeout(step, 200 + Math.random() * 200);
+  };
+
+  overlay.addEventListener("click", () => { finished ? dismiss() : showPrompt(); });
+  document.addEventListener("keydown", function onKey() {
+    if (!document.getElementById("boot-overlay")) { document.removeEventListener("keydown", onKey); return; }
+    finished ? dismiss() : showPrompt();
+  });
+  // Hard fallback: never trap the user on a loading screen.
+  setTimeout(dismiss, 15000);
+
+  if (reduceMotion) { seq.forEach(renderLine); showPrompt(); }
+  else step();
+}
+
 async function init() {
   document.getElementById("menu-btn").addEventListener("click", openDrawer);
   overlay().addEventListener("click", closeDrawer);
@@ -9588,6 +9730,7 @@ function initPanicMode() {
   });
 }
 
+runBootSequence();
 init();
 initPanicMode();
 
