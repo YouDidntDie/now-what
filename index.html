@@ -8685,6 +8685,7 @@ function closeDrawer() { store.ui.drawerOpen = false; drawer().classList.remove(
 
 function goTo(screenName, opts = {}) {
   store.ui.activeScreen = screenName;
+  try { localStorage.setItem("yddnw_last_screen", screenName); } catch (e) {}
   tabBtns().forEach(b => b.classList.toggle("active", b.dataset.screen === screenName));
   document.querySelectorAll("[data-nav]").forEach(el =>
     el.classList.toggle("drawer-active", el.dataset.nav === screenName && !el.dataset.domain)
@@ -8875,7 +8876,17 @@ async function init() {
   });
 
   buildDrawer();
-  goTo("simulator");
+  // Entry flow (bible §52, revised 2026-09-23): first visit lands on Learning
+  // for orientation; return visits resume where the user left off, defaulting
+  // to the simulator once they have basics. PANIC stays one tap away, always.
+  let entry = "learning";
+  try {
+    if (localStorage.getItem("yddnw_visited"))
+      entry = localStorage.getItem("yddnw_last_screen") || "simulator";
+    localStorage.setItem("yddnw_visited", "1");
+  } catch (e) {}
+  const validEntry = ["simulator","learning","encyclopedia","atlas","store","profile"];
+  goTo(validEntry.includes(entry) ? entry : "learning");
 
   try {
     const manifest = await loadManifest();
