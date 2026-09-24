@@ -1500,6 +1500,22 @@ body::after {
 .learn-xp-num { font-family: var(--font-d); font-size: 36px; font-weight: 800; color: var(--green-lt); }
 .learn-xp-lbl { font-family: var(--font-m); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--green); margin-top: 2px; }
 
+/* Achievement / info toast (bottom overlay) */
+.badge-toast {
+  position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%) translateY(16px);
+  display: flex; align-items: center; gap: 12px; max-width: min(420px, calc(100vw - 32px));
+  background: #0a0f0a; border: 1px solid var(--green); border-radius: var(--radius);
+  padding: 12px 16px; z-index: 9999; opacity: 0; pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease;
+  box-shadow: 0 0 18px rgba(0,0,0,.8), 0 0 6px var(--green-dk);
+}
+.badge-toast.bt-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+.bt-icon { font-size: 28px; line-height: 1; }
+.bt-body { min-width: 0; }
+.bt-title { font-family: var(--font-m); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--green); }
+.bt-name { font-family: var(--font-d); font-size: 16px; font-weight: 700; color: var(--green-lt); margin-top: 2px; }
+.bt-desc { font-size: 12px; color: var(--green); opacity: .85; margin-top: 2px; }
+
 /* Article link inside lesson */
 .learn-article-link {
   display: flex; align-items: center; gap: 10px;
@@ -14950,7 +14966,7 @@ function renderBadges(char) {
 }
 
 // ── Show badge toast notification ────────────────────────────────────────────
-function showBadgeToast(badge) {
+function showInfoToast(icon, title, name, desc, ms = 4000) {
   const existing = document.getElementById("badge-toast");
   if (existing) existing.remove();
 
@@ -14958,22 +14974,26 @@ function showBadgeToast(badge) {
   toast.id = "badge-toast";
   toast.className = "badge-toast";
   toast.innerHTML = `
-    <div class="bt-icon">${badge.icon}</div>
+    <div class="bt-icon">${icon}</div>
     <div class="bt-body">
-      <div class="bt-title">Achievement Unlocked</div>
-      <div class="bt-name">${badge.name}</div>
-      <div class="bt-desc">${badge.desc}</div>
+      <div class="bt-title">${title}</div>
+      <div class="bt-name">${name}</div>
+      ${desc ? `<div class="bt-desc">${desc}</div>` : ""}
     </div>`;
   document.body.appendChild(toast);
 
   // Animate in
   requestAnimationFrame(() => toast.classList.add("bt-visible"));
 
-  // Auto dismiss after 4s
+  // Auto dismiss
   setTimeout(() => {
     toast.classList.remove("bt-visible");
     setTimeout(() => toast.remove(), 400);
-  }, 4000);
+  }, ms);
+}
+
+function showBadgeToast(badge) {
+  showInfoToast(badge.icon, "Achievement Unlocked", badge.name, badge.desc);
 }
 
 // PROFILE SCREEN — Tactical Dossier + RPG Operator Sheet
@@ -16491,7 +16511,7 @@ async function init() {
   document.addEventListener("nav:goto", e => {
     const d = e.detail;
     if (typeof d === "string") goTo(d);
-    else goTo(d.screen, { domainId: d.domainId });
+    else goTo(d.screen, { domainId: d.domainId, articleId: d.articleId });
   });
 
   buildDrawer();
@@ -17250,6 +17270,17 @@ function renderLearning(root) {
       if (skill) openSkillLessons(root, skill, state);
     });
   });
+
+  // Locked cards: explain the requirement instead of silently ignoring the tap
+  root.querySelectorAll(".learn-skill-card.locked-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const skill = LEARN_SKILLS.find(s => s.id === card.dataset.skill);
+      showInfoToast("🔒", "Skill Locked",
+        skill ? skill.name : "Locked skill",
+        skill ? `Reach level ${skill.unlock_gate} to unlock this skill.` : "Reach a higher level to unlock this skill.",
+        2600);
+    });
+  });
 }
 
 function openSkillLessons(root, skill, state) {
@@ -17355,8 +17386,13 @@ function renderLesson(lessonView, skill, lesson, state, onBack) {
 
     const doneBtn = lessonView.querySelector("#learn-done");
     if (doneBtn) {
+      // Mutable guard: after "Mark Complete" the same button becomes
+      // "← Back to Skills" with a second listener — without this, that
+      // second click would re-run the grant (double XP).
+      let granted = alreadyDone;
       doneBtn.addEventListener("click", () => {
-        if (!alreadyDone) {
+        if (!granted) {
+          granted = true;
           // Award XP and save
           state.completedLessons[lesson.id] = lesson.xp;
           state.skillXp[skill.id] = (state.skillXp[skill.id] || 0) + lesson.xp;
