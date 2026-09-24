@@ -714,6 +714,17 @@ body::after {
 .enc-select option { background: var(--bg2); }
 
 .domain-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 22px; }
+/* Mobile: 32 domain chips become a horizontal scroll strip instead of a
+   wrapping wall — guarantees no mid-text clipping at narrow widths. */
+@media (max-width: 560px) {
+  .domain-chips {
+    flex-wrap: nowrap; overflow-x: auto; margin-bottom: 16px;
+    padding-bottom: 6px; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .domain-chips::-webkit-scrollbar { display: none; }
+  .domain-chips .chip { flex-shrink: 0; }
+}
 
 .article-grid {
   display: grid;
@@ -1830,6 +1841,11 @@ body::after {
   width: 100%;
 }
 .btn-danger:hover { background: var(--red-pale); }
+.btn-danger.armed {
+  background: var(--red); color: #0a0a0a; font-weight: 700;
+  animation: danger-pulse 1s ease-in-out infinite;
+}
+@keyframes danger-pulse { 0%,100% { opacity: 1; } 50% { opacity: .65; } }
 .reset-hint { font-size: 11px; color: var(--text-faint); margin-top: 6px; }
 
 /* legacy compat */
@@ -15249,10 +15265,38 @@ function renderProfile(root) {
   );
 
   root.querySelector("#btn-orientation").addEventListener("click", () => window.showOnboarding(0));
-  root.querySelector("#btn-reset").addEventListener("click", () => {
-    if (confirm("Reset all operator progress? This cannot be undone.")) {
-      resetCharacter(); refreshChar(); renderProfile(root);
+  // Two-tap arm-and-confirm: native confirm() is unreliable (suppressed in
+  // some webviews/automation), so the button arms on first tap and executes
+  // on the second. Wipes all progress keys; keeps display prefs (phosphor,
+  // collapsed sections).
+  const resetBtn = root.querySelector("#btn-reset");
+  let resetArmed = false, resetTimer = null;
+  const disarmReset = () => {
+    resetArmed = false;
+    resetBtn.textContent = "Reset Operator";
+    resetBtn.classList.remove("armed");
+  };
+  resetBtn.addEventListener("click", () => {
+    if (!resetArmed) {
+      resetArmed = true;
+      resetBtn.textContent = "⚠ Tap again to erase everything";
+      resetBtn.classList.add("armed");
+      showInfoToast("⚠", "Reset Operator",
+        "This permanently erases all progress, lessons, achievements and gear.",
+        "Tap the button again to confirm.", 4000);
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(disarmReset, 8000);
+      return;
     }
+    clearTimeout(resetTimer);
+    try {
+      [SAVE_KEY, BADGE_SAVE_KEY, LEARN_SAVE_KEY, ONBOARD_KEY, "yddnw_visited", "yddnw_last_screen"]
+        .forEach(k => localStorage.removeItem(k));
+    } catch(e) {}
+    disarmReset();
+    refreshChar();
+    renderProfile(root);
+    showInfoToast("♻", "Operator Reset", "Fresh start.", "Your next visit begins on Learning with orientation.", 4000);
   });
 
   root.querySelectorAll(".phase-row").forEach(row =>
