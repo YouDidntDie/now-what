@@ -2265,6 +2265,30 @@ body::after {
   flex-shrink: 0;
 }
 
+/* Atlas search */
+.atlas-search-wrap { margin: 0 0 14px; }
+.atlas-search-wrap .enc-input { width: 100%; box-sizing: border-box; }
+.atlas-search-results { display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; }
+.atlas-search-count {
+  font-family: var(--font-m); font-size: 10px; color: var(--text-faint);
+  letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px;
+}
+
+/* Related encyclopedia articles (region detail) */
+.atlas-related-item {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 10px 12px; margin-bottom: 6px;
+  background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; text-align: left;
+  transition: border-color var(--speed), background var(--speed);
+}
+.atlas-related-item:hover { border-color: var(--amber); background: var(--bg2); }
+.atlas-related-body { flex: 1; }
+.atlas-related-title { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+.atlas-related-meta { font-family: var(--font-m); font-size: 10px; color: var(--text-faint); }
+.atlas-related-arrow { color: var(--text-faint); font-size: 16px; transition: color var(--speed); }
+.atlas-related-item:hover .atlas-related-arrow { color: var(--amber); }
+
 /* Location detail page */
 .atlas-detail-page {
   max-width: 780px; margin: 0 auto; padding: 26px 24px 80px;
@@ -15722,6 +15746,9 @@ function renderContinentGrid(root) {
       <h2 class="screen-title" style="margin-bottom:6px">World Atlas</h2>
       <p class="atlas-intro">Select a continent to explore survival conditions by country and region.</p>
 
+      ${atlasSearchBoxHTML()}
+
+      <div id="atlas-normal">
       <!-- SVG World Map -->
       <div class="atlas-map-wrap">
         <svg class="atlas-map-svg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" aria-label="World map — select a continent">
@@ -15765,7 +15792,10 @@ function renderContinentGrid(root) {
       <!-- Continent card grid (always visible, touch-friendly fallback) -->
       <div class="atlas-map-section-label">— or select below —</div>
       <div class="atlas-continent-grid">${cards}</div>
+      </div><!-- /#atlas-normal -->
     </div>`;
+
+  bindAtlasSearch(root, "#atlas-normal");
 
   // Wire SVG continent clicks
   root.querySelectorAll(".atlas-map-cont.amc-ready").forEach(g => {
@@ -15834,10 +15864,14 @@ function renderCountryList(root) {
             ${continent.general_threats.map(t => `<div class="atlas-threat-item">${t}</div>`).join("")}
           </div>
         </div>` : ""}
+      ${atlasSearchBoxHTML()}
+      <div id="atlas-normal">
       <div class="atlas-list">${items || '<div class="enc-empty">No countries mapped yet</div>'}</div>
+      </div>
     </div>`;
 
   bindBreadcrumb(root);
+  bindAtlasSearch(root, "#atlas-normal");
   root.querySelectorAll(".atlas-list-item").forEach(btn => {
     btn.addEventListener("click", () => {
       const country = continent.countries.find(c => c.id === btn.dataset.cid);
@@ -15867,10 +15901,14 @@ function renderRegionList(root) {
       <div class="screen-eyebrow">${atlasState.stack[0].ref.icon} ${atlasState.stack[0].name}</div>
       <h2 class="screen-title" style="margin-bottom:6px">${country.name}</h2>
       <div class="atlas-climate-tag" style="margin-bottom:20px">${country.climate || ""}</div>
+      ${atlasSearchBoxHTML()}
+      <div id="atlas-normal">
       <div class="atlas-list" style="margin-top:16px">${items || '<div class="enc-empty">No regions mapped yet</div>'}</div>
+      </div>
     </div>`;
 
   bindBreadcrumb(root);
+  bindAtlasSearch(root, "#atlas-normal");
   root.querySelectorAll(".atlas-list-item").forEach(btn => {
     btn.addEventListener("click", () => {
       const region = country.regions.find(r => r.id === btn.dataset.rid);
@@ -16011,10 +16049,14 @@ function renderRegionDetail(root) {
               </div>`).join("")}
           </div>
         </div>` : ""}
+      ${atlasRelatedHTML(region)}
     </div>`;
 
   bindBreadcrumb(root);
   bindAtlasSections(root);
+  root.querySelectorAll(".atlas-related-item").forEach(btn => {
+    btn.addEventListener("click", () => goTo("encyclopedia", { articleId: btn.dataset.article }));
+  });
 }
 
 // ── Section helper ──────────────────────────────────────────────────────────
@@ -16043,6 +16085,169 @@ function bindAtlasSections(root) {
       if (tog) tog.textContent = collapsed ? "▸" : "▾";
     });
   });
+}
+
+// ── Atlas search (flat results across continents → countries → regions → cities) ──
+
+function atlasSearchBoxHTML() {
+  return `
+    <div class="atlas-search-wrap">
+      <input id="atlas-search" class="enc-input" type="text"
+        placeholder="Search continents, countries, regions…" autocomplete="off">
+    </div>
+    <div id="atlas-search-results" class="atlas-search-results" style="display:none"></div>`;
+}
+
+function atlasSearch(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  const out = [];
+  for (const cont of atlasState.continents) {
+    for (const country of (cont.countries || [])) {
+      if ((country.name || "").toLowerCase().includes(q)) {
+        out.push({ kind: "country", name: country.name, context: cont.name, cont, country });
+      }
+      for (const region of (country.regions || [])) {
+        if ((region.name || "").toLowerCase().includes(q)) {
+          out.push({ kind: "region", name: region.name, context: `${country.name} · ${cont.name}`, cont, country, region });
+        }
+        for (const city of (region.cities || [])) {
+          if ((city.name || "").toLowerCase().includes(q)) {
+            out.push({ kind: "city", name: city.name, context: `${region.name} · ${country.name}`, cont, country, region, city });
+          }
+        }
+      }
+    }
+  }
+  return out.slice(0, 60);
+}
+
+function atlasSearchResultHTML(res, i) {
+  const kindLabel = res.kind === "country" ? "Country" : res.kind === "region" ? "Region" : "City";
+  return `
+    <button class="atlas-list-item" data-sres="${i}">
+      <div class="atlas-list-body">
+        <div class="atlas-list-name">${res.name}</div>
+        <div class="atlas-list-meta">${res.context}</div>
+      </div>
+      <span class="atlas-list-type">${kindLabel}</span>
+      <span class="atlas-list-arrow">›</span>
+    </button>`;
+}
+
+// Binds the search box already rendered by atlasSearchBoxHTML(). While a query
+// is active the normal list (normalSelector) is hidden and only the results
+// container is updated — the input keeps focus. Clearing restores the list.
+function bindAtlasSearch(root, normalSelector) {
+  const input = root.querySelector("#atlas-search");
+  const resultsEl = root.querySelector("#atlas-search-results");
+  const normalEl = normalSelector ? root.querySelector(normalSelector) : null;
+  if (!input || !resultsEl) return;
+  let lastResults = [];
+  input.addEventListener("input", () => {
+    const q = input.value.trim();
+    if (!q) {
+      resultsEl.style.display = "none";
+      resultsEl.innerHTML = "";
+      if (normalEl) normalEl.style.display = "";
+      return;
+    }
+    lastResults = atlasSearch(q);
+    resultsEl.innerHTML =
+      `<div class="atlas-search-count">${lastResults.length} result${lastResults.length === 1 ? "" : "s"}</div>` +
+      (lastResults.length
+        ? lastResults.map((r, i) => atlasSearchResultHTML(r, i)).join("")
+        : `<div class="enc-empty">No matches in the Atlas</div>`);
+    resultsEl.style.display = "";
+    if (normalEl) normalEl.style.display = "none";
+    resultsEl.querySelectorAll("[data-sres]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const res = lastResults[parseInt(btn.dataset.sres, 10)];
+        if (res) atlasJumpTo(root, res);
+      });
+    });
+  });
+}
+
+function atlasJumpTo(root, res) {
+  const c0 = { name: res.cont.name, type: "continent", ref: res.cont };
+  const c1 = { name: res.country.name, type: "country", ref: res.country };
+  const c2 = { name: res.region.name, type: "region", ref: res.region };
+  // Cities have no standalone detail view — land on the parent region instead.
+  if (res.kind === "country")      atlasState.stack = [c0, c1];
+  else                            atlasState.stack = [c0, c1, c2];
+  renderAtlas(root);
+}
+
+// ── Related encyclopedia articles for a region ─────────────────────────────
+// Scores articles by keyword overlap with the region's name/terrain/climate/
+// biomes/threats. Title hits weigh 3× summary hits; only title-relevant (or
+// strongly summary-relevant) articles are shown.
+
+const ATLAS_STOPWORDS = new Set((
+  "a,an,the,and,or,but,with,from,into,onto,for,of,to,in,on,at,by,via,per,as," +
+  "is,are,was,were,be,been,your,you,they,them,their,there,that,this,these,those," +
+  "have,has,had,will,would,can,could,should,all,any,each,more,most,some,such," +
+  "very,much,many,also,than,then,its,may,might,often,just,like,over,under," +
+  "between,within,during,through,across,around,about,above,below,along,plus," +
+  "without,high,higher,low,lower,hot,cold,dry,wet,large,small,great,common"
+).split(","));
+
+function atlasRegionKeywords(region) {
+  const parts = [];
+  if (region.name) parts.push(region.name);
+  if (region.terrain) parts.push(region.terrain);
+  if (region.climate) parts.push(region.climate);
+  if (Array.isArray(region.biomes)) parts.push(region.biomes.join(" "));
+  const t = region.threats || {};
+  ["weather", "natural_disasters"].forEach(k => {
+    if (Array.isArray(t[k])) parts.push(t[k].join(" "));
+  });
+  if (region.water && region.water.quality) parts.push(region.water.quality);
+  const words = parts.join(" ").toLowerCase().replace(/[^a-z\s]/g, " ").split(/\s+/);
+  const seen = new Set();
+  const out = [];
+  for (const w of words) {
+    if (w.length < 4 || ATLAS_STOPWORDS.has(w) || seen.has(w)) continue;
+    seen.add(w);
+    out.push(w);
+  }
+  return out.slice(0, 24);
+}
+
+function atlasRelatedArticles(region) {
+  if (!store.articles || !store.articles.length) return [];
+  const kws = atlasRegionKeywords(region);
+  if (!kws.length) return [];
+  const scored = [];
+  for (const a of store.articles) {
+    const title = (a.title || "").toLowerCase();
+    const summary = (a.summary || "").toLowerCase();
+    let score = 0;
+    for (const kw of kws) {
+      if (title.includes(kw)) score += 3;
+      else if (summary.includes(kw)) score += 1;
+    }
+    if (score >= 3) scored.push({ a, score });
+  }
+  scored.sort((x, y) => y.score - x.score || x.a.difficulty - y.a.difficulty);
+  return scored.slice(0, 6).map(s => s.a);
+}
+
+function atlasRelatedHTML(region) {
+  const related = atlasRelatedArticles(region);
+  if (!related.length) return "";
+  return atlasSection("📚 Related Knowledge",
+    `<div style="font-size:11px;color:var(--text-faint);margin-bottom:10px">Encyclopedia articles relevant to ${region.name}:</div>` +
+    related.map(a => `
+      <button class="atlas-related-item" data-article="${a.id}">
+        <div class="atlas-related-body">
+          <div class="atlas-related-title">${a.title}</div>
+          <div class="atlas-related-meta">${a.domainIcon || ""} ${a.domainName || ""} · Lvl ${a.difficulty} · ${a.readTime} min</div>
+        </div>
+        <span class="atlas-related-arrow">›</span>
+      </button>`).join(""),
+    "related");
 }
 
 // ═══ app.js ═══
