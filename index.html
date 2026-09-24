@@ -459,6 +459,7 @@ body::after {
   top: var(--topbar-h); left: 0; right: 0; bottom: 0;
   overflow-y: auto;
   overscroll-behavior-y: contain;
+  overflow-anchor: none;
   background: var(--bg);
 }
 
@@ -1186,6 +1187,18 @@ body::after {
 .hud-bar { width: 100px; height: 4px; background: var(--bg4); border-radius: 2px; overflow: hidden; }
 .hud-bar-fill { height: 100%; border-radius: 2px; transition: width 400ms ease; }
 .hud-morale { background: var(--amber); }
+.hud-systems { display: flex; flex-direction: column; gap: 7px; }
+.sys-bar-row { display: flex; align-items: center; gap: 8px; }
+.sys-bar-icon { width: 18px; flex-shrink: 0; text-align: center; font-size: 13px; }
+.sys-bar-track { flex: 1; height: 5px; background: var(--bg4); border-radius: 2px; overflow: hidden; }
+.sys-bar-fill { height: 100%; background: var(--amber); border-radius: 2px; transition: width 400ms ease; }
+.sys-bar-fill.sys-bar-warn { background: var(--red); }
+.sys-bar-val { font-family: var(--font-m); font-size: 10px; color: var(--text-dim); min-width: 46px; text-align: right; white-space: nowrap; }
+.systems-readout { display: flex; flex-direction: column; gap: 8px; }
+.sys-readout-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.sys-readout-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 7px 10px; font-size: 12px; color: var(--text-dim); }
+.sys-readout-item span:last-child { font-family: var(--font-m); font-size: 11px; color: var(--text); }
+.sys-readout-item.sys-warn { border-color: var(--red); color: var(--red-lt); }
 .wide-bar { width: 100%; }
 .condition-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
 .cond-tag { font-family: var(--font-m); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: var(--radius); background: var(--red-pale); border: 1px solid var(--red); color: var(--red-lt); }
@@ -13774,7 +13787,6 @@ function stageBodyHTML() {
   }).join("");
 
   return `
-    <div class="sim-page">
       <div class="run-hud">
         <div class="hud-progress">
           ${Array.from({length: total}, (_, i) =>
@@ -13846,7 +13858,7 @@ function stageBodyHTML() {
             ${item.icon}<span class="inv-uses">${item.remaining >= 99 ? "∞" : item.remaining}</span>
           </span>`).join("")}
       </div>
-    </div>`;
+`;
 }
 
 function wireStageScreen(root) {
@@ -13941,8 +13953,15 @@ function resolveStageChoice(root, choice) {
     RUN.stageResolved = true;
   }
   const st = root.scrollTop; // choice → inline result is in-place: keep scroll
+  const toDebrief = RUN.phase === "debrief";
   renderSimulator(root);
-  root.scrollTop = RUN.phase === "debrief" ? 0 : st; // fatal outcome → fresh screen, start at top
+  if (toDebrief) { root.scrollTop = 0; return; } // fatal outcome → fresh screen, start at top
+  // Full-container innerHTML swaps can make the browser drop a synchronously-set
+  // scrollTop (scroll anchoring / post-layout adjustments), so re-assert after paint.
+  root.scrollTop = st;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (root.isConnected) root.scrollTop = st;
+  }));
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -14040,7 +14059,6 @@ function resultBodyHTML() {
       </div>` : ""}`;
 
   return `
-    <div class="sim-page">
       <div class="result-stage-banner ${won ? "rsb-ok" : "rsb-fail"}">
         <span class="rsb-badge">${vd.badge}</span>
         <span class="rsb-stage">Stage ${stageNum} of ${RUN.scenario.stages.length}</span>
@@ -14073,7 +14091,7 @@ function resultBodyHTML() {
       <button class="btn-solid" id="btn-next" style="margin-top:24px;width:100%;padding:14px">
         ${isLast ? "Complete Scenario →" : "Next Stage →"}
       </button>
-    </div>`;
+`;
 }
 
 function wireResultScreen(root, onOpenArticle) {
