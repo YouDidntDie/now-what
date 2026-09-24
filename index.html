@@ -8971,7 +8971,354 @@ const SCENARIOS = [
       },
     },
   ],
+},
+// ══ Batch 3 — The Grip of the Rip / The Quiet Harvest / The Small and the Old ══
+{
+  id: "rip-current",
+  gear: "nothing",
+  biomes: ["coastal", "island", "ocean"],
+  title: "The Grip of the Rip",
+  icon: "🌊",
+  difficulty: 2,
+  phase: 0,
+  timeOfDay: "16:40",
+  environment: "An unpatrolled stretch of ocean beach, late afternoon. Two-metre swell, steady onshore wind, no lifeguard tower in sight — just a faded warning sign at the dune path you walked past without reading.",
+  weather: "Late sun, 24°C air, water cool enough to steal warmth. Swell 2 m, wind onshore 25 km/h.",
+  relatedDomain: "hazards",
+  intro: "You went in for a swim at a beach with no lifeguards. The water under you started sliding seaward — the waves are breaking on both sides of you but not where you are, and the bottom just dropped away. You're caught in a rip, and it's carrying you out. Fight it and you'll lose; outthink it and you'll make the sand.",
+  stages: [
+    {
+      id: "s1", title: "Stage 1 — 16:40, The Pull",
+      situation: "You were floating in chest-deep water when the bottom fell away beneath you. Now the beach is getting smaller, the waves are breaking on both sides of you but not where you are, and the water around you is moving steadily out to sea.",
+      check: { stat: "composure", difficulty: 10, tag: "psychology", label: "Read the Water" },
+      choices: [
+        { id: "stayCalm", q: "sound", label: "Stay calm, roll onto your back, read the water", desc: "Don't fight. Let the current carry you while you breathe, get your bearings, and note where the waves are breaking — that's your exit map.", statHint: "composure", tag: "psychology" },
+        { id: "parallelEarly", q: "risky", label: "Slip sideways, parallel to shore, right now", desc: "You're fresh and the current is narrow here. Turn ninety degrees and swim steadily sideways, out of the channel.", statHint: "endurance", tag: "water" },
+        { id: "sprintBack", q: "poor", label: "Sprint straight back toward the beach", desc: "You're a decent swimmer and the sand isn't far. Put your head down and power straight in, against the pull.", statHint: "strength", tag: "water" },
+      ],
+      outcomes: {
+        stayCalm: {
+          success: { narrative: "You flip onto your back and force your breathing slow. The panic drains with the first controlled breaths. From here you can see it clearly: white water breaking on both sides, a dark calm channel right under you — the rip. You're moving out, but your airway is clear and your arms are still fresh.", effects: { conditionAdd: "energy_conserved", moraleMod: 8, xpBonus: 20 }, tip: "A rip pulls you AWAY from shore, never under. The first move is always the same: stay calm, float, conserve. You can't outswim it — rips can run faster than an Olympic swimmer — but you can outlast it.", learnMore: ["hz006"] },
+          failure: { narrative: "You try to roll back but the panic gets a word in first — you gasp at the wrong moment and take water. Coughing, you get your face clear and force the next breaths slow. You're still afloat and still moving out, but the scare cost you.", effects: { conditionAdd: "aspirated_water", moraleMod: -8 }, tip: "If you swallow water, don't let the cough turn into thrashing. Get your face clear, cough it out, and return to the float. Panic is what turns a survivable ride into exhaustion.", learnMore: ["hz005"] },
+        },
+        parallelEarly: {
+          success: { narrative: "You turn sideways and settle into a steady crawl — not a sprint. Twenty strokes and the pull eases; another twenty and the white water is pushing you shoreward instead. You slipped out of the channel while you were still strong.", effects: { conditionAdd: "out_of_rip", moraleMod: 10, xpBonus: 10 }, tip: "Swim parallel to shore to exit a rip — most are only 20 to 150 feet wide. Steady pace, not a sprint: you need strength left to get back in afterwards.", learnMore: ["hz006"] },
+          failure: { narrative: "Ten strokes sideways and the current is still dragging you — you guessed the edge wrong, or this one is wider than most. Your arms are burning and you're still in the channel. You stop swimming, roll onto your back, and decide the next move will be a smarter one.", effects: { conditionAdd: "strength_spent", moraleMod: -10 }, tip: "If parallel swimming isn't working, stop. Some rips run wider than the usual band — and a tired swimmer fighting blind burns the energy the float would have saved. Know your options; switch when one fails.", learnMore: ["hz006", "ev004"] },
+        },
+        sprintBack: {
+          success: { narrative: "You thrash straight toward the beach — and for a few seconds it feels like progress. Then the pull wins. You've spent everything to end up farther out than you started — until a surfer paddling past swings his board around and lets you grab the nose. It wasn't the swimming that saved you; it was being seen.", effects: { conditionAdd: "strength_spent", moraleMod: -8 }, tip: "Swimming against a rip is the fastest way to exhaust yourself — rip speeds can top 2 metres per second. If you try it and fail, the backup plan is already there: stop, float, signal.", learnMore: ["hz006"] },
+          failure: { narrative: "Two minutes of sprinting against the pull and your arms are concrete. The beach hasn't gotten any closer — it's gotten smaller. You're breathing in ragged gulps now, and every wave slaps water into your mouth.", effects: { conditionAdd: "strength_spent", conditionAdd2: "exhausted", moraleMod: -16 }, tip: "Fighting the current head-on is the drowning mechanism in rip deaths: exhaustion, then panic, then water. The moment you feel yourself losing ground, stop swimming and switch to the float.", learnMore: ["hz005", "hz006"] },
+        },
+      },
+    },
+    {
+      id: "s2", title: "Stage 2 — 16:47, The Escape",
+      situation: "You're 80 metres out, riding the current past the breakers. The beach is a long way off now. Your arms are tired but working, your breathing is under control, and the water around you is starting to slow — you're nearing the end of the rip's run.",
+      check: { stat: "endurance", difficulty: 12, tag: "water", label: "Break the Grip" },
+      randomEvents: [
+        { chance: 0.2, text: "A larger set rolls through — white water foams up on both sides of the channel.", effect: { moraleMod: -8 } },
+      ],
+      choices: [
+        { id: "swimParallel", q: "sound", label: "Swim steadily parallel to the shore", desc: "Turn sideways out of the channel — smooth, unhurried strokes. Once the pull releases, angle back in with the waves.", statHint: "endurance", tag: "water" },
+        { id: "breakers", q: "risky", label: "Angle toward the breaking waves beside you", desc: "The white water pushes shoreward. Swim for the breakers at the rip's edge and let them carry you in.", statHint: "perception", tag: "navigation" },
+        { id: "diveUnder", q: "poor", label: "Duck-dive under it — it's an undertow", desc: "It's pulling you out, so dive down and swim under the current. Undertows pull down, right? Get beneath it and swim back.", statHint: "composure", tag: "water" },
+      ],
+      outcomes: {
+        swimParallel: {
+          success: { narrative: "You turn ninety degrees and settle into rhythm — breathe, stroke, breathe. The seaward drag fades, then stops. One more push and the waves start shoving you toward the beach instead. You're out of the rip and heading in under your own power.", effects: { conditionAdd: "out_of_rip", moraleMod: 12, xpBonus: 20 }, tip: "Swim parallel to shore until the pull releases, then angle back toward the beach with the waves — never straight at them. The waves are free transport once you're out of the channel.", learnMore: ["hz006"] },
+          failure: { narrative: "You swim parallel, but your stroke is ragged and you keep drifting back into the channel. You're out of the main pull — but your arms are spent and the beach is still far. You roll onto your back to rest before the next attempt.", effects: { conditionAdd: "strength_spent", moraleMod: -6 }, tip: "Exiting the rip is only half the job — you still need the strength to get back in. If the exit swim costs you everything, stop and float: rest is a move, not a failure.", learnMore: ["hz006"] },
+        },
+        breakers: {
+          success: { narrative: "You angle toward the foam line and feel the rip's grip loosen as the broken water grabs you instead. A wave picks you up and shoves you shoreward — suddenly you're body-surfing, not fighting. Two waves later you're in waist-deep water, standing.", effects: { conditionAdd: "out_of_rip", conditionAdd2: "shoreward_push", moraleMod: 12, xpBonus: 10 }, tip: "Swimming toward the breaking waves is a valid exit: the surf pushes shoreward. Once a wave takes you, ride it — don't fight the white water, work with it.", learnMore: ["hz006", "ev004"] },
+          failure: { narrative: "You aim for the breakers but misjudge the distance — the foam keeps retreating and you're swimming hard just to stay in place. Your shoulders are done. You quit the chase, float up, and watch the beach from farther out than you'd like.", effects: { conditionAdd: "strength_spent", moraleMod: -10 }, tip: "The breakers mark the rip's edge, but chasing them burns energy fast. If the swim to the foam costs more than it gives, stop: float, conserve, and signal. A tired swimmer is a worse swimmer.", learnMore: ["hz005"] },
+        },
+        diveUnder: {
+          success: { narrative: "You dive under and surface to the same seaward pull — there was nothing to swim under. The rip isn't an undertow. But the shock of the dive clears the panic fog, and you stop fighting the wrong enemy: turn sideways, float.", effects: { conditionAdd: "strength_spent", moraleMod: -8 }, tip: "Rips pull you out, not down — there is no 'under' to swim through. Duck-diving an outgoing current just spends breath and strength you need for the float.", learnMore: ["hz006", "hz005"] },
+          failure: { narrative: "You dive under, push hard, surface — and the rip is still carrying you out. So you dive again. Each dive costs breath and strength, and the panic builds with every surfacing that hasn't saved you. You're more tired and no closer to shore.", effects: { conditionAdd: "strength_spent", conditionAdd2: "panicking", moraleMod: -14 }, tip: "The undertow is a myth at surf beaches — the killer is the outward current. Every breath spent diving under is a breath stolen from the float that would actually save you.", learnMore: ["hz005"] },
+        },
+      },
+    },
+    {
+      id: "s3", title: "Stage 3 — 16:55, Beyond the Breakers",
+      situation: "The current has carried you past the surf — the beach is a thin line now, the water calmer but deep. Your arms are heavy. You're alone out here: no lifeguard, no buddy, and the sun is starting to drop.",
+      check: { stat: "endurance", difficulty: 12, tag: "water", label: "Hold On" },
+      choices: [
+        { id: "floatSignal", q: "sound", label: "Float on your back, raise an arm, shout", desc: "Conserve everything. The rip weakens out here — float, breathe, and make yourself seen and heard.", statHint: "composure", tag: "signal" },
+        { id: "finalPush", q: "risky", label: "One last hard push parallel, then rest", desc: "You've got one surge left in your arms. Spend it on a sideways escape now, before you're too tired to swim at all.", statHint: "endurance", tag: "water" },
+        { id: "fightToExhaustion", q: "fatal", label: "Keep fighting for shore until you can't", desc: "Swim straight at the beach with everything left. No floating, no waiting — just refuse to stop until you're on the sand.", statHint: "strength", tag: "water" },
+      ],
+      outcomes: {
+        floatSignal: {
+          success: { narrative: "You roll onto your back and go still. The breathing slows, the arms stop burning. Out here the current is already fading — and then you hear it: a voice. A surfer paddling in sees your raised arm and angles over. Help is coming, and you have the strength left to take it.", effects: { conditionAdd: "help_coming", moraleMod: 12, xpBonus: 20 }, tip: "Beyond the breakers, rips usually weaken and fade — floating here is not giving up, it's the plan. Raise an arm, shout, stay visible: most good swimmers can float for a very long time, and being seen is being saved.", learnMore: ["hz006", "n008"] },
+          failure: { narrative: "You float and wave, but the beach is far and empty — nobody sees. The shouting costs you, so you stop, save your breath, and settle into the float for the long wait. The current is fading; the swim back will be slow, but you'll be swimming it with something left.", effects: { conditionAdd: "energy_conserved", moraleMod: -8 }, tip: "This is why you never swim alone at an unguarded beach: the float saves you only if someone can see it. Buddy up, swim near lifeguards, check the surf forecast before you go in.", learnMore: ["hz006", "ev004"] },
+        },
+        finalPush: {
+          success: { narrative: "You dig deep — thirty hard strokes sideways. The water releases you all at once, like a hand letting go. You're free, breathing hard, and the long swim in starts now. It worked because you spent the strength while you still had strength to spend.", effects: { conditionAdd: "out_of_rip", moraleMod: 10, xpBonus: 10 }, tip: "A final push is a gamble that pays only if you exit the channel. Spend it sideways — never against the current — and the moment the pull releases, stop and rest before the swim in.", learnMore: ["hz006"] },
+          failure: { narrative: "The surge gets you sideways — but not far enough. The pull catches you again, and now the tank is empty: your arms won't lift properly and your kick is gone. You roll onto your back because there's nothing left to do with. The float is no longer a choice; it's all you have.", effects: { conditionAdd: "exhausted", conditionAdd2: "strength_spent", moraleMod: -14 }, tip: "This is why the float is the backup plan that never runs out: spent muscles can still hold a back-float. Exhausted swimmers drown trying to swim; floating buys the current time to fade.", learnMore: ["hz005", "hz006"] },
+        },
+        fightToExhaustion: {
+          success: { narrative: "You swim straight in, and straight in, and somehow — a lucky wave catches you and hurls you shoreward, again and again, until your knees scrape sand. You made it. You will never, ever do that again.", effects: { moraleMod: -6 }, tip: "You got lucky: the waves finished a swim your arms had already lost. Fighting a rip head-on is the drowning mechanism — exhaustion, then panic, then water. Luck is not a plan.", learnMore: ["hz006"] },
+          failure: { narrative: "Your arms give out a hundred metres from the sand. The kick follows. You try to float but the breathing is too ragged to keep your face clear, and the panic takes the last of your air. The water doesn't pull you down — you simply can't stay up. Alone, exhausted, beyond the breakers, you slip under.", effects: { fatal: true }, tip: "This is the documented drowning mechanism in rip deaths: not dragged down — drowned by exhaustion and panic after fighting the current. Alone at an unguarded beach, spent past the point of floating, there is no rescue coming.", learnMore: ["hz005", "hz006"] },
+        },
+      },
+    },
+    {
+      id: "s4", title: "Stage 4 — 17:05, The White Water",
+      situation: "You're back inside the breakers — or you never fully left them. Waves are rolling you shoreward in bursts, the bottom is close enough to touch, and dry sand is twenty metres away. The surf zone is the last boss: white water can knock you flat and drag you back out.",
+      check: { stat: "knowledge", difficulty: 11, tag: "water", label: "Work the Surf" },
+      choices: [
+        { id: "rideTheWhite", q: "sound", label: "Ride the waves in, feet first", desc: "Wait for a wave, let it push you, keep your feet up and pointed shoreward. Work with the white water, not against it.", statHint: "knowledge", tag: "water" },
+        { id: "standAndSprint", q: "risky", label: "Stand when you touch bottom, sprint between sets", desc: "Feet on sand — get up and move fast in the lull between waves. Don't linger in the impact zone.", statHint: "composure", tag: "water" },
+        { id: "fightTheSurf", q: "poor", label: "Stand your ground against each wave", desc: "Plant your feet chest-deep and brace against the incoming white water. Walk straight in like you own the place.", statHint: "strength", tag: "water" },
+      ],
+      outcomes: {
+        rideTheWhite: {
+          success: { narrative: "You catch a wave on your back, feet up and pointed at the beach, and it delivers you shoreward like luggage. Between sets you crawl a few metres; the next wave does the rest. Your knees hit dry sand and you stay there, breathing, done.", effects: { conditionAdd: "ashore", moraleMod: 14, xpBonus: 20 }, tip: "Ride white water in feet-first, never headfirst — feet find the bottom before your head does. Bodysurfing head-first into shallow water has broken necks; the surf zone rewards feet and humility.", learnMore: ["hz006", "hz005"] },
+          failure: { narrative: "You catch the wave wrong and it tumbles you — suddenly you're rolling in foam with no idea which way is up. You tuck, wait, and surface sputtering, closer to shore than before. The surf moved you anyway; it just charged a fee.", effects: { conditionAdd: "aspirated_water", moraleMod: -6 }, tip: "Getting tumbled isn't failing — it's the surf zone doing its thing. Protect your head, wait for the spin to stop, and surface: the waves are still moving you shoreward even when they roll you.", learnMore: ["hz005"] },
+        },
+        standAndSprint: {
+          success: { narrative: "You touch bottom, time the lull, and you're up and moving — knee-deep, waist-deep, then a wave shoves you the last metres and you land on wet sand running. Fast, ugly, effective. You're out.", effects: { conditionAdd: "ashore", moraleMod: 10, xpBonus: 10 }, tip: "Standing in the surf zone works only between sets: move fast in the lull, and if a wave catches you mid-stand, drop low and let it pass — never brace against it upright.", learnMore: ["hz006"] },
+          failure: { narrative: "You stand — and a wave you didn't see picks you up and slams you down. Sand in your mouth, the world spinning, the backwash dragging you out through the foam. You're upright again, coughing, ten metres farther out than you stood.", effects: { conditionAdd: "knocked_down", conditionAdd2: "aspirated_water", moraleMod: -12 }, tip: "You swallowed water getting worked — if the coughing doesn't clear, or your breathing feels wrong after you're out, get medical help. Aspiration can turn serious hours later; 'I feel fine' isn't a diagnosis.", learnMore: ["hz005"] },
+        },
+        fightTheSurf: {
+          success: { narrative: "You brace against wave after wave — until a beach walker sees you getting hammered, wades in with a cooler lid as a float, and drags you the last metres. The bracing didn't save you; being seen did.", effects: { conditionAdd: "knocked_down", moraleMod: -8 }, tip: "If you're the one on the beach watching someone get hammered: don't swim out to them — throw something that floats, shout 'swim parallel', and get help. Many people have died trying to rescue rip victims.", learnMore: ["hz006", "n008"] },
+          failure: { narrative: "The third wave folds you in half and the backwash drags you out through the foam. You're coughing water, disoriented, and every wave is now hitting you while you're already down. A feeder current catches your tired legs — and you're heading back out.", effects: { conditionAdd: "knocked_down", conditionAdd2: "aspirated_water", moraleMod: -16 }, tip: "A knocked-down swimmer who keeps standing back up to fight is how surf zones recycle victims into the rip. Stay low, ride or float, and let the waves do the carrying — pride is not a flotation device.", learnMore: ["hz005", "hz006"] },
+        },
+      },
+    },
+  ],
+},
+{
+  "id": "fishing-trapping",
+  "gear": "kit",
+  "biomes": ["temperate_forest", "boreal", "wetland"],
+  "title": "The Quiet Harvest",
+  "icon": "🎣",
+  "difficulty": 2,
+  "phase": 1,
+  "timeOfDay": "06:10",
+  "environment": "An established camp at a lake outlet — mixed birch and spruce, a cold creek running through it, game trails threading down to the water's edge. Five days in, with cordage, hooks, a knife, an axe, and a smoking rack.",
+  "weather": "Early autumn. Nights near 4°C, days around 14°C, rain building from the west.",
+  "relatedDomain": "food",
+  "intro": "Five days in at the lake outlet, and the math is getting honest: you burn more calories working than a day of foraging replaces. The answer isn't working harder — it's systems that work while you sleep: lines in the water, traps on the trails. Set them right, check them daily, preserve what they give you, and the camp eats.",
+  "stages": [
+    {
+      "id": "s1", title: "Stage 1 — Day 1, 06:10, Setting the Systems",
+      "situation": "Dawn on the creek. You have cordage, a few hooks, snare wire, and a full day before the rain arrives. The game trails to the water are fresh with sign, the creek narrows twenty metres downstream, and the current bends past a fallen birch. Where the sets go decides whether the camp eats this week.",
+      "check": { stat: "knowledge", difficulty: 10, tag: "food", label: "Read the Water and the Trails" },
+      "choices": [
+        { id: "set-lines", q: "sound", label: "Trotline, funnel trap, trail snares", desc: "Trotline staked across the creek run by the fallen birch, funnel basket trap in the narrows where the whole creek must pass, snares hung in the middle of the game trail to water.", statHint: "knowledge", tag: "food" },
+        { id: "weir", q: "risky", label: "Weir half the creek, long snare line", desc: "Weave a brush weir across half the creek funneling into a basket trap, and run a dozen snares on every run you found — all of it built today, in one push.", statHint: "endurance", tag: "food" },
+        { id: "near-camp", q: "poor", label: "Set everything close to camp", desc: "Keep it convenient: snares on the paths you walk daily, the trotline in the pool by the tents. Short walks, easy checks.", statHint: "perception", tag: "food" },
+      ],
+      "outcomes": {
+        "set-lines": {
+          "success": { narrative: "By noon the trotline is staked across the creek run where the current bends past the fallen birch, baited hooks hanging in the flow. The funnel trap sits in the narrows where the whole creek has to pass through it, and three snares hang in the middle of the game trail down to the water. Every set is where animals already go — the systems start working tonight while you split firewood.", effects: { conditionAdd: "lines_set", moraleMod: 6, xpBonus: 20 }, tip: "Place sets where animals already travel — runs, trails, water crossings, creek narrows. A perfect snare in the wrong place catches nothing; a crude one in the right place works all night.", learnMore: ["d042", "d043"] },
+          "failure": { narrative: "The placements are right but the execution is sloppy — one snare trigger too stiff, the funnel trap's mouth facing the slack water instead of the current. You catch nothing the first night and spend the morning fixing what you rushed. The lesson costs a day, not the week.", effects: { conditionAdd: "sets_need_work", moraleMod: -4 }, tip: "Test every trigger and check the funnel mouth faces the current before you walk away — a set you didn't verify is a set you didn't make.", learnMore: ["d042"] },
+        },
+        "weir": {
+          "success": { narrative: "You spend the whole brutal day on it — brush woven between stakes across half the creek, a dozen snares on every run you found. By dusk the weir is funneling the creek into your basket trap and the snare line is long. It cost you a day of calories, but the system is big and it is working.", effects: { conditionAdd: "big_system", moraleMod: 8, xpBonus: 10 }, tip: "A weir turns the whole stream into a funnel — but it's a structure you now own: debris clogs it, water rises against it, and it needs tending like everything else.", learnMore: ["d043", "d003"] },
+          "failure": { narrative: "You run out of day halfway through — the weir is half-woven and already catching leaves instead of fish, and the snare line is a dozen rushed sets you won't have time to check tomorrow. You burned a full day's calories building a system you can't maintain yet. Scale back: finish the weir properly or pull half the snares.", effects: { conditionAdd: "overbuilt", conditionAdd2: "exhausted", moraleMod: -10 }, tip: "Never build more passive gear than you can check daily — an unmaintained trap line is just litter that occasionally kills things you never collect.", learnMore: ["d042"] },
+        },
+        "near-camp": {
+          "success": { narrative: "Two nights, nothing — not even a sprung trigger. Then you find your own boot prints pressed into the mud right across the 'game trail' you chose, twenty metres from the fire pit. You move every set out to the real trails and the water, and the first night after the move a snare fires. The camp-edge sets taught you the rule by failing.", effects: { conditionAdd: "sets_moved", moraleMod: -4 }, tip: "Animals pattern you faster than you pattern them — sets near camp, on paths you walk, soaked in your scent and noise, catch nothing. Put distance between your life and your traps.", learnMore: ["d042"] },
+          "failure": { narrative: "A week of empty snares and an untouched trotline. The sets sat in your scent, in your noise, on ground you trample daily — the animals simply routed around them. You finally pull everything and rebuild on the far trails, having paid a week of camp calories for the lesson.", effects: { conditionAdd: "week_lost", moraleMod: -12 }, tip: "Build the sets away from the site and don't disturb the ground around them — animals avoid fresh digging and trampled vegetation. Prepare parts away from the set, carry them in.", learnMore: ["d042"] },
+        },
+      },
+    },
+    {
+      "id": "s2", title: "Stage 2 — Day 2, 06:00, The Checking Round",
+      "situation": "Dawn, frost on the guy-lines. The circuit is half-walked when your campmate comes up the trail with a bandana full of mushrooms — pale caps, white gills — found by the deadfall sets. 'Calories are calories,' they say. The traps need checking either way.",
+      "check": { stat: "endurance", difficulty: 11, tag: "food", label: "Walk the Line" },
+      "randomEvents": [
+        { chance: 0.2, text: "Overnight rain lifted the creek a hand's width — the trotline stakes are holding, barely, and one snare trigger is soaked.", effect: { moraleMod: -6 } },
+      ],
+      "choices": [
+        { id: "check-daily", q: "sound", label: "Dawn circuit, every trap, every day", desc: "First light, the full round: trotline, funnel trap, each snare. Dispatch fast, reset what's sprung, move what's dead, collect what's caught.", statHint: "endurance", tag: "food" },
+        { id: "check-late", q: "poor", label: "Check every third day — they'll keep", desc: "The traps work without you; that's the point. Walk the circuit when you have time, not on a schedule.", statHint: "composure", tag: "food" },
+        { id: "wild-mushrooms", q: "fatal", label: "Eat the mushrooms — calories are calories", desc: "Pale caps, white gills, found by the traps. Nobody here can name the species, but the bandana is full and the pot is empty.", statHint: "perception", tag: "food" },
+      ],
+      "outcomes": {
+        "check-daily": {
+          "success": { narrative: "First light, every day: trotline, funnel trap, every snare. A rabbit in a snare is dispatched in seconds and the set is re-armed before its body is cold; two sprung-empties get rebuilt on the spot; the funnel trap holds three creek chub, lively and fresh. The line never sits idle and nothing sits dead.", effects: { conditionAdd: "catch_kept", moraleMod: 8, xpBonus: 20 }, tip: "Check at first light, every day, no exceptions: reset what's sprung, move what's dead, collect what's caught. A trap you don't check is either empty or rotting.", learnMore: ["d042", "d015"] },
+          "failure": { narrative: "You walk the circuit but you rush it — a snare that fired gets left 'for tomorrow,' and tomorrow the rabbit in it is stiff and fly-blown. You bury it and re-set properly, angry at yourself. The circuit works; the discipline has to be daily, not almost-daily.", effects: { conditionAdd: "catch_wasted", moraleMod: -6 }, tip: "A sprung trap catches nothing until it's reset, and a dead animal left sitting is meat lost to bacteria and flies. 'Tomorrow' is how food becomes garbage.", learnMore: ["d042"] },
+        },
+        "check-late": {
+          "success": { narrative: "On day three the snares hold a rabbit dead at least a day — belly bloated, smell wrong. You don't eat it; you bury it deep away from camp and reset the line, shaken at how close 'they'll keep' came to a sick camp. From here the circuit is daily.", effects: { conditionAdd: "lesson_learned", moraleMod: -8 }, tip: "Meat begins spoiling the moment the animal dies — bacteria multiply fast in warm weather. A trap checked every third day is a gamble where the prize is food poisoning.", learnMore: ["d058", "d015"] },
+          "failure": { narrative: "Three days. The rabbit is bloated and crawling, the fish on the trotline are soft-eyed and stinking, and half your snares fired days ago on nothing. You bury the lot, scrub your hands, and lose days of protein the camp was counting on — plus a scare that sits in everyone's stomach.", effects: { conditionAdd: "catch_spoiled", conditionAdd2: "camp_shaken", moraleMod: -14 }, tip: "A dead animal left in a trap is wasted food and a disease risk; a sprung, empty trap catches nothing. Daily checks are the whole system — the traps are only half of it.", learnMore: ["d058"] },
+        },
+        "wild-mushrooms": {
+          "success": { narrative: "You eat three, then a fourth — and spend the night with your gut in knots, waiting for the vomiting that never quite comes. By morning you're fine, and furious at yourself: they were probably harmless, but you had no way to know that. Luck is not identification. Never again.", effects: { conditionAdd: "mushroom_scare", moraleMod: -12 }, tip: "Never eat a wild mushroom you can't positively identify — cooking doesn't destroy amatoxins, and the universal edibility test is for plants, not fungi. 'Probably safe' is how foragers die.", learnMore: ["d026", "d017"] },
+          "failure": { narrative: "They taste fine. That's the horror of it — for six hours, nothing. Then the vomiting starts, violent and unstoppable, and eases by the second day just enough to fool you. By day four your liver is failing, and the things that save amatoxin victims — IV fluids, drugs, a transplant team — are a world away from this camp. The mushrooms were never food; they were a delayed fuse.", effects: { fatal: true }, tip: "Amatoxin poisoning runs in phases: delayed violent illness 6–24 hours after eating, a false recovery, then liver and kidney failure days later. It kills a significant share of victims even with hospital care — in the field, with none, it's a death sentence.", learnMore: ["d026", "d017"] },
+        },
+      },
+    },
+    {
+      "id": "s3", title: "Stage 3 — Day 3, The Catch",
+      "situation": "The circuit paid: two rabbits in the snares, a fat chub tangle on the trotline, the funnel trap full of small silver fish. The trotline's far end is snagged deep, though — one section hangs tangled in the current with a fish still on it, out past where you can reach from the bank.",
+      "check": { stat: "knowledge", difficulty: 11, tag: "food", label: "From Trap to Clean Meat" },
+      "choices": [
+        { id: "dispatch-clean", q: "sound", label: "Dispatch fast, gut promptly, keep it clean", desc: "Quick humane dispatch, gloves on, bleed and gut immediately, cavities wiped clean, meat hung in moving shade air. Fish stunned, gills cut, bellies opened and rinsed.", statHint: "knowledge", tag: "food" },
+        { id: "tangled-line", q: "risky", label: "Wade out to free the tangled trotline", desc: "The far section is snagged with a fish still on it. Wade out past your thighs, work it free, save the line and the catch.", statHint: "composure", tag: "food" },
+        { id: "camp-scraps", q: "poor", label: "Clean the catch at camp, leave the scraps", desc: "Gut everything on the cleaning log by the fire and toss the remains where they fall. Fast, easy, done.", statHint: "perception", tag: "security" },
+      ],
+      "outcomes": {
+        "dispatch-clean": {
+          "success": { narrative: "The rabbits are dispatched in seconds — quick, no suffering. Gloves on: bled, gutted, the cavities wiped clean, meat hung in the shade where the air moves. The fish are stunned, gills cut, bellies opened and rinsed in the creek. Clean hands, clean knife, clean meat — nothing wasted, nothing fouled.", effects: { conditionAdd: "meat_clean", moraleMod: 6, xpBonus: 20 }, tip: "Dispatch trapped animals immediately and humanely, then gut, clean, and cool the meat fast — spoilage starts at death. Plain note: trapping and fishing are regulated almost everywhere (seasons, licenses, permitted methods); this scenario assumes lawful take or genuine necessity.", learnMore: ["d038", "d015"] },
+          "failure": { narrative: "You fumble the dispatch and the gutting is slow — the rabbit suffers longer than it should, and by the time the cavity is open the afternoon is warm and flies are on the meat. You salvage it, but the meat tastes of your delay and your hands are nicked and dirty. Speed and cleanliness aren't niceties; they're the difference between food and waste.", effects: { conditionAdd: "meat_dirty", moraleMod: -8 }, tip: "Keep the knife sharp, the hands gloved, the cavity clean — and work fast. Every minute of delay in warm weather is bacteria multiplying; every nick is a door for infection.", learnMore: ["d038"] },
+        },
+        "tangled-line": {
+          "success": { narrative: "You read the current first — knee-deep entry downstream, shuffling feet, a stick for balance — and work the trotline free without going past your thighs. The hooks are saved, two fish are still lively on the line, and you're back on the bank in ten minutes, wet to the knees and grinning.", effects: { conditionAdd: "line_saved", moraleMod: 8, xpBonus: 10 }, tip: "Never wade deeper than you must, and never fight the current — enter downstream, shuffle, keep your balance. The line is replaceable; you aren't.", learnMore: ["d003"] },
+          "failure": { narrative: "Mid-thigh the bottom drops away and the current takes your legs — you're swimming with a trotline wrapped around your arm before you get footing on the far bank. The line is lost, the hooks are gone, and you're soaked and shivering with the afternoon cooling. A fish died on that line for nothing.", effects: { conditionAdd: "line_lost", conditionAdd2: "soaked", moraleMod: -12 }, tip: "Cold water steals strength in minutes and a tangled line can hold you under. If you can't reach it from safe footing, cut your losses — literally, if you have to.", learnMore: ["d003"] },
+        },
+        "camp-scraps": {
+          "success": { narrative: "By dusk the smell has done its work — a fox is bold enough to trot the camp edge, and something bigger has been through the gut pile in the night, scattering it toward the tents. You spend the morning hauling every scrap a hundred metres downwind and scrubbing the cleaning log. The camp learns the rule the loud way.", effects: { conditionAdd: "camp_fouled", moraleMod: -8 }, tip: "Clean fish and game away from camp and get the remains far downwind — gut piles and blood are a dinner bell for every scavenger and predator in the valley. Never drag a blood trail back to where you sleep.", learnMore: ["d015"] },
+          "failure": { narrative: "You leave the guts where they fall, three nights running. On the fourth night something large comes through camp — tents slashed, the food cache raided, and nobody sleeps properly for a week. The meat you 'saved time' on cost the camp its sense of safety.", effects: { conditionAdd: "camp_raided", moraleMod: -16 }, tip: "Separate the carcass from the gut pile fast and keep the remains well away from camp — in bear country, distance is measured in hundreds of metres, not steps. A fed predator is a returning predator.", learnMore: ["d015"] },
+        },
+      },
+    },
+    {
+      "id": "s4", title: "Stage 4 — Days 4–5, Preservation and the Ledger",
+      "situation": "The rack is full and the math is simple: everything you caught starts spoiling the moment it's dead, and the camp can't eat it all tonight. Smoke, dry, or keep cool — catching it was half the job. The warm afternoon is already working against you.",
+      "check": { stat: "knowledge", difficulty: 12, tag: "food", label: "Make It Keep" },
+      "choices": [
+        { id: "dry-smoke", q: "sound", label: "Thin strips, dry through, smoke to finish", desc: "Meat cut thin over a low smoky fire until fully dried; fish split and smoke-dried until they snap. What can't be dried tonight hangs in the cold creek shade for the morning — and only the morning.", statHint: "knowledge", tag: "food" },
+        { id: "cold-stash", q: "risky", label: "Stash the surplus in the cold creek", desc: "The creek runs near 5°C. Gutted, rinsed, shaded, in moving water — buy a night and a morning before the drying rack takes it.", statHint: "knowledge", tag: "food" },
+        { id: "borderline-fish", q: "risky", label: "Cook the strong-smelling day-old fish", desc: "Yesterday's chub smells strong but the eyes are clear and the flesh is firm. Boil it hard and eat it tonight, or throw it in the fire.", statHint: "perception", tag: "food" },
+      ],
+      "outcomes": {
+        "dry-smoke": {
+          "success": { narrative: "The meat goes up in thin strips over a low, smoky fire — dried through, not cooked. The fish are split and smoke-dried until they snap between your fingers. What couldn't be dried tonight hung in the cold creek shade and was on the rack at dawn. By week's end the camp holds days of food that won't rot.", effects: { conditionAdd: "catch_preserved", moraleMod: 10, xpBonus: 20 }, tip: "Dry meat fully through — thin strips, steady low heat, moving air — and smoke to finish. Smoke-dried fish kept dry needs no refrigeration; anything merely 'smoked' or half-dried is still on the clock.", learnMore: ["d031", "d032", "d066"] },
+          "failure": { narrative: "The strips go up too thick and the fire runs too hot — cooked outside, raw inside, and by the second day the centers are sour. You lose half the rack and spend a day re-cutting what's left thinner. Drying is dehydration, not cooking: thin, slow, all the way through.", effects: { conditionAdd: "half_spoiled", moraleMod: -8 }, tip: "If a strip bends without cracking and feels cool in the middle, it's not done. Thick pieces rot from the inside out while the outside looks fine.", learnMore: ["d031"] },
+        },
+        "cold-stash": {
+          "success": { narrative: "The creek is running cold and the surplus goes in — gutted, rinsed, in the shade of the bank, water flowing through. It buys you one cool night and a morning, and at dawn it's all on the drying rack. Cooling is a pause button, not a save file — and you treated it like one.", effects: { conditionAdd: "stash_bought_time", moraleMod: 6, xpBonus: 10 }, tip: "Cold water buys hours, not days — keep it gutted, keep it shaded, keep the water moving, and process it at first light. Warm sun on a still pool is a bacterial incubator, not a refrigerator.", learnMore: ["d014"] },
+          "failure": { narrative: "The afternoon runs warmer than forecast and the pool goes slack and sunny. By evening the stashed fish have a sweet-sour smell and soft bellies — the whole surplus is a loss, and the creek did exactly what creeks do when you ask them to be refrigerators. You bury it, and the week's surplus math collapses.", effects: { conditionAdd: "stash_lost", moraleMod: -12 }, tip: "Never trust cooling you can't control — a shaded, moving 5°C creek is a pause; a sun-warmed pool is a spoilage accelerator. When in doubt, dry it now.", learnMore: ["d014", "d058"] },
+        },
+        "borderline-fish": {
+          "success": { narrative: "The day-old fish smells strong, but the eyes are clear, the gills still red, the flesh springs back under your thumb — just fishy, not spoiled. Into the pot it goes, boiled hard, eaten hot. Your nose and your knowledge agreed, and the pot is full tonight.", effects: { conditionAdd: "meal_saved", moraleMod: 6, xpBonus: 10 }, tip: "Judge borderline fish with everything you have — smell, eyes, gills, flesh firmness — and when in doubt, cook it thoroughly or throw it out. 'Strong' is a warning; 'sour' or 'ammonia' is a verdict.", learnMore: ["d015", "d058"] },
+          "failure": { narrative: "You talk yourself into it — the smell is 'just fishy,' the pot is already hot. By midnight you're vomiting, and by morning the whole camp is on water duty while you shake through the cramps. One bad fish cost a day of everyone's work.", effects: { conditionAdd: "food_poisoned", moraleMod: -12 }, tip: "When the signs disagree, the fish loses — no meal is worth a day of vomiting and dehydration. Spoiled fish goes in the fire, not the pot.", learnMore: ["d058"] },
+        },
+      },
+    },
+  ],
+},
+{
+  id: "camp-vulnerable",
+  gear: "kit",
+  biomes: ["boreal", "temperate_forest", "highland"],
+  title: "The Small and the Old",
+  icon: "🧒",
+  difficulty: 2,
+  phase: 1,
+  timeOfDay: "17:40",
+  environment: "Established week-two camp at a boreal trail junction: weatherproofed shelter, fire ring, food cache, a handwashing station. And two people who cannot carry their own weight — June, seven years old, and Walter, seventy-four, with a week's worth of daily pills.",
+  weather: "Clear sky, −4°C and falling. Wind picking up. A hard cold night coming.",
+  relatedDomain: "medical",
+  intro: "Three weeks of winter trail, and the last two joined you on day ten: June, seven, and Walter, seventy-four, who takes daily pills he cannot replace. Tonight the temperature is dropping and the camp runs on what you decide. Children and elders don't fail at survival — they get failed by it. Your job tonight is to not fail them.",
+  stages: [
+    {
+      id: "s1", title: "Stage 1 — 17:40, the Evening Triage",
+      situation: "Light is going. The shelter has a wind-sheltered side near the fire and a cold edge near the door — not enough good ground for everyone. June is already shivering; Walter says he's fine, but his hands are slow. Warmth, water, food, medicine: tonight the order matters.",
+      check: { stat: "knowledge", difficulty: 11, tag: "warmth", label: "Cold Triage" },
+      randomEvents: [
+        { chance: 0.2, text: "A gust finds the shelter's seam and the fire flares sideways — the cold edge just got colder.", effect: { moraleMod: -8 } },
+      ],
+      choices: [
+        { id: "warm-first", q: "sound", label: "Warmth to the vulnerable first", desc: "June and Walter get the wind-sheltered spots closest to the fire and the best insulation. Able-bodied adults take the cold edge — that's what strength is for.", statHint: "knowledge", tag: "warmth" },
+        { id: "rotate", q: "risky", label: "Rotate the warm spots", desc: "Nobody owns the warm side. Rotate every few hours so no one freezes all night — fairness for everyone.", statHint: "endurance", tag: "warmth" },
+        { id: "save-fuel", q: "poor", label: "Bank the fuel, bed down cold", desc: "Keep the fire small tonight to stretch fuel through the week. Everyone sleeps cold; Walter gets the spare blanket.", statHint: "knowledge", tag: "fire" },
+      ],
+      outcomes: {
+        "warm-first": {
+          success: { narrative: "June and Walter are tucked into the sheltered side before dark, close enough to the fire to feel it. You take the cold edge and spend the night colder than you'd like — but at 3 AM, when you check, both of them are warm and breathing easy. That is the entire job.", effects: { conditionAdd: "vulnerable_warm", moraleMod: 8, xpBonus: 20 }, tip: "In a cold camp, the warmest spots go to those who lose heat fastest: babies, children, and older adults are at the highest risk of hypothermia, and the elderly make less heat because of slower metabolism. Warmth is not shared equally — it is allocated by risk.", learnMore: ["m018", "m031", "m032"] },
+          failure: { narrative: "You give them the warm side but misjudge the wind — it swings in the night and the draft finds you instead of them. Your own sleep is wrecked and you shiver till dawn. June and Walter stay warm, though. That part of the plan held.", effects: { conditionAdd: "vulnerable_warm", conditionAdd2: "sleepless", moraleMod: -4 }, tip: "Moving air strips heat far faster than still cold air. Place the vulnerable where the wind cannot reach, not just where the fire is — a windbreak is part of the warm spot.", learnMore: ["m018"] },
+        },
+        rotate: {
+          success: { narrative: "The rotation runs all night — two hours warm, two hours cold edge, everyone moving on schedule. Everyone is tired at dawn, but nobody spent the whole night in the cold, and the checks at each handover catch June's cold hands before it becomes a problem.", effects: { conditionAdd: "night_rotated", moraleMod: 6, xpBonus: 10 }, tip: "Rotation works only if every handover includes a check — cold hands, shivering, breathing. A rotation without checks is just scheduled neglect.", learnMore: ["m018"] },
+          failure: { narrative: "During the 2 AM handover the schedule slips — nobody wants to wake up, and June ends up in the cold spot for almost three hours. She wakes with teeth chattering, hands white, and takes an hour by the fire to stop shaking. She was the one who could least afford the gap.", effects: { conditionAdd: "child_chilled", moraleMod: -10 }, tip: "One uninterrupted cold gap is all it takes. Children and elders recover from cold slower than healthy adults — so the vulnerable need continuous warmth, not turns in it.", learnMore: ["m018", "m031"] },
+        },
+        "save-fuel": {
+          success: { narrative: "You bank the fuel and bed everyone down cold — but you can't sleep through June's shivering, and at 1 AM you give up and feed the fire properly. The fuel you saved is fuel you spend anyway, just hours later and after everyone has already gone cold.", effects: { conditionAdd: "fuel_saved", moraleMod: -6 }, tip: "Hypothermia kills faster than a fuel shortage does. Older adults with inadequate heating are among those at highest risk — a fire kept small all night is a gamble with the people who can least afford to lose.", learnMore: ["m018", "m032"] },
+          failure: { narrative: "The small fire dies to coals by midnight. Walter goes to bed cold and stays cold; June's shivering never settles into sleep. Nobody rests. The morning starts with two chilled people, one exhausted camp, and a week's fuel plan that already cost you the night it was supposed to protect.", effects: { conditionAdd: "camp_chilled", conditionAdd2: "fuel_saved", moraleMod: -16 }, tip: "Warmth, then water, then food, then medicine — that is the priority order when it is cold. Fuel is spent on the vulnerable tonight; the week takes care of itself tomorrow.", learnMore: ["m018", "m032"] },
+        },
+      },
+    },
+    {
+      id: "s2", title: "Stage 2 — 23:10, the Night Watch",
+      situation: "Everyone is down. The coldest hours are ahead — 2 to 5 AM — when the fire burns lowest and sleeping bodies produce the least heat. June and Walter are asleep; Walter takes pills that dull his body's temperature regulation. Somebody needs to check breathing and warmth through the night, or nobody does.",
+      check: { stat: "perception", difficulty: 11, tag: "medical", label: "The Night Watch" },
+      choices: [
+        { id: "check-rounds", q: "sound", label: "Set a watch through the night", desc: "Every ninety minutes: hands, feet, breathing — June and Walter first. Stoke the fire each round.", statHint: "perception", tag: "medical" },
+        { id: "buddy-warm", q: "risky", label: "Share body heat, lighter checks", desc: "June in your sleeping bag, Walter between two warm adults. Body heat through the night, one check before dawn.", statHint: "composure", tag: "warmth" },
+        { id: "sleep-through", q: "fatal", label: "Everyone sleeps — no watch", desc: "You're exhausted. Skip the checks, let the fire do its work, save your strength for tomorrow.", statHint: "endurance", tag: "utility" },
+      ],
+      outcomes: {
+        "check-rounds": {
+          success: { narrative: "The rounds run like clockwork. At 3 AM Walter's feet are cold to the touch — extra blanket, pulled closer to the fire, warm by four. At 4:30 June has kicked her covers off and you tuck her back in before she cools. Both wake alive and warm. That's what the watch was for.", effects: { conditionAdd: "watch_kept", moraleMod: 10, xpBonus: 20 }, tip: "In sleep the body produces less heat, and hypothermia steals awareness — a person may not know it is happening and won't be able to act. The very young and very old need someone awake enough to notice for them.", learnMore: ["m018", "m032"] },
+          failure: { narrative: "You sleep through the 3 AM round and wake panicked at 4:30 — everyone is still breathing, Walter's hands are cool but not cold, the fire is low but alive. Your heart doesn't settle for an hour. The system bent and didn't break, but only because you resumed it.", effects: { conditionAdd: "watch_kept", conditionAdd2: "exhausted", moraleMod: -6 }, tip: "A missed round is forgiven by a watch that resumes. The danger is never the stumble — it is deciding the watch doesn't matter.", learnMore: ["m018"] },
+        },
+        "buddy-warm": {
+          success: { narrative: "Shared body heat does the work the fire can't. June sleeps warm against you; Walter, sandwiched between two adults, stays steady all night. Dawn comes with everyone warm and only one tired check to show for it. Warm bodies are a legitimate heat source.", effects: { conditionAdd: "shared_warmth", moraleMod: 6, xpBonus: 10 }, tip: "Body heat — skin-to-skin contact, warming the chest, neck, and head — is a recognized rewarming method. It is a supplement to the fire, never a substitute for watching it.", learnMore: ["m018"] },
+          failure: { narrative: "Everyone sleeps too deeply in the shared warmth, and nobody feeds the fire. It dies at 3 AM. You wake at five to a cold shelter — and Walter's shivering has gone quiet, his thinking slow and slurry. An hour of blankets and the morning fire brings him back, but he spends the day grey and spent.", effects: { conditionAdd: "elder_chilled", conditionAdd2: "fire_dead", moraleMod: -12 }, tip: "Shivering that stops is the red line — below about 32°C the body quits producing heat on its own. A quiet, still, cold person is not resting. Check them.", learnMore: ["m018", "m032"] },
+        },
+        "sleep-through": {
+          success: { narrative: "You wake at 4 AM on pure instinct — the fire is coals, Walter's hands are white-cold, June is breathing fast and shallow. You spend an hour re-warming both of them with blankets and body heat. You got lucky. You will never, ever do this again.", effects: { conditionAdd: "near_miss", moraleMod: -8 }, tip: "You got lucky. Older adults with inadequate heating are among those at the highest risk of hypothermia — and cold bedrooms are a known killer of infants too. Unchecked cold does not always forgive.", learnMore: ["m018", "m032"] },
+          failure: { narrative: "The fire dies by 2 AM. Walter — seventy-four, already cold at bedtime, on pills that dull his temperature regulation — never wakes to tell anyone. His shivering fades as his core drops, and nobody is awake to see the one sign that mattered: the stillness. At dawn he is cold to the bone, and warming him does nothing. The watch was the difference between a person and a body.", effects: { fatal: true }, tip: "This is how it actually happens: quietly, in sleep, in someone whose body stopped signaling distress. Older adults recover from cold slower than anyone, and a single check at 3 AM would have found a living man.", learnMore: ["m018", "m032"] },
+        },
+      },
+    },
+    {
+      id: "s3", title: "Stage 3 — 07:30, the Hard Morning",
+      situation: "Dawn, −7°C. Walter's pill bottle is lighter than it should be — four days of his daily pills left, maybe five. The food cache is thinner than anyone admitted. Somebody eats first, somebody's medicine gets stretched, and Walter is watching you decide which of his pills matter.",
+      check: { stat: "knowledge", difficulty: 12, tag: "medical", label: "Read the Bottles" },
+      choices: [
+        { id: "meds-first", q: "sound", label: "Inventory the pills with Walter", desc: "Count every pill, learn which ones he says he can't skip, prioritize the essential ones, and plan the stretch together — his knowledge, your arithmetic.", statHint: "knowledge", tag: "medical" },
+        { id: "stretch-meds", q: "risky", label: "Half-doses starting today", desc: "Cut today's dose in half across the board to make the supply last the week. Everyone shares the pain.", statHint: "composure", tag: "medical" },
+        { id: "share-meds", q: "poor", label: "Give him pills from someone else's supply", desc: "Another camper has pills that look near enough. Same colour, same shape — close counts.", statHint: "perception", tag: "medical" },
+      ],
+      outcomes: {
+        "meds-first": {
+          success: { narrative: "You sit with Walter and count it out — every pill, every bottle. He knows his own regimen: which ones he must not miss, which ones can wait. The essential ones get protected at full schedule; the rest get stretched. He is part of the plan, not its subject, and the count is honest.", effects: { conditionAdd: "meds_planned", moraleMod: 8, xpBonus: 20 }, tip: "Never stop or cut a chronic medication without medical guidance — abrupt stopping of some drugs can trigger heart attack, dangerous blood sugar swings, or severe withdrawal. And never let the supply run uncounted: plan the shortage before it plans you.", learnMore: ["m027", "m026", "m032"] },
+          failure: { narrative: "The count is worse than hoped — three days of the critical pills, not five. But the plan is real: Walter knows which ones matter, knows the schedule, and knows you didn't guess. A hard truth he helped write beats a soft lie you wrote alone.", effects: { conditionAdd: "meds_short", moraleMod: -6 }, tip: "An honest inventory beats a hopeful guess. Red Cross guidance for elders in emergencies: keep a written record of every medication, its dose, and its timing — so decisions are made from facts, not from the bottle's weight in your hand.", learnMore: ["m027", "m032"] },
+        },
+        "stretch-meds": {
+          success: { narrative: "Half-doses go out with breakfast. Walter stays steady through the day — no dizziness, no shortfall symptoms. The bottle stretches toward the week's end. It worked this time, but you are spending his margin, and the account is nearly empty.", effects: { conditionAdd: "meds_stretched", moraleMod: 4, xpBonus: 10 }, tip: "Rationing has a price, and the price is function. When medication is short, watch the person, not the bottle: dizziness, confusion, unsteady steps. The goal is keeping him upright — not hoarding pills while he falls.", learnMore: ["m027", "m032"] },
+          failure: { narrative: "By afternoon Walter is dizzy on the latrine path — and he goes down hard. Bruised hip, scraped hands, not broken, but the camp's heart stops for a minute and Walter's pride takes the real hit. Half-doses bought you days and cost you his footing.", effects: { conditionAdd: "elder_fallen", conditionAdd2: "meds_stretched", moraleMod: -12 }, tip: "Falls are an elder's fastest route to disaster in camp conditions. When medication is short, the movement plan gets shorter too: no solo trips, no slopes, no night walks.", learnMore: ["m027", "m032"] },
+        },
+        "share-meds": {
+          success: { narrative: "Nothing visible happens — which is exactly the problem. No reaction you can see doesn't mean no interaction you can't. You stop before the second dose, shaken at how close 'close enough' came to something you couldn't take back.", effects: { moraleMod: -8 }, tip: "Never take a prescription that isn't yours — poison control's rule is absolute: do not share medicines, use only medicine prescribed for you. Effects depend on the individual, their conditions, and every other pill they take. 'Looks the same' means nothing.", learnMore: ["m027", "m020"] },
+          failure: { narrative: "Within the hour Walter breaks out in a rash and his breathing goes wrong — fast, shallow, wrong. You spend the day managing a reaction you caused, with no pharmacy, no antidote, and no way to know what you actually gave him. The pills sit untouched after that. Nobody suggests sharing again.", effects: { conditionAdd: "med_reaction", conditionAdd2: "meds_short", moraleMod: -18 }, tip: "A prescription is written for one body. Another person's pills can collide with his conditions and his other medications — side effects, interactions, allergic reactions. 'Trying to help' is not a safe dose.", learnMore: ["m027", "m020"] },
+        },
+      },
+    },
+    {
+      id: "s4", title: "Stage 4 — 10:00, the Long Day",
+      situation: "Morning. June has had loose stools twice — a gut bug starting, the kind that dehydrates a child fast. Walter is steadier on the planned pills. The day stretches long and cold: someone has to keep a seven-year-old occupied, calm, and hydrated, keep Walter useful without wearing him out, and keep the latrine's germs away from the food.",
+      check: { stat: "composure", difficulty: 11, tag: "psychology", label: "Hold the Day Together" },
+      choices: [
+        { id: "routine", q: "sound", label: "Routine, play, and a handwashing line", desc: "Fixed meal times, games and a small job for June, a separate sleeping corner for the sick, and the handwashing station on the path between latrine and food prep.", statHint: "composure", tag: "psychology" },
+        { id: "elder-leads", q: "risky", label: "Put the elder in charge of the day", desc: "Walter knows this country. Let him plan today's foraging route — his call, his pace.", statHint: "knowledge", tag: "community" },
+        { id: "still-quiet", q: "poor", label: "Keep the child quiet and still", desc: "Still means safe, quiet means calm. Keep June sitting by the fire and out of the way.", statHint: "composure", tag: "psychology" },
+      ],
+      outcomes: {
+        routine: {
+          success: { narrative: "The day finds its shape: breakfast, games, June's 'job' sorting the firewood, handwashing before every meal — the station sits exactly on the latrine-to-food path. June gets frequent small sips of oral rehydration solution through the day — ORS from the kit, or clean water with a little salt and sugar when the packets run out; the loose stools don't spread to anyone else. A routine is a promise a child can check.", effects: { conditionAdd: "camp_routine", moraleMod: 12, xpBonus: 20 }, tip: "Two rules hold a camp with the vulnerable: handwashing with soap between latrine and food breaks the fecal-oral route that spreads gut illness, and the sick sleep and eat apart from the well. CDC camp guidance is explicit — isolate the ill, wash the hands.", learnMore: ["m010", "m045", "p026"] },
+          failure: { narrative: "The routine holds but the play hour collapses — June is bored by noon and starts crying for home. The handwashing and the separation work; the camp stays healthy. But a bored, scared seven-year-old is a camp problem that water and soap don't solve.", effects: { conditionAdd: "camp_routine", conditionAdd2: "child_distressed", moraleMod: -4 }, tip: "Play is not a luxury — psychological first aid says to encourage play and keep familiar routines. It is how children process stress. A child with nothing to do has only fear to do.", learnMore: ["p026", "p025"] },
+        },
+        "elder-leads": {
+          success: { narrative: "Walter plans the day's foraging like he's done it a hundred times — because he has. He knows the ground, sets the pace, and the camp eats better tonight than it has in days. He stands straighter than he has since he arrived. Asked, not carried.", effects: { conditionAdd: "elder_purpose", moraleMod: 10, xpBonus: 10 }, tip: "Elders are not cargo. Red Cross emergency guidance is built on dignity, access, participation, and safety — the vulnerable participate in the response, they don't just receive it. Consult them; use what they know.", learnMore: ["m032", "p010"] },
+          failure: { narrative: "Walter plans the route and then tries to walk it like a younger man. He overdoes it on the slope, goes down hard, and comes back bruised and grey — and quiet about it, which is worse. The foraging gains don't cover what the fall cost.", effects: { conditionAdd: "elder_fallen", moraleMod: -10 }, tip: "Agency, yes — exhaustion, no. Give the elder work with a chair, not a hillside: plan from camp, decide the route, let younger legs walk it.", learnMore: ["m032"] },
+        },
+        "still-quiet": {
+          success: { narrative: "June sits still and quiet by the fire all day — no trouble, no noise. But she doesn't play, doesn't eat properly, and flinches when the wind bangs the shelter. A quiet child is not a calm child; she is a scared child being very good at hiding it.", effects: { moraleMod: -8 }, tip: "Children take their cues from the adults around them — especially young children. If the adults are tense and silent, the child reads danger. Your calm is her information.", learnMore: ["p026", "p025"] },
+          failure: { narrative: "By afternoon June is spiraling — clingy, crying, refusing water, and the gut bug worsens on the stress. Nothing you do reaches her, because 'sit still and be quiet' taught her that her fear has no place to go. The camp's mood collapses with hers.", effects: { conditionAdd: "child_distressed", conditionAdd2: "child_dehydrated", moraleMod: -18 }, tip: "Psychological first aid for children: answer questions honestly but without frightening detail, keep calm, keep them occupied, keep routines. Never pressure a frightened child into silence — give the fear somewhere to go.", learnMore: ["p026", "p025"] },
+        },
+      },
+    },
+  ],
 }
+
 ];
 
 
