@@ -11842,9 +11842,309 @@ const SCENARIOS = [
       },
     },
   ],
-}
+},
 
 
+{
+  id: "first-fire",
+  biomes: ["boreal", "temperate_forest"],
+  title: "First Fire",
+  icon: "◔",
+  difficulty: 1,
+  phase: 0,
+  gear: "kit",
+  timeOfDay: "16:40",
+  environment: "Late afternoon at your planned campsite: a flat clearing on the edge of a boreal stand, a stone fire ring left by past campers, your kit unpacked on a log. Sunset in about an hour and a half.",
+  weather: "Temperature dropping as the sun falls toward the treetops. Overcast sky, thin gray light, and a light breeze threading through the pines — enough to steal warmth from bare hands and carry loose sparks somewhere you don't want them.",
+  relatedDomain: "fire",
+  intro: "The sun is dropping behind the pines, and your first night out will be decided by this: a fire. Every fire runs on the same three things — fuel, oxygen, heat — and it dies the moment any one of the three is taken away. But the triangle doesn't start the fire. Preparation does: tinder first, then kindling, then fuel, gathered in that order. The ferro rod is the last step, not the first.",
+  stages: [
+    {
+      id: "s1", title: "Stage 1 — Gather in Order",
+      situation: "The ring is ready and you have one ferro rod. Before you think about a spark, you need the whole ladder of material — and the order you gather it in matters more than the tool you carry.",
+      check: { stat: "knowledge", difficulty: 7, tag: "fire", label: "Tinder & Fuel Order" },
+      randomEvents: [
+        { chance: 0.25, text: "Under a fallen pine you find a thick mat of dry bark curls, already curled off and papery.", effect: { conditionAdd: "bark_cache_found", moraleMod: 10 } },
+        { chance: 0.2, text: "The breeze stiffens. Anything loose and dry starts drifting — keep your tinder gathered tight.", effect: { moraleMod: -5 } },
+      ],
+      choices: [
+        { id: "ordered", label: "Gather tinder first, then kindling, then fuel", desc: "A jacket-full of fine dry tinder, an armload of pencil-thin twigs, then wrist-thick dead branches. Small to large, in that order.", statHint: "knowledge", tag: "fire", q: "sound" },
+        { id: "big_logs", label: "Grab the big logs and figure it out", desc: "Drag the heaviest dead wood to camp. Fire is fire — a spark is a spark.", statHint: "strength", tag: "fire", q: "poor" },
+        { id: "mixed", label: "Gather mixed armfuls and sort it out later", desc: "Grab everything that looks dry and hope the pile sorts itself out at camp.", statHint: "endurance", tag: "fire", q: "risky" },
+      ],
+      outcomes: {
+        ordered: {
+          success: { narrative: "Three deliberate trips: first a jacket-full of birch bark curls and dry grass, then an armload of pencil-thin twigs, then wrist-thick dead branches snapped short. Laid out by the ring it looks like a staircase of sizes — small to large, each step feeding the next. You haven't struck a single spark, and the fire is already half built.", effects: { conditionAdd: "ladder_gathered", xpBonus: 20 }, tip: "Gather in size order: fine dry tinder first (birch bark, dry grass, feather sticks), then kindling pencil-to-thumb thick, then fuel wood wrist-thick and up. A flame that starts on tinder must find kindling within seconds — each stage feeds the next.", learnMore: ["f003"] },
+          failure: { narrative: "Even in order, the first armload of 'dry' grass turns out to be damp underneath. You re-sort, discard the worst of it, and still end up with enough — at the cost of twenty minutes of fading light.", effects: { moraleMod: -5 }, tip: "Test dryness with your hands, not your hopes. Squeeze tinder hard — if it clumps and stays clumped, it's damp. Dry material springs back apart.", learnMore: ["f003"] },
+        },
+        big_logs: {
+          success: { narrative: "Against the odds, one cracked log splits along its grain and reveals a dry inner face that takes a spark. It's luck wearing a disguise as skill — don't invoice it twice.", effects: { moraleMod: 5 }, tip: "Split wood exposes dry interior faces that ignite far more easily than bark or weathered outer wood. But a plan that depends on luck is not a plan.", learnMore: ["f003"] },
+          failure: { narrative: "The thick logs stare back at you. Your sparks land on solid bark and die in the cracks — there is nothing fine enough to catch them. An hour of fading light burns while you realize you gathered the roof before the foundation.", effects: { conditionAdd: "big_logs_gathered", moraleMod: -15 }, tip: "Surface area is everything. A spark cannot heat a whole log — it needs fine, dry tinder with huge surface area to catch first. Big logs are the last step of fire building, never the first.", learnMore: ["f001", "f003"] },
+        },
+        mixed: {
+          success: { narrative: "The pile is chaos, but you sort it fast by the ring: the fine stuff shredded into a bundle, twigs snapped to length, branches broken down. It costs you fifteen minutes you didn't want to spend, but the ladder appears.", effects: { conditionAdd: "fuel_sorted_late", moraleMod: -5 }, tip: "Sorting at camp works, but it costs time and daylight — and every minute spent sorting is one the sun keeps sinking. Gathering in order is free; sorting is a tax.", learnMore: ["f003"] },
+          failure: { narrative: "Half the armfuls are half-rotted or damp inside, and the sorting takes so long the light is nearly gone before you even start the lay. You end up racing a fire you haven't built yet.", effects: { conditionAdd: "fuel_wasted", moraleMod: -10 }, tip: "Unsorted armfuls hide damp and rotten wood inside the bundle. When gathering blindly, everything takes longer — and in fading light, longer is the most expensive word there is.", learnMore: ["f003"] },
+        },
+      },
+    },
+    {
+      id: "s2", title: "Stage 2 — Prepare Before You Strike",
+      situation: "The ladder of material is piled beside the ring. Your hands are getting clumsy with cold, and you have a limited number of good strikes in your arms tonight. How do you use the first one?",
+      check: { stat: "knowledge", difficulty: 8, tag: "fire", label: "Fire Lay Preparation" },
+      randomEvents: [
+        { chance: 0.3, text: "A patch of old man's beard hangs bone-dry from a low branch — superb tinder, free of charge.", effect: { conditionAdd: "tinder_cache_found", moraleMod: 10 } },
+        { chance: 0.15, text: "A gust scatters part of your shredded tinder across the ring. Gather it before it goes.", effect: { moraleMod: -8 } },
+      ],
+      choices: [
+        { id: "lay_first", label: "Lay the full fire — tinder bundle, kindling tipi, windbreak — before striking", desc: "Shred the tinder into a bird's nest, lean kindling in a tipi, set a stone or log windbreak on the breeze side. Only then strike.", statHint: "knowledge", tag: "fire", q: "sound" },
+        { id: "strike_first", label: "Strike the rod now, then hunt for tinder while the spark is fresh", desc: "Sparks first, details later. Surely something dry will turn up.", statHint: "composure", tag: "fire", q: "poor" },
+        { id: "skip_windbreak", label: "Prepare everything but skip the windbreak", desc: "The breeze is light. A windbreak can wait until the flame is established.", statHint: "perception", tag: "fire", q: "risky" },
+      ],
+      outcomes: {
+        lay_first: {
+          success: { narrative: "You shred the birch bark into a loose bird's nest, lean the twigs in a tipi over it, and stack two logs on the windward side. Only then do you strike — and the first shower of sparks lands in a nest that is ready, not hopeful. The tinder catches on the third strike, and you feed it twig by twig until the tipi takes.", effects: { conditionAdd: "fire_lit", xpBonus: 20 }, tip: "Prepare the entire fire lay before striking: tinder bundle shredded and loose, kindling tipi over it, fuel staged within arm's reach. A spark lasts seconds — your preparation decides what those seconds land on.", learnMore: ["f004", "f002"] },
+          failure: { narrative: "The nest takes four strikes instead of three — your fingers are clumsier than you budgeted for. The lay still pays off: the prepared tinder catches anyway, and the kindling follows. Preparation absorbed the mistake.", effects: { moraleMod: -5 }, tip: "A fully prepared lay forgives clumsy hands. That is the entire point of preparing — the work you did before the strike carries you through the strike itself.", learnMore: ["f004"] },
+        },
+        strike_first: {
+          success: { narrative: "One lucky spark lands in a crack of bark and smoulders just long enough for you to sprint back with a handful of grass. It's a fire — built on a sprint and a fluke, and you know it.", effects: { moraleMod: 5 }, tip: "Luck is not a method. The spark worked because it found something fine and dry — the one thing a prepared lay guarantees and a gamble merely hopes for.", learnMore: ["f002"] },
+          failure: { narrative: "You strike. Bright sparks scatter across bare stone and die in seconds, each one smaller than the last. By the time you return with a handful of bark, your arm is shaking and the sparks scatter wrong. The rod was never the problem — the missing preparation was.", effects: { conditionAdd: "sparks_wasted", moraleMod: -15 }, tip: "Ignition is the last step, not the first. Striking before the tinder is prepared spends your best tool on nothing — and cold hands make every attempt worse.", learnMore: ["f002", "f004"] },
+        },
+        skip_windbreak: {
+          success: { narrative: "The nest catches, the tipi climbs — and then the breeze finds it. The flame leans hard, guttering, and you spend ten minutes shielding it with your body and feeding it slowly until it grows roots deep enough to stand. It works, but your hands are numb.", effects: { conditionAdd: "fire_lit", moraleMod: -5 }, tip: "A windbreak doesn't just protect the flame — it protects you from having to protect the flame. Ten minutes of body-shielding is ten minutes of heat loss and clumsier hands.", learnMore: ["f004"] },
+          failure: { narrative: "The breeze steals heat from the small flame faster than the kindling can catch. You burn through half your tinder for a flame that never gets past a matchstick, and you're back to gathering — this time in the dark.", effects: { conditionAdd: "tinder_spent", moraleMod: -15 }, tip: "Wind steals heat from a small flame faster than the flame can grow. Even a light breeze is enough to flatten a young fire — a windbreak on the windward side is part of the lay, not an accessory.", learnMore: ["f004"] },
+        },
+      },
+    },
+    {
+      id: "s3", title: "Stage 3 — Feed It Into the Night",
+      situation: "Dusk is settling on the treetops and the fire is burning steadily. It will either be burning all night, or it won't. What kind of morning are you buying yourself?",
+      check: { stat: "composure", difficulty: 7, tag: "fire", label: "Overnight Fire Care" },
+      randomEvents: [
+        { chance: 0.25, text: "You find a dead-standing birch already down and punky-dry — it will burn slow and hot.", effect: { conditionAdd: "good_fuel_found", moraleMod: 10 } },
+        { chance: 0.2, text: "Embers keep finding gaps in your windbreak. Small adjustments, constant attention.", effect: { moraleMod: -5 } },
+      ],
+      choices: [
+        { id: "feed_and_bank", label: "Feed it gradually, build a windbreak, bank the coals before sleep", desc: "Steady fuel, a stacked-log windbreak, and coals buried in ash before bed — a fire you can wake up from.", statHint: "composure", tag: "fire", q: "sound" },
+        { id: "roar", label: "Feed it big and let it roar while you sleep — get ahead", desc: "Pile on the fuel. A big fire means a long fire, and you'll be asleep anyway.", statHint: "endurance", tag: "fire", q: "poor" },
+        { id: "let_die", label: "Let it burn out and trust the sleeping bag", desc: "The fire did its job. Extinguish it properly and sleep warm in the bag.", statHint: "composure", tag: "fire", q: "risky" },
+      ],
+      outcomes: {
+        feed_and_bank: {
+          success: { narrative: "You feed the fire a steady armload through the evening — never smothering it, never starving it — and stack the remaining logs into a low wall on the windward side. Before sleep you push the coals together and bury them in ash. Hours later you wake, rake the ash back, and the coals glow alive on the first breath.", effects: { conditionAdd: "coals_banked", xpBonus: 25 }, tip: "Bank coals before sleep: push them together and cover with ash to insulate them from the air. A banked fire revives in minutes in the morning — a dead fire has to be built from nothing.", learnMore: ["f017", "f006"] },
+          failure: { narrative: "The banking works, but you underestimated the night's damp: the coals are smaller come morning. They still revive with breath and dry bark — a banked fire bends, it doesn't break.", effects: { moraleMod: -5 }, tip: "Banking is insurance, not a guarantee — deep ash and tight coals make the difference between embers at dawn and a cold ring. Check the bank if you wake in the night.", learnMore: ["f017"] },
+        },
+        roar: {
+          success: { narrative: "The bonfire burns through your stockpile and into the small hours. You sleep warm — and wake to a cold ring, an empty woodpile, and a morning that demands a full rebuild with stiff hands.", effects: { moraleMod: 5 }, tip: "A roaring fire feels productive, but heat that leaves while you sleep is heat you paid for twice: once to burn, once to rebuild. Steady beats spectacular.", learnMore: ["f006"] },
+          failure: { narrative: "You pile on fuel and crawl into the bag. The fire roars, chews through your stockpile, and by midnight it's a bed of ash and scattered embers — half your morning fuel gone up the sky, and a wind-blown patch of scorched grass beyond the ring will bother you until dawn.", effects: { conditionAdd: "woodpile_burned", moraleMod: -15 }, tip: "An unattended fire does not burn longer — it burns faster, wastes fuel, and throws sparks beyond the ring. A fire fed steadily through the evening delivers more total heat for less wood than one bonfire.", learnMore: ["f006", "f010"] },
+        },
+        let_die: {
+          success: { narrative: "The night is milder than feared, and the sleeping bag holds. You wake cold but functional — with a fire to rebuild from scratch and stiff fingers to do it with.", effects: { moraleMod: 5 }, tip: "Sometimes you get away with it. But a dead fire means rebuilding everything in the morning cold — and if the night turns colder than expected, there is no backup.", learnMore: ["f014", "f006"] },
+          failure: { narrative: "The temperature drops harder than the evening promised. By the small hours you're awake, shivering, and rebuilding a fire in the dark with numb hands — exactly the job a bed of banked coals would have done for you.", effects: { conditionAdd: "woke_up_cold", moraleMod: -12 }, tip: "Extinguishing a fire before sleep is a bet that the night stays mild. Banked coals cost minutes and buy a warm morning — the cheapest insurance in camp.", learnMore: ["f014", "f017"] },
+        },
+      },
+    },
+  ],
+},
+{
+    id: "safe-water",
+    biomes: ["temperate_forest", "highland", "grassland"],
+    title: "Don't Drink That",
+    icon: "◎",
+    difficulty: 1,
+    phase: 0,
+    gear: "kit",
+    timeOfDay: "10:20",
+    environment: "Day two at your planned camp. A stream runs 200 metres from your shelter — clear, fast, and cold. Your camp bottles are down to the last litre.",
+    weather: "Clear morning, mild, no wind. The stream is running high and bright from yesterday's rain upstream.",
+    relatedDomain: "water",
+    intro: "Clear water is not safe water. The things that will make you sick — giardia, cryptosporidium, bacteria — are invisible; they change nothing about how water looks, smells, or tastes. The one reliable thing you can do for yourself with basic equipment is a rolling boil. This scenario is about that, and about not undoing it afterwards.",
+    stages: [
+      {
+        id: "s1", title: "Stage 1 — Read the Water",
+        situation: "The stream looks pristine — clear and cold. Before you fill your bottles, do you trust your eyes, or do you check what's upstream?",
+        check: { stat: "perception", difficulty: 7, tag: "water", label: "Water Source Assessment" },
+        randomEvents: [
+          { chance: 0.25, text: "You spot fresh deer tracks crossing the stream a little way up — animals drink and foul here.", effect: { moraleMod: -5 } },
+          { chance: 0.2, text: "A shallow side eddy traps leaves and silt; the main current runs clear beside it.", effect: { conditionAdd: "eddy_noted", moraleMod: 5 } },
+        ],
+        choices: [
+          { id: "scout",    label: "Scout upstream before filling",            desc: "Walk 10 minutes up the bank: look for dead animals, camps, livestock, or anything fouling the water.", statHint: "perception", tag: "water", q: "sound" },
+          { id: "stagnant", label: "Fill from the closer stagnant pool",       desc: "Save the 10-minute walk. The pool is right here, and the water looks fine.", statHint: "endurance", tag: "water", q: "risky" },
+          { id: "drink",    label: "Drink straight from the stream",           desc: "It's clear, cold, and moving fast. Your eyes say it's clean.", statHint: "composure", tag: "water", q: "poor" },
+        ],
+        outcomes: {
+          scout: {
+            success: { narrative: "The upstream walk pays off. You find a beaver dam 300 metres up — the whole colony has been using this stream for months. You also spot a spot where the bank erodes and runoff pours straight in. None of this was visible from your fill point.", effects: { conditionAdd: "water_upstream_checked", xpBonus: 20 }, tip: "What fouls water is upstream, not at your fill point. Beaver activity means giardia is likely; runoff after rain means fresh contamination. Always scout before you trust a source.", learnMore: ["w026", "w040"] },
+            failure: { narrative: "The bank is thick with brambles and the walk costs you real time and sweat. You find nothing damning, but now you know the next half-kilometre is clean-ish — which is better than not knowing at all.", effects: { conditionAdd: "water_upstream_checked" }, tip: "Even an inconclusive scout teaches you the land. And the walk is cheap compared to a week of cramps.", learnMore: ["w001", "w040"] },
+          },
+          stagnant: {
+            success: { narrative: "You fill quickly from the pool and get moving. The water looks okay, and today it happens to be okay — but you noticed the film on the surface, and it stays in your head all afternoon.", effects: { conditionAdd: "water_filled_stagnant", moraleMod: -5 }, tip: "Stagnant water concentrates everything: bacteria, parasites, runoff. Flowing water dilutes; standing water accumulates. Choose the current, not the pool.", learnMore: ["w026", "w001"] },
+            failure: { narrative: "The pool had been warm in the sun for days. By evening your gut is cramping and churning — classic signs of something living in that water. You spend the night close to the latrine instead of sleeping.", effects: { conditionAdd: "water_sick", moraleMod: -20 }, tip: "Warm stagnant water is ideal breeding ground for bacteria and parasites. Cramps, nausea, and diarrhoea 6–72 hours after drinking are the textbook signature of waterborne illness.", learnMore: ["w026", "w027"] },
+          },
+          drink: {
+            success: { narrative: "You cup your hands and drink. Cold, clean, refreshing — and this time, lucky. Nothing hits you today. But nothing about how that water looked told you it would be safe.", effects: { conditionAdd: "water_drank_raw", moraleMod: 5 }, tip: "Getting away with it is not data. Giardia and cryptosporidium are invisible and survive cold water for weeks. Clear and cold tells you nothing about pathogens.", learnMore: ["w026", "w040"] },
+            failure: { narrative: "Twelve hours later your stomach turns. Cramping, nausea, watery diarrhoea — the classic giardia signature, showing up a day or two after the drink. That crystal-clear stream had beaver upstream, and beaver means giardia.", effects: { conditionAdd: "water_sick", moraleMod: -25 }, tip: "Giardia's hallmark: cramping and diarrhoea 1–3 weeks after exposure (sometimes sooner with heavy contamination). It does not change the water's look, taste, or smell. Clear is not clean.", learnMore: ["w026", "w027"] },
+          },
+        },
+      },
+      {
+        id: "s2", title: "Stage 2 — Make It Safe",
+        situation: "Bottles filled from the stream. You have a pot, firewood, and daylight. How do you make this water safe to drink?",
+        check: { stat: "knowledge", difficulty: 8, tag: "water", label: "Water Purification" },
+        randomEvents: [
+          { chance: 0.2, text: "You find a spare length of cloth in your kit — enough for a decent pre-filter.", effect: { conditionAdd: "cloth_found", moraleMod: 8 } },
+          { chance: 0.15, text: "Charcoal from last night's fire is still in the fire ring — useful for an improvised filter.", effect: { conditionAdd: "charcoal_available", moraleMod: 5 } },
+        ],
+        choices: [
+          { id: "boil",    label: "Boil it to a rolling boil for a full minute", desc: "Pour it through cloth first to clear the grit, then a hard rolling boil. The reliable baseline.", statHint: "knowledge", tag: "water", q: "sound" },
+          { id: "filter",  label: "Run it through an improvised cloth-and-charcoal filter", desc: "Looks crystal clear coming out. Clarification is fast and uses no firewood.", statHint: "knowledge", tag: "water", q: "risky" },
+          { id: "settle",  label: "Let it sit so the sediment settles, then drink", desc: "The mud sinks to the bottom in an hour. Clear water on top means clean, right?", statHint: "composure", tag: "water", q: "poor" },
+        ],
+        outcomes: {
+          boil: {
+            success: { narrative: "You pre-filter through cloth to knock out the grit, then get a hard rolling boil for a full minute — longer than feels necessary, which is the point. The bottles get filled while it's still hot and covered as it cools. This is water you can trust.", effects: { conditionAdd: "water_boiled", xpBonus: 25 }, tip: "A rolling boil for one minute destroys viruses, bacteria, and parasites including giardia and cryptosporidium. At high altitude — above roughly 2,000 metres — boil for three minutes. This is the gold standard because it needs no gear and no chemistry.", learnMore: ["w011", "w010"] },
+            failure: { narrative: "The fire is fighting damp wood and you manage only a weak simmer before giving up. It's better than nothing — heat helps — but a simmer that barely bubbles isn't a verified rolling boil, and you know it.", effects: { conditionAdd: "water_boiled_weak", moraleMod: -8 }, tip: "A lazy simmer does not guarantee pathogens are neutralized. The water must reach a full rolling boil — vigorous bubbling across the surface — for the full minute. If the fire can't do it, that is a fire problem to fix.", learnMore: ["w011", "w030"] },
+          },
+          filter: {
+            success: { narrative: "Your layered cloth-and-charcoal setup turns cloudy water crystal clear. It looks wonderful. But you know what you're looking at: clear, not disinfected — so you keep it for washing and save your remaining treated water for drinking.", effects: { conditionAdd: "water_filtered", moraleMod: 5 }, tip: "Improvised filters clarify — they remove grit, some sediment, and improve taste. They do not reliably remove bacteria or parasites unless the filter medium is rated for it. Filtering is step one of a system, never the whole system.", learnMore: ["w012", "w015"] },
+            failure: { narrative: "It comes out beautifully clear and you drink deep. Clear water, invisible passengers. By tomorrow your gut is paying for the lesson that clarification is cosmetic — bacteria and parasites pass straight through cloth.", effects: { conditionAdd: "water_sick", moraleMod: -20 }, tip: "Bacteria are around a micron across; parasites a few microns. Cloth pores are vastly larger. A filter that isn't rated for disinfection is a clarifier, not a purifier — pair it with boiling or chemical treatment.", learnMore: ["w012", "w026"] },
+          },
+          settle: {
+            success: { narrative: "You let the bottle sit and the sediment sinks. The top water is beautifully clear — and you drink it anyway, because you never learned what settling actually does. Today nothing hits you. The lesson arrives as luck, not knowledge.", effects: { conditionAdd: "water_settled_drank", moraleMod: 5 }, tip: "Settling removes grit, nothing biological. The pathogens stay suspended in the clear water. Getting away with it is luck, not a method.", learnMore: ["w026", "w040"] },
+            failure: { narrative: "The sediment sinks neatly and the top water sparkles. You drink it with confidence — and by the next day you are cramping and running to the latrine. Settling removed mud. It removed nothing alive.", effects: { conditionAdd: "water_sick", moraleMod: -25 }, tip: "Decanting clears turbidity but leaves every virus, bacterium, and parasite right where it was. Settling is a useful pre-treatment before boiling — it makes boiling more effective — but it is never purification on its own.", learnMore: ["w026", "w027"] },
+          },
+        },
+      },
+      {
+        id: "s3", title: "Stage 3 — Keep It Clean",
+        situation: "You've boiled two litres. Now it has to stay safe until it's drunk — through dinner, overnight, and the morning. How do you store it?",
+        check: { stat: "knowledge", difficulty: 7, tag: "water", label: "Water Storage Hygiene" },
+        randomEvents: [
+          { chance: 0.2, text: "Someone offers you a spare bottle — clean and capped.", effect: { moraleMod: 8 } },
+          { chance: 0.15, text: "A fly lands on the rim of your open bottle and you swat it too late.", effect: { conditionAdd: "fly_landed", moraleMod: -5 } },
+        ],
+        choices: [
+          { id: "cover",    label: "Store it in a clean covered container, away from the waste area", desc: "Rinsed bottles, caps on, stored upwind and uphill of the latrine and the dish-wash pit.", statHint: "knowledge", tag: "water", q: "sound" },
+          { id: "open_pot", label: "Keep it in the open cooking pot by the fire",      desc: "Everyone can see it, everyone can dip. Simple, social, convenient.", statHint: "composure", tag: "water", q: "risky" },
+          { id: "top_up",  label: "Top up the treated bottle with untreated water to stretch it", desc: "Two litres treated, one litre left of stream water. Mix and you've got three.", statHint: "endurance", tag: "water", q: "poor" },
+        ],
+        outcomes: {
+          cover: {
+            success: { narrative: "Bottles rinsed, capped, labelled as treated, and set on the high side of camp — uphill and upwind of the latrine. When someone reaches for water at midnight, the cap comes off and the cap goes back on. It stays what you made it: safe.", effects: { conditionAdd: "water_stored_clean", xpBonus: 15 }, tip: "Recontamination is the most common way treated water fails. Clean covered containers, capped between uses, stored uphill and upwind of latrines and waste. Never let hands, cups, or dip utensils touch the inside.", learnMore: ["w016", "w032"] },
+            failure: { narrative: "You rinse the bottles but leave one cap off overnight — a curious squirrel isn't the worry, dust and debris are. You re-boil it in the morning. A small cost, and a habit corrected early.", effects: { moraleMod: -5 }, tip: "An uncovered container re-collects contamination from air, insects, and hands. Capped is the rule, every time, between every use.", learnMore: ["w016", "w017"] },
+          },
+          open_pot: {
+            success: { narrative: "The pot sits by the fire, lid on when nobody is drinking. You watch it like a hawk and police every cup. It works — today. It only takes one dip of a dirty hand to undo the boiling.", effects: { conditionAdd: "water_stored_open", moraleMod: 5 }, tip: "Shared open containers are recontamination highways: every hand, every cup, every ladle is a new chance. If you must share, pour — never dip.", learnMore: ["w032", "w016"] },
+            failure: { narrative: "By morning half the camp has dipped into the pot — including with unwashed hands after the latrine. That pot is now a petri dish. You pour it out and start the boil again, annoyed at yourself for knowing better.", effects: { conditionAdd: "water_contaminated", moraleMod: -15 }, tip: "Hands carry fecal bacteria even when they look clean. One dip re-seeds the whole container. Treated water plus one dirty hand equals untreated water.", learnMore: ["w032", "w026"] },
+          },
+          top_up: {
+            success: { narrative: "You're about to pour the stream water in when you catch yourself. One bottle stays pure. You drink less tonight and boil the rest in the morning — discipline over comfort.", effects: { conditionAdd: "water_not_mixed", moraleMod: 5 }, tip: "Mixing treated and untreated water produces untreated water — the contamination dilutes, the pathogens survive. Keep the two strictly separate, always.", learnMore: ["w032", "w017"] },
+            failure: { narrative: "Three litres, all equally contaminated now. One part stream water re-seeds the whole bottle — the pathogens you boiled out are back in business. You feel fine tonight. That's the cruel part: you won't feel it until tomorrow.", effects: { conditionAdd: "water_contaminated", moraleMod: -25 }, tip: "Dilution is not purification. Adding untreated water to treated water recontaminates everything it touches. Separate containers, separate handling, no exceptions.", learnMore: ["w032", "w027"] },
+          },
+        },
+      },
+    ],
+  },
+{
+    id: "the-cut",
+    biomes: ["boreal", "temperate_forest", "highland"],
+    title: "The Cut",
+    icon: "◉",
+    difficulty: 1,
+    phase: 0,
+    gear: "kit",
+    timeOfDay: "15:10",
+    environment: "Afternoon at your planned campsite, batoning firewood with a fixed-blade knife on a chopping stump. Your pack and first aid kit are within arm's reach.",
+    weather: "Cool and overcast, dry air with a light breeze. No rain expected — a still, forgiving afternoon to be working with a blade.",
+    relatedDomain: "medical",
+    intro: "One missed strike and the knife skates across your palm. Blood wells up faster than you expected. For a bleeding wound, direct pressure comes first — lifting the hand high helps — and a wound must be clean before it's closed. A tourniquet is for life-threatening limb bleeding you can't stop otherwise, never a palm cut.",
+    stages: [
+      {
+        id: "s1", title: "Stage 1 — Stop the Bleed",
+        situation: "Blood is welling out of your palm in a steady flow. It looks worse than it is, but it won't stop on its own while you stand here deciding. Your first aid kit is right there.",
+        check: { stat: "composure", difficulty: 7, tag: "medical", label: "Direct Pressure" },
+        randomEvents: [
+          { chance: 0.25, text: "A folded bandana in your back pocket is still clean — perfect pressure cloth, already in reach.", effect: { conditionAdd: "clean_cloth_found", moraleMod: 10 } },
+          { chance: 0.2, text: "A mosquito finds you and you flinch — your hand drops below your heart for a moment.", effect: { moraleMod: -5 } },
+        ],
+        choices: [
+          { id: "pressure",   q: "sound", label: "Press hard with a clean cloth and lift your hand high", desc: "Direct pressure on the wound, hand above your heart. Hold it steady — don't peek every ten seconds.", statHint: "composure",  tag: "medical" },
+          { id: "tourniquet", q: "poor", label: "Tie a tourniquet tight above the wrist",                 desc: "Stop the bleeding for good by cutting off circulation to the whole hand.", statHint: "knowledge",   tag: "medical" },
+          { id: "carry_on",   q: "risky", label: "Wipe it off and keep splitting wood",                    desc: "It's just a palm cut — and you're on a roll with this firewood.", statHint: "endurance",   tag: "medical" },
+        ],
+        outcomes: {
+          pressure: {
+            success: { narrative: "Cloth on, pressure on, hand up. You hold it through five full minutes without lifting to check — and when you do look, the flow has eased to an ooze. Your hand is still yours, still working, still fed with blood.", effects: { conditionAdd: "bleeding_controlled", xpBonus: 20 }, tip: "Direct pressure with a clean cloth plus elevation above the heart is the first line for almost all bleeding. Pressure lets a clot form; elevation slows the flow feeding the wound.", learnMore: ["m003", "m002"] },
+            failure: { narrative: "You keep lifting the cloth to check, breaking the clot each time. Eventually you commit to five unbroken minutes and the bleeding settles — slower than it could have been, but controlled.", effects: { conditionAdd: "bleeding_controlled" }, tip: "Peeking under the pressure cloth breaks the forming clot and restarts the clock. Commit to five unbroken minutes of steady pressure.", learnMore: ["m003", "m002"] },
+          },
+          tourniquet: {
+            success: { narrative: "You never get that far — halfway through wrapping, your hand goes cold and numb and the mistake becomes obvious before any real damage is done. Off it comes.", effects: { conditionAdd: "hand_numb" }, tip: "A tourniquet on a forearm cut starves the entire hand of blood for no reason. It's reserved for life-threatening limb bleeding you cannot stop with pressure.", learnMore: ["m003"] },
+            failure: { narrative: "The wrap goes on tight and stays on. Within minutes your fingers are cold, pale, and tingling — you've traded a bleeding palm for a hand with no blood supply at all. You release it slowly, shaking out pins and needles, and go back to pressure like you should have done first.", effects: { conditionAdd: "hand_numb", moraleMod: -15 }, tip: "A tourniquet is for life-threatening limb bleeding only — arterial spurts you can't stop any other way. On a palm cut it causes more harm than the cut itself: numbness, tissue damage, and lost use of the hand.", learnMore: ["m003"] },
+          },
+          carry_on: {
+            success: { narrative: "The bleeding eases to a trickle on its own — lucky. You finish the wood, but the cut is packed with bark grit and keeps weeping under your grip.", effects: { conditionAdd: "bleeding_slowed", conditionAdd2: "wound_dirty" }, tip: "Lucky doesn't mean wise. Every swing drove dirt deeper into the cut, and a dirty open wound is a setup for the real problem three days from now.", learnMore: ["m002", "m007"] },
+            failure: { narrative: "The third swing reopens it fully and blood slicks the knife handle. The cut is now packed with bark grit and sap, and it won't stop bleeding while you keep working it.", effects: { conditionAdd: "wound_reopened", conditionAdd2: "wound_dirty", moraleMod: -10 }, tip: "Bleeding that restarts under activity won't close while the limb keeps working. Stop, press, elevate — the wood can wait.", learnMore: ["m003", "m002"] },
+          },
+        },
+      },
+      {
+        id: "s2", title: "Stage 2 — Clean It",
+        situation: "The bleeding has slowed. Your palm is filthy — bark dust, a visible wood splinter, sap. Whatever you put over this now stays with it. Clean it before you close it.",
+        check: { stat: "knowledge", difficulty: 8, tag: "medical", label: "Wound Cleaning" },
+        randomEvents: [
+          { chance: 0.2, text: "Your water bottle is still half full — clean water, right there.", effect: { moraleMod: 8 } },
+          { chance: 0.15, text: "A splinter shifts as you move your hand. It needs to come out before anything covers this.", effect: { moraleMod: -5 } },
+        ],
+        choices: [
+          { id: "irrigate",      q: "sound", label: "Flush with plenty of clean water, pick out debris, then cover", desc: "Pressure-rinse the cut with clean water, remove visible splinters with clean tweezers, then dress it.", statHint: "knowledge", tag: "medical" },
+          { id: "bandage_dirty", q: "poor", label: "Bandage it shut over the dirt to keep germs out",                 desc: "Cover it fast and tight — a sealed wound is a protected wound.", statHint: "knowledge", tag: "medical" },
+          { id: "alcohol_burn",  q: "risky", label: "Pour alcohol on it and touch the edge with a heated knife",        desc: "Disinfect with alcohol, then seal the wound by heat. Field cauterization.", statHint: "composure", tag: "medical" },
+        ],
+        outcomes: {
+          irrigate: {
+            success: { narrative: "Water first — you pour a long steady stream through the cut until it runs clear, then lift the splinter out with tweezers. The wound looks angry but honest. A clean dry dressing goes over a clean wound.", effects: { conditionRemove: "wound_dirty", conditionAdd: "wound_cleaned", xpBonus: 20 }, tip: "Irrigate wounds with plenty of clean water — pressure rinsing flushes out debris and contamination far better than dabbing. Remove visible debris, then cover. Clean first, close second, always in that order.", learnMore: ["m002", "m035"] },
+            failure: { narrative: "You flush it well but the tweezers slip and the splinter stays put. Still, the rinse got the bark dust out, and a clean dressing beats a dirty one. You'll deal with the splinter at the next change.", effects: { conditionAdd: "wound_cleaned" }, tip: "Even an imperfect irrigation removes most contamination. Flush with clean water until it runs clear — that's the part that matters most.", learnMore: ["m002", "m035"] },
+          },
+          bandage_dirty: {
+            success: { narrative: "You get it covered quickly, dirt and all. It's fast and sealed — but the bandage is just a lid on a contaminated wound.", effects: { conditionAdd: "wound_closed_dirty" }, tip: "Sealing contamination inside a wound is how infections start. A bandage over dirt doesn't keep germs out — it locks them in.", learnMore: ["m002", "m007"] },
+            failure: { narrative: "The bandage goes on tight over a wound full of bark grit and sap. By evening the palm throbs under the wrap — trapped debris, trapped moisture, and a perfect warm shelter for whatever was on that bark.", effects: { conditionAdd: "wound_closed_dirty", moraleMod: -15 }, tip: "Never close a dirty wound. Bandaging over debris traps contamination, moisture, and bacteria together — exactly the conditions infection wants.", learnMore: ["m002", "m007"] },
+          },
+          alcohol_burn: {
+            success: { narrative: "The alcohol burns white-hot and you jerk the knife away before it does much — the cut is disinfected and scorched at the rim. It stopped the moment but damaged the tissue around it.", effects: { conditionAdd: "wound_burned", moraleMod: -10 }, tip: "Alcohol damages healing tissue and cauterization burns it. Neither belongs in a field kit: alcohol stings, delays healing, and a heated knife turns a cleanable wound into a burn.", learnMore: ["m002", "m005"] },
+            failure: { narrative: "The alcohol hits like a white flash and the heated edge sears the rim of the cut. Now you have a palm wound ringed with a fresh burn — damaged tissue that heals slower, hurts more, and invites exactly the infection you were trying to prevent.", effects: { conditionAdd: "wound_burned", moraleMod: -20 }, tip: "Alcohol damages healthy tissue along with germs and delays healing. Cauterization belongs nowhere in a field kit — a burned wound edge heals slower and infects more easily than a clean-rinsed one.", learnMore: ["m002", "m005"] },
+          },
+        },
+      },
+      {
+        id: "s3", title: "Stage 3 — The Next Three Days",
+        situation: "The wound is cleaned and dressed. Camp life continues for three days — dishes, firewood, weather. The cut doesn't need drama now; it needs watching.",
+        check: { stat: "knowledge", difficulty: 7, tag: "medical", label: "Infection Watch" },
+        randomEvents: [
+          { chance: 0.25, text: "You have enough spare bandage to change the dressing daily. That's the whole game, right there.", effect: { moraleMod: 10 } },
+          { chance: 0.2, text: "Afternoon rain threatens. A wet dressing is a useless dressing.", effect: { conditionAdd: "rain_threat", moraleMod: -8 } },
+        ],
+        choices: [
+          { id: "dressing", q: "sound", label: "Keep a dry dressing on, change it daily, watch for warning signs", desc: "Clean dry cover, fresh each day. Check for spreading redness, heat, swelling, red streaks, pus, or fever.", statHint: "knowledge",  tag: "medical" },
+          { id: "air_out", q: "risky", label: "Leave it open to air out in the camp",                          desc: "Fresh air heals. The bandage can stay off while you work around camp.", statHint: "endurance",  tag: "medical" },
+          { id: "ignore",  q: "poor", label: "Ignore it and do dishes and firewood as normal",                desc: "It's a cut, not a crisis. Soak it in dishwater, grab rough logs, don't baby it.", statHint: "endurance",  tag: "medical" },
+        ],
+        outcomes: {
+          dressing: {
+            success: { narrative: "Each morning the old dressing comes off and a dry one goes on. Day two, the wound edges look pink and closing; day three, no spreading redness, no streaks, no heat. Boring is the best possible outcome.", effects: { conditionAdd: "wound_dressed", conditionRemove: "wound_dirty", xpBonus: 25 }, tip: "Keep wounds covered with a dry dressing and change it daily. Watch for infection signs: spreading redness, warmth, swelling, red streaks, pus, or fever. At the first sign, reopen, clean, and re-cover.", learnMore: ["m002", "m007"] },
+            failure: { narrative: "You change the dressing daily but skip a day when rain soaks your supplies. The one damp dressing stays on too long and the skin around it softens — recoverable, but a reminder that dry and daily is the whole protocol.", effects: { conditionAdd: "wound_dressed" }, tip: "A wet dressing must come off — dampness softens the wound edges and invites infection. Keep spare dry dressings and change them daily without exception.", learnMore: ["m002", "m007"] },
+          },
+          air_out: {
+            success: { narrative: "You air it out in camp and the edges start to dry — the air feels like progress. But every gust carries dust, and by evening there's grit on the raw surface again.", effects: { conditionAdd: "wound_dressed" }, tip: "Airing a fresh wound in a camp environment just invites dirt back in. Keep it covered with a dry dressing until the skin has started to close.", learnMore: ["m002", "m007"] },
+            failure: { narrative: "Two days open in camp air and the wound is crusted with dust. The edges look puffy and warm, and a faint redness creeps outward from the cut. Dirt re-entered exactly as warned.", effects: { conditionAdd: "wound_dirty", conditionAdd2: "infection_signs", moraleMod: -15 }, tip: "Open wounds in camp grime collect dirt fast. Redness that spreads outward, heat, swelling, and red streaks are the warning signs — at the first sign, reopen, clean with water, and re-cover.", learnMore: ["m007", "m002"] },
+          },
+          ignore: {
+            success: { narrative: "You work it hard and it survives on stubbornness. But the edges stay open and angry, and every night the palm aches where it shouldn't.", effects: { conditionAdd: "wound_dirty", moraleMod: -10 }, tip: "Working a wound like nothing happened grinds contamination in and reopens edges. Rest the hand, keep it clean and covered — the work waits.", learnMore: ["m007", "m002"] },
+            failure: { narrative: "Day two, the cut throbs. Day three, redness spreads outward from the wound, the skin is hot to the touch, and a red streak starts climbing toward your wrist. Dishwater and rough firewood ground camp grime straight into it. This is what infection looks like — redness, heat, streaks — and the only move is to reopen it, clean it properly, and re-cover.", effects: { conditionAdd: "infection_signs", conditionAdd2: "wound_reopened", moraleMod: -20 }, tip: "Infection signs: spreading redness, warmth, swelling, red streaks, pus, fever. At the first sign — reopen the wound, irrigate it with clean water, and re-cover with a dry dressing. Ignoring it is how a small cut becomes a real problem.", learnMore: ["m007", "m002"] },
+          },
+        },
+      },
+    ],
+  },
 ];
 
 
