@@ -18,6 +18,7 @@
 
 /* ── Tokens ─────────────────────────────────────────────────────────────── */
 :root {
+  --tabbar-h: 62px;
   /* Phosphor terminal: one hue, chosen by the user. Everything derives
      from --phosphor via color-mix; only --red stays independent (alerts). */
   --phosphor:    #00ff41;
@@ -456,7 +457,7 @@ body::after {
    ════════════════════════════════════════════════════════════════════════════ */
 #screen {
   position: fixed;
-  top: var(--topbar-h); left: 0; right: 0; bottom: 0;
+  top: var(--topbar-h); left: 0; right: 0; bottom: var(--tabbar-h);
   overflow-y: auto;
   overscroll-behavior-y: contain;
   overflow-anchor: none;
@@ -2539,6 +2540,134 @@ body::after {
 }
 #install-pwa-btn:hover { background: var(--amber-lt); transform: translateY(-2px); }
 #install-pwa-btn:active { transform: translateY(0); }
+/* ════════════════════════════════════════════════════════════════════════════
+   BOTTOM TAB BAR — the four primary destinations (Console v2)
+   ════════════════════════════════════════════════════════════════════════════ */
+#tabbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  display: flex;
+  background: #040604;
+  border-top: 1px solid var(--border2);
+  z-index: 900;
+}
+.tabbar-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-faint);
+  font-family: inherit;
+  padding: 8px 0 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+.tabbar-icon { font-size: 19px; line-height: 1; }
+.tabbar-label {
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.tabbar-tab.active { color: var(--phosphor); }
+.tabbar-tab.active .tabbar-icon {
+  text-shadow: 0 0 8px var(--phosphor);
+}
+
+/* Topbar back button (global nav history) */
+#back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px; height: 34px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--phosphor);
+  cursor: pointer;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+#back-btn[hidden] { display: none; }
+#back-btn:active { background: var(--bg3); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ARTICLE "GO FURTHER" — cross-links: lessons, atlas, simulator, gear
+   ════════════════════════════════════════════════════════════════════════════ */
+.go-further {
+  margin-top: 28px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+.go-further-title {
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+.go-further-group { margin-bottom: 14px; }
+.go-further-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.go-further-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.go-further-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  background: var(--bg2);
+  color: var(--phosphor);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+.go-further-link:active { background: var(--bg3); }
+.go-further-empty {
+  font-size: 12px;
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   LOADOUT STRIP — simulator menu entry point to the gear shop
+   ════════════════════════════════════════════════════════════════════════════ */
+.loadout-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  color: var(--text);
+}
+.loadout-strip:active { background: var(--bg3); }
+.loadout-strip-icon { font-size: 22px; color: var(--phosphor); flex-shrink: 0; }
+.loadout-strip-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.loadout-strip-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.loadout-strip-sub { font-size: 11px; color: var(--text-dim); }
+.loadout-strip-arrow { color: var(--text-faint); font-size: 18px; }
 
 </style>
 </head>
@@ -2586,28 +2715,26 @@ body::after {
     <div class="drawer-body">
       <div class="drawer-section">Navigation</div>
 
+      <div class="drawer-item" data-nav="learning">
+        <span class="di">◈</span> Learn
+      </div>
+
+      <div class="drawer-item" data-nav="library">
+        <span class="di">📖</span> Library
+      </div>
+
       <div class="drawer-item" data-nav="simulator">
-        <span class="di">◈</span> Simulator
+        <span class="di">▶</span> Simulate
       </div>
 
-      <div class="drawer-item-group">
-        <div class="drawer-item" id="enc-nav-label" style="flex:1;cursor:pointer">
-          <span class="di">◧</span> Encyclopedia
-        </div>
-        <div class="drawer-item" id="enc-toggle" style="padding-left:0;padding-right:12px;cursor:pointer">
-          <span class="chevron">›</span>
-        </div>
-      </div>
-      <div id="enc-sub" class="enc-submenu">
-        <!-- Populated by app.js after data loads -->
-        <div class="drawer-sub" style="opacity:.35;pointer-events:none">Loading…</div>
-      </div>
-
-      <div class="drawer-item" data-nav="store">
-        <span class="di">◫</span> Store
-      </div>
       <div class="drawer-item" data-nav="profile">
-        <span class="di">◉</span> Profile
+        <span class="di">👤</span> Profile
+      </div>
+
+      <div class="drawer-section">Console</div>
+
+      <div class="drawer-item" id="drawer-orientation">
+        <span class="di">↺</span> Replay Orientation
       </div>
 
       <div class="drawer-section">Phosphor</div>
@@ -2625,6 +2752,13 @@ body::after {
 
   <!-- ── Top Bar ─────────────────────────────────────────────────────────── -->
   <header id="topbar">
+    <button id="back-btn" aria-label="Go back" hidden>
+      <svg width="16" height="14" viewBox="0 0 16 14" fill="none"
+           stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="15" y1="7" x2="1" y2="7"/>
+        <polyline points="7,1 1,7 7,13"/>
+      </svg>
+    </button>
     <button id="menu-btn" aria-label="Open menu">
       <svg width="18" height="14" viewBox="0 0 18 14" fill="none"
            stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
@@ -2636,13 +2770,6 @@ body::after {
 
     <div class="topbar-logo" id="site-title"><em>You Didn't Die,</em> Now What?</div>
     <div class="topbar-rule"></div>
-
-    <nav class="topbar-tabs">
-      <button class="nav-tab active" data-screen="simulator">Simulator</button>
-      <button class="nav-tab nav-tab-learn" data-screen="learning">Knowledge</button>
-      <button class="nav-tab" data-screen="store">Store</button>
-      <button class="nav-tab" data-screen="profile">Profile</button>
-    </nav>
 
     <div class="topbar-end">
       <button id="panic-btn" aria-label="Open Panic Mode">
@@ -2834,6 +2961,22 @@ body::after {
 
   <!-- ── Main screen (single scrollable surface) ─────────────────────────── -->
   <main id="screen"></main>
+
+  <!-- ── Bottom tab bar: the four primary destinations ───────────────────── -->
+  <nav id="tabbar" aria-label="Primary">
+    <button class="tabbar-tab" data-screen="learning">
+      <span class="tabbar-icon">◈</span><span class="tabbar-label">Learn</span>
+    </button>
+    <button class="tabbar-tab" data-screen="library">
+      <span class="tabbar-icon">📖</span><span class="tabbar-label">Library</span>
+    </button>
+    <button class="tabbar-tab" data-screen="simulator">
+      <span class="tabbar-icon">▶</span><span class="tabbar-label">Simulate</span>
+    </button>
+    <button class="tabbar-tab" data-screen="profile">
+      <span class="tabbar-icon">👤</span><span class="tabbar-label">Profile</span>
+    </button>
+  </nav>
 
   <script>
 /* ═══ EMBEDDED DATA — generated by build.py — do not hand-edit ═══ */
@@ -11899,21 +12042,75 @@ function renderArticle(root, article, onOpenArticle, onBack) {
 
       <div class="article-body">${formatContent(article.content)}</div>
 
-      <div class="article-gear">
-        <div class="card-label">Recommended Gear</div>
-        <button class="btn-outline" id="art-store">Browse related equipment in Store →</button>
+      <div class="go-further">
+        <div class="go-further-title">Go further</div>
+        <div class="go-further-group" id="gf-lessons"></div>
+        <div class="go-further-group" id="gf-atlas"></div>
+        <div class="go-further-group" id="gf-scenarios"></div>
+        <div class="go-further-group">
+          <div class="go-further-label">◈ Gear</div>
+          <div class="go-further-links">
+            <button class="go-further-link" id="art-loadout">Browse loadout gear →</button>
+          </div>
+        </div>
       </div>
     </div>
   `;
 
+  // Back always returns to where the article was opened from (lesson, atlas,
+  // search, grid) via the global history.
   root.querySelector("#art-back").addEventListener("click", () => {
     store.ui.currentArticleId = null;
-    if (onBack) onBack();
-    else renderEncyclopedia(root, onOpenArticle);
+    goBack();
   });
 
-  root.querySelector("#art-store").addEventListener("click", () => {
-    document.dispatchEvent(new CustomEvent("nav:goto", { detail: "store" }));
+  // ── Populate cross-links ──
+  const lessons = articleLessonsFor(article.id);
+  root.querySelector("#gf-lessons").innerHTML = lessons.length ? `
+      <div class="go-further-label">◈ Train this in Lessons</div>
+      <div class="go-further-links">
+        ${lessons.map(l => `
+          <button class="go-further-link" data-gf-lesson="${l.skillId}:${l.lessonId}">
+            ${l.skillIcon} ${l.title} <span style="opacity:.6">+${l.xp} XP</span>
+          </button>`).join("")}
+      </div>` : "";
+
+  const regions = articleRegionsFor(article.id);
+  root.querySelector("#gf-atlas").innerHTML = regions.length ? `
+      <div class="go-further-label">🗺 See it in the Atlas</div>
+      <div class="go-further-links">
+        ${regions.map(r => `
+          <button class="go-further-link" data-gf-region="${r.regionId}">
+            🗺 ${r.regionName} <span style="opacity:.6">${r.countryName}</span>
+          </button>`).join("")}
+      </div>` : "";
+
+  const scenarios = articleScenariosFor(article);
+  root.querySelector("#gf-scenarios").innerHTML = scenarios.length ? `
+      <div class="go-further-label">▶ Practice in the Simulator</div>
+      <div class="go-further-links">
+        ${scenarios.map(s => `
+          <button class="go-further-link" data-gf-scenario="${s.id}">
+            ▶ ${s.title}
+          </button>`).join("")}
+      </div>` : "";
+
+  root.querySelectorAll("[data-gf-lesson]").forEach(btn =>
+    btn.addEventListener("click", () => {
+      const [skillId, lessonId] = btn.dataset.gfLesson.split(":");
+      goTo("learning", { skillId, lessonId });
+    }));
+  root.querySelectorAll("[data-gf-region]").forEach(btn =>
+    btn.addEventListener("click", () => {
+      goTo("library", { tab: "atlas", atlasRegion: btn.dataset.gfRegion });
+    }));
+  root.querySelectorAll("[data-gf-scenario]").forEach(btn =>
+    btn.addEventListener("click", () => {
+      goTo("simulator", { scenarioId: btn.dataset.gfScenario });
+    }));
+
+  root.querySelector("#art-loadout").addEventListener("click", () => {
+    goTo("simulator", { section: "loadout" });
   });
 }
 
@@ -13075,6 +13272,23 @@ function runSimulationTick() {
 // tab entry; internal transitions call renderSimulator(root) without it. Cache
 // it so Learn More / debrief article buttons keep working after any transition.
 let SIM_OPEN_ARTICLE = null;
+// Launch a scenario's setup phase by id (menu clicks + article cross-links)
+function startScenarioById(root, scenarioId) {
+  resetRun();
+  if (scenarioId === "__hybrid__") {
+    RUN.scenario = generateHybridScenario();
+    RUN.env      = { ...RUN.scenario.mergedEnv };
+    if (!RUN.env.wind_speed) RUN.env.wind_speed = 15;
+  } else {
+    RUN.scenario = SCENARIOS.find(s => s.id === scenarioId);
+    if (!RUN.scenario) return;
+    RUN.env = buildLegacyEnv(RUN.scenario);
+  }
+  RUN.phase = "setup";
+  renderSimulator(root);
+  root.scrollTop = 0;
+}
+
 function renderSimulator(root, onOpenArticle) {
   if (onOpenArticle) SIM_OPEN_ARTICLE = onOpenArticle;
   const openArticle = onOpenArticle || SIM_OPEN_ARTICLE;
@@ -13121,6 +13335,15 @@ function renderMenu(root) {
             <span class="sc-val">${char.stats[s.id]}</span>
           </div>`).join("")}
       </div>
+
+      <button class="loadout-strip" id="menu-loadout">
+        <span class="loadout-strip-icon">◈</span>
+        <span class="loadout-strip-body">
+          <span class="loadout-strip-title">Loadout</span>
+          <span class="loadout-strip-sub" id="menu-loadout-sub"></span>
+        </span>
+        <span class="loadout-strip-arrow">›</span>
+      </button>
 
       <div class="menu-section-label"><span class="card-label">Choose Scenario</span></div>
       <div class="scenario-list">
@@ -13174,22 +13397,14 @@ function renderMenu(root) {
         </div>` : ""}
     </div>`;
 
+  const ownedCount = (char.ownedGear || []).length;
+  const lsSub = root.querySelector("#menu-loadout-sub");
+  if (lsSub) lsSub.textContent = `${char.credits ?? 0} credits · ${ownedCount} item${ownedCount === 1 ? "" : "s"} owned`;
+  root.querySelector("#menu-loadout")?.addEventListener("click", () =>
+    goTo("simulator", { section: "loadout" }));
+
   root.querySelectorAll(".scenario-row").forEach(btn =>
-    btn.addEventListener("click", () => {
-      resetRun();
-      if (btn.dataset.id === "__hybrid__") {
-        RUN.scenario = generateHybridScenario();
-        RUN.env      = { ...RUN.scenario.mergedEnv };
-        if (!RUN.env.wind_speed) RUN.env.wind_speed = 15;
-      } else {
-        RUN.scenario = SCENARIOS.find(s => s.id === btn.dataset.id);
-        RUN.env      = buildLegacyEnv(RUN.scenario);
-      }
-      RUN.phase = "setup";
-      renderSimulator(root);
-      root.scrollTop = 0; // fresh navigation: start at the top
-    })
-  );
+    btn.addEventListener("click", () => startScenarioById(root, btn.dataset.id)));
 }
 
 function buildLegacyEnv(scenario) {
@@ -15022,7 +15237,7 @@ function showBadgeToast(badge) {
 // PROFILE SCREEN — Tactical Dossier + RPG Operator Sheet
 // ─────────────────────────────────────────────────────────────────────────────
 
-function renderProfile(root) {
+function renderProfile(root, opts = {}) {
   refreshChar();
   const char = getChar();
   const pct  = xpBarPct(char);
@@ -15208,6 +15423,19 @@ function renderProfile(root) {
         </div></div>
       </div>
 
+      <div class="profile-section">
+        <div class="profile-section-head" data-sec="fieldkit">
+          <div class="profile-section-left">
+            <span class="profile-section-title"><span class="pst-icon">🎒</span> Field-Tested Kit</span>
+            <span class="profile-section-badge">real gear</span>
+          </div>
+          <span class="profile-section-chevron">▾</span>
+        </div>
+        <div class="profile-section-body"><div class="psb-inner">
+          ${renderFieldKitHTML()}
+        </div></div>
+      </div>
+
       ${renderSkillTree(char)}
 
       <div class="danger-zone">
@@ -15223,6 +15451,7 @@ function renderProfile(root) {
   try { collapsedSecs = new Set(JSON.parse(localStorage.getItem(COLLAPSED_KEY) || "[]")); }
   catch(e) { collapsedSecs = new Set(); }
 
+  if (opts.section) collapsedSecs.delete(opts.section);
   root.querySelectorAll(".profile-section-head[data-sec]").forEach(head => {
     const sec = head.dataset.sec;
     const section = head.closest(".profile-section");
@@ -15490,42 +15719,17 @@ const RW_CATALOG = [
 ];
 
 // ── Store mode state ─────────────────────────────────────────────────────────
-function getStoreMode() { return store.ui.storeMode || "sim"; }
-function setStoreMode(m) { store.ui.storeMode = m; }
 
-function renderStore(root) {
-  refreshChar();
-  if (getStoreMode() === "real") renderRealStore(root);
-  else renderSimStore(root);
-}
-
-function storeModeTabsHTML(activeMode) {
-  return `
-    <div class="store-mode-tabs">
-      <button class="store-mode-tab ${activeMode === "sim" ? "active" : ""}" data-mode="sim">
-        <span class="smt-icon">◈</span> Sim Gear
-      </button>
-      <button class="store-mode-tab ${activeMode === "real" ? "active" : ""}" data-mode="real">
-        <span class="smt-icon">🛒</span> Real World Gear
-      </button>
-    </div>`;
-}
-
-function wireModeTabsInStore(root) {
-  root.querySelectorAll(".store-mode-tab").forEach(btn =>
-    btn.addEventListener("click", () => { setStoreMode(btn.dataset.mode); renderStore(root); })
-  );
-}
-
-// ── Simulator Gear Store ──────────────────────────────────────────────────────
-function renderSimStore(root) {
+// ── Loadout (Console v2): sim-gear shop moved out of the old Store ────────
+// Gear is game economy: it belongs to the simulator loop, not a top-level tab.
+function openLoadoutSection(root) {
   refreshChar();
   const activeCat = store.ui.storeCategory || "All";
   const owned = new Set(char.ownedGear || []);
 
   root.innerHTML = `
     <div class="store-page">
-      ${storeModeTabsHTML("sim")}
+      <button class="back-btn" id="loadout-back">← Back to Simulator</button>
 
       <div class="store-credits-bar">
         <div class="store-credits-left">
@@ -15551,7 +15755,7 @@ function renderSimStore(root) {
       <div id="store-item-grid" class="store-item-grid">${storeItemsHTML(activeCat)}</div>
     </div>`;
 
-  wireModeTabsInStore(root);
+  root.querySelector("#loadout-back").addEventListener("click", goBack);
 
   root.querySelectorAll(".store-cat-tabs .chip").forEach(btn =>
     btn.addEventListener("click", () => {
@@ -15627,18 +15831,18 @@ function wireStoreBuyButtons(root) {
       saveCharacter(char);
       const newBadges = checkAndAwardBadges(char);
       newBadges.forEach((b, i) => setTimeout(() => showBadgeToast(b), 400 + i * 1600));
-      renderStore(root);
+      openLoadoutSection(root);
     });
   });
 }
 
 // ── Real-World Gear Store ─────────────────────────────────────────────────────
-function renderRealStore(root) {
-  const ownedIds = char.ownedGear || [];
-
-  root.innerHTML = `
-    <div class="store-page">
-      ${storeModeTabsHTML("real")}
+// ── Field-Tested Kit (Console v2): the real-gear catalog, now a Profile section ──
+// Honest by design: no star ratings, no review counts — just the recommendation,
+// an estimated price, and an Amazon search link.
+function renderFieldKitHTML() {
+  const ownedIds = (typeof char !== "undefined" && char.ownedGear) || [];
+  return `
       <p class="rw-intro">Field-tested recommendations for actual purchase. Items marked <span class="store-sim-badge">◈ Sim Linked</span> have a counterpart in your simulator loadout.</p>
       ${RW_CATALOG.map(section => `
         <div class="rw-section">
@@ -15651,17 +15855,12 @@ function renderRealStore(root) {
             ${section.items.map(item => rwCardHTML(item, ownedIds)).join("")}
           </div>
         </div>`).join("")}
-      <div class="rw-disclaimer">⚠ Links search Amazon for the recommended product. We don't guarantee pricing or availability.</div>
-    </div>`;
-
-  wireModeTabsInStore(root);
+      <div class="rw-disclaimer">⚠ Links search Amazon for the recommended product. We don't guarantee pricing or availability.</div>`;
 }
 
 function rwCardHTML(item, ownedIds) {
   const simItem  = item.simLinked ? ITEMS[item.simLinked] : null;
   const simOwned = item.simLinked && ownedIds.includes(item.simLinked);
-  const stars    = "★".repeat(Math.round(item.rating)) + "☆".repeat(5 - Math.round(item.rating));
-  const reviews  = item.reviews >= 1000 ? (item.reviews / 1000).toFixed(0) + "k" : item.reviews;
 
   return `
     <div class="rw-card">
@@ -15678,23 +15877,19 @@ function rwCardHTML(item, ownedIds) {
         ${simItem ? `<span class="rw-card-chip rw-chip-sim">◈ ${simItem.icon} ${simItem.name}</span>` : ""}
         ${simOwned ? `<span class="rw-card-chip rw-chip-owned">✓ Sim owned</span>` : ""}
       </div>
-      <div class="rw-card-rating">
-        <span class="rw-card-stars">${stars}</span>
-        <span class="rw-card-reviews">${reviews} reviews</span>
-      </div>
       <div class="rw-card-footer">
         <div>
           <div class="rw-card-price">${item.price}</div>
           <div class="rw-card-price-sub">est. retail</div>
         </div>
-        <a class="rw-card-cta" href="${item.link}" target="_blank" rel="noopener">Shop →</a>
+        <a class="rw-card-cta" href="${item.link}" target="_blank" rel="noopener">Search Amazon ↗</a>
       </div>
     </div>`;
 }
 
-// Legacy — kept for any potential external calls
+// Legacy shims — the old Store screen no longer exists (see Console v2 notes)
 function gearListHTML() { return ""; }
-function renderItemsStore(root) { renderStore(root); }
+function renderItemsStore(root) { if (root) openLoadoutSection(root); }
 
 
 
@@ -15740,10 +15935,16 @@ async function loadAtlas() {
 
 // ── Render dispatch ─────────────────────────────────────────────────────────
 
+// Drill deeper into the atlas as a real navigation entry: the global back
+// button returns to the previous level. The breadcrumb stays for local hops.
+function atlasDrill(newStack) {
+  goTo("library", { tab: "atlas", atlasStack: serializeAtlasStack(newStack) });
+}
+
 function renderAtlas(root) {
   if (!atlasState.loaded) {
     root.innerHTML = `<div class="atlas-page"><div class="atlas-loading">Loading Atlas…</div></div>`;
-    loadAtlas().then(() => renderAtlas(root));
+    loadAtlas().then(() => { buildCrosslinkIndexes(); renderAtlas(root); });
     return;
   }
 
@@ -15932,8 +16133,7 @@ function renderContinentGrid(root) {
     });
     g.addEventListener("click", () => {
       const c = contMap[cid];
-      atlasState.stack = [{ name: c.name, type: "continent", ref: c }];
-      renderAtlas(root);
+      atlasDrill([{ name: c.name, type: "continent", ref: c }]);
     });
   });
 
@@ -15941,8 +16141,7 @@ function renderContinentGrid(root) {
   root.querySelectorAll(".atlas-continent-card").forEach(btn => {
     btn.addEventListener("click", () => {
       const c = atlasState.continents.find(x => x.id === btn.dataset.cid);
-      atlasState.stack = [{ name: c.name, type: "continent", ref: c }];
-      renderAtlas(root);
+      atlasDrill([{ name: c.name, type: "continent", ref: c }]);
     });
   });
 }
@@ -15984,8 +16183,7 @@ function renderCountryList(root) {
   root.querySelectorAll(".atlas-list-item").forEach(btn => {
     btn.addEventListener("click", () => {
       const country = continent.countries.find(c => c.id === btn.dataset.cid);
-      atlasState.stack = [...atlasState.stack, { name: country.name, type: "country", ref: country }];
-      renderAtlas(root);
+      atlasDrill([...atlasState.stack, { name: country.name, type: "country", ref: country }]);
     });
   });
 }
@@ -16021,8 +16219,7 @@ function renderRegionList(root) {
   root.querySelectorAll(".atlas-list-item").forEach(btn => {
     btn.addEventListener("click", () => {
       const region = country.regions.find(r => r.id === btn.dataset.rid);
-      atlasState.stack = [...atlasState.stack, { name: region.name, type: "region", ref: region }];
-      renderAtlas(root);
+      atlasDrill([...atlasState.stack, { name: region.name, type: "region", ref: region }]);
     });
   });
 }
@@ -16343,6 +16540,68 @@ function atlasRelatedArticles(region) {
   return scored.slice(0, 6).map(s => s.a);
 }
 
+// ── Cross-link engine (Console v2): the encyclopedia leads everywhere ──────
+// article -> lessons (inverted lesson.articleId), article -> atlas regions
+// (reverse keyword match), article -> simulator scenarios (by domain).
+const XL = { articleLessons: {}, regionKeywords: [], regionCache: {} };
+
+function buildCrosslinkIndexes() {
+  XL.articleLessons = {};
+  for (const skill of LEARN_SKILLS) {
+    for (const l of skill.lessons) {
+      if (!l.articleId) continue;
+      (XL.articleLessons[l.articleId] = XL.articleLessons[l.articleId] || []).push({
+        skillId: skill.id, skillName: skill.name, skillIcon: skill.icon,
+        lessonId: l.id, title: l.title, xp: l.xp,
+      });
+    }
+  }
+  XL.regionKeywords = [];
+  XL.regionCache = {};
+  if (atlasState.loaded) {
+    for (const c of atlasState.continents) {
+      for (const co of (c.countries || [])) {
+        for (const r of (co.regions || [])) {
+          XL.regionKeywords.push({
+            regionId: r.id, regionName: r.name, countryName: co.name,
+            kws: atlasRegionKeywords(r),
+          });
+        }
+      }
+    }
+  }
+}
+
+function articleLessonsFor(articleId) {
+  return XL.articleLessons[articleId] || [];
+}
+
+function articleRegionsFor(articleId) {
+  if (XL.regionCache[articleId]) return XL.regionCache[articleId];
+  const a = store.articlesById[articleId];
+  if (!a) return [];
+  const title = (a.title || "").toLowerCase();
+  const summary = (a.summary || "").toLowerCase();
+  const scored = [];
+  for (const rk of XL.regionKeywords) {
+    let score = 0;
+    for (const kw of rk.kws) {
+      if (title.includes(kw)) score += 3;
+      else if (summary.includes(kw)) score += 1;
+    }
+    if (score >= 3) scored.push({ rk, score });
+  }
+  scored.sort((x, y) => y.score - x.score);
+  const out = scored.slice(0, 4).map(s => s.rk);
+  XL.regionCache[articleId] = out;
+  return out;
+}
+
+function articleScenariosFor(article) {
+  if (!article || !article.domainId || typeof SCENARIOS === "undefined") return [];
+  return SCENARIOS.filter(s => s.relatedDomain === article.domainId).slice(0, 3);
+}
+
 function atlasRelatedHTML(region) {
   const related = atlasRelatedArticles(region);
   if (!related.length) return "";
@@ -16364,48 +16623,79 @@ function atlasRelatedHTML(region) {
 
 
 const screenEl = () => document.getElementById("screen");
-const tabBtns  = () => document.querySelectorAll(".nav-tab");
+const tabBtns  = () => document.querySelectorAll(".tabbar-tab");
 const drawer   = () => document.getElementById("drawer");
 const overlay  = () => document.getElementById("overlay");
 
 function openDrawer()  { store.ui.drawerOpen = true;  drawer().classList.add("open");    overlay().classList.add("open"); }
 function closeDrawer() { store.ui.drawerOpen = false; drawer().classList.remove("open"); overlay().classList.remove("open"); }
 
-function goTo(screenName, opts = {}) {
-  store.ui.activeScreen = screenName;
-  try { localStorage.setItem("yddnw_last_screen", screenName); } catch (e) {}
-  tabBtns().forEach(b => b.classList.toggle("active", b.dataset.screen === screenName));
-  document.querySelectorAll("[data-nav]").forEach(el =>
-    el.classList.toggle("drawer-active", el.dataset.nav === screenName && !el.dataset.domain)
-  );
+// ── Navigation core (Console v2) ──────────────────────────────────────────
+// Every destination is a history entry: { screen, opts }. The topbar back
+// button walks the stack, so page-to-page travel never strands the user.
+const navStack = [];     // entries we can go back to
+let navCurrent = null;   // { screen, opts } currently shown
 
+function goTo(screenName, opts = {}) {
+  // Legacy aliases from the old information architecture
+  if (screenName === "encyclopedia")      { screenName = "library";   opts = { ...opts, tab: "articles" }; }
+  else if (screenName === "atlas")       { screenName = "library";   opts = { ...opts, tab: "atlas" }; }
+  else if (screenName === "store")       { screenName = "simulator"; opts = { ...opts, section: "loadout" }; }
+
+  if (!opts.replace && navCurrent && !sameNavEntry(navCurrent, { screen: screenName, opts })) {
+    navStack.push(navCurrent);
+    if (navStack.length > 30) navStack.shift();
+  }
+  navCurrent = { screen: screenName, opts: { ...opts } };
+  renderScreen(screenName, navCurrent.opts);
+  updateNavChrome();
+}
+
+function sameNavEntry(a, b) {
+  if (a.screen !== b.screen) return false;
+  const ka = Object.keys(a.opts).filter(k => k !== "replace");
+  const kb = Object.keys(b.opts).filter(k => k !== "replace");
+  if (ka.length !== kb.length) return false;
+  return ka.every(k => a.opts[k] === b.opts[k]);
+}
+
+function goBack() {
+  const prev = navStack.pop();
+  if (!prev) return;
+  navCurrent = prev;
+  renderScreen(prev.screen, { ...prev.opts, replace: true });
+  updateNavChrome();
+}
+
+function updateNavChrome() {
+  const s = navCurrent && navCurrent.screen;
+  document.querySelectorAll(".tabbar-tab").forEach(b =>
+    b.classList.toggle("active", b.dataset.screen === s));
+  document.querySelectorAll("[data-nav]").forEach(el =>
+    el.classList.toggle("drawer-active", el.dataset.nav === s));
+  const bb = document.getElementById("back-btn");
+  if (bb) bb.hidden = navStack.length === 0;
+  try { localStorage.setItem("yddnw_last_screen", s); } catch (e) {}
   const root = screenEl();
-  root.scrollTop = 0;
+  if (root) root.scrollTop = 0;
+}
+
+function renderScreen(screenName, opts = {}) {
+  store.ui.activeScreen = screenName;
+  const root = screenEl();
 
   if (screenName === "simulator") {
-    // SIMULATOR tab tapped mid-run: abandon the run and land on the menu.
-    if (RUN.scenario && (RUN.phase === "setup" || RUN.phase === "run")) resetRun();
-    renderSimulator(root, (articleId) => {
-      store.ui.currentArticleId = articleId;
-      goTo("encyclopedia");
-    });
-  } else if (screenName === "encyclopedia") {
-    if (opts.domainId)  store.ui.currentDomainId  = opts.domainId;
-    if (opts.articleId) store.ui.currentArticleId = opts.articleId;
-    store.ui.learnTab = "encyclopedia";
-    renderLearningHub(root);
-  } else if (screenName === "atlas") {
-    store.ui.learnTab = "atlas";
-    renderLearningHub(root);
-  } else if (screenName === "store") {
-    renderStore(root, (articleId) => {
-      store.ui.currentArticleId = articleId;
-      goTo("encyclopedia");
-    });
+    // SIMULATE tab tapped mid-run: abandon the run and land on the menu.
+    if (RUN.scenario && (RUN.phase === "setup" || RUN.phase === "run") && !opts.keepRun && !opts.scenarioId) resetRun();
+    renderSimulator(root, (articleId) => goTo("library", { tab: "articles", articleId }));
+    if (opts.scenarioId) startScenarioById(root, opts.scenarioId);
+    else if (opts.section === "loadout") openLoadoutSection(root);
+  } else if (screenName === "library") {
+    renderLibraryScreen(root, opts);
   } else if (screenName === "profile") {
-    renderProfile(root);
+    renderProfile(root, opts);
   } else if (screenName === "learning") {
-    renderLearningHub(root);
+    renderLearnScreen(root, opts);
   }
 }
 
@@ -16413,32 +16703,13 @@ function buildDrawer() {
   document.querySelectorAll("[data-nav]").forEach(el =>
     el.addEventListener("click", () => {
       closeDrawer();
-      goTo(el.dataset.nav, el.dataset.domain ? { domainId: el.dataset.domain } : {});
+      goTo(el.dataset.nav);
     })
   );
-  const encToggle = document.getElementById("enc-toggle");
-  const encSub    = document.getElementById("enc-sub");
-  encToggle?.addEventListener("click", e => {
-    e.stopPropagation();
-    const open = encSub.classList.toggle("open");
-    encToggle.querySelector(".chevron").textContent = open ? "⌄" : "›";
-    goTo("encyclopedia");
+  document.getElementById("drawer-orientation")?.addEventListener("click", () => {
     closeDrawer();
+    if (typeof showOnboarding === "function") showOnboarding(0);
   });
-  document.getElementById("enc-nav-label")?.addEventListener("click", () => {
-    closeDrawer(); goTo("encyclopedia");
-  });
-}
-
-function populateDrawerDomains() {
-  const sub = document.getElementById("enc-sub");
-  if (!sub || !store.domains.length) return;
-  sub.innerHTML = store.domains.map(d => `
-    <div class="drawer-sub" data-nav="learning" data-domain="${d.id}">${d.icon} ${d.name}</div>
-  `).join("");
-  sub.querySelectorAll("[data-nav]").forEach(el =>
-    el.addEventListener("click", () => { closeDrawer(); goTo("encyclopedia", { domainId: el.dataset.domain }); })
-  );
 }
 
 function updateHeader() {
@@ -16557,6 +16828,7 @@ function runBootSequence() {
 
 async function init() {
   document.getElementById("menu-btn").addEventListener("click", openDrawer);
+  document.getElementById("back-btn").addEventListener("click", goBack);
   overlay().addEventListener("click", closeDrawer);
   tabBtns().forEach(btn => btn.addEventListener("click", () => goTo(btn.dataset.screen)));
   document.addEventListener("nav:goto", e => {
@@ -16575,7 +16847,7 @@ async function init() {
       entry = localStorage.getItem("yddnw_last_screen") || "simulator";
     localStorage.setItem("yddnw_visited", "1");
   } catch (e) {}
-  const validEntry = ["simulator","learning","encyclopedia","atlas","store","profile"];
+  const validEntry = ["simulator","learning","library","profile"];
   goTo(validEntry.includes(entry) ? entry : "learning");
 
   try {
@@ -16583,8 +16855,8 @@ async function init() {
     await loadArticlesFromManifest(manifest);
     await loadSystemsFromManifest(manifest);
     updateHeader();
-    populateDrawerDomains();
-    goTo(store.ui.activeScreen);
+    buildCrosslinkIndexes();
+    goTo(store.ui.activeScreen, { replace: true });
   } catch (err) {
     console.error("Content load failed:", err);
     const banner = document.createElement("div");
@@ -16614,9 +16886,9 @@ Pick a scenario. Read the brief. Make decisions. The system tracks your choices 
     highlight: "Each stage is a decision under pressure. There's no perfect answer — only better-informed ones.",
   },
   {
-    title: "The Encyclopedia",
-    body: `The <strong>Encyclopedia</strong> is the knowledge base. Everything from fire-making to wound care to navigation.<br><br>
-When the Simulator references a technique you don't know, the encyclopedia is where you find it. Articles are cross-linked — following them is how you build fluency.`,
+    title: "The Library",
+    body: `The <strong>Library</strong> is the knowledge base: <strong>Articles</strong> cover everything from fire-making to wound care, and the <strong>Atlas</strong> maps the world's regions.<br><br>
+Articles lead somewhere — related lessons, atlas regions, simulator scenarios, and loadout gear are linked at the bottom of every article. Follow them to build fluency.`,
     highlight: null,
   },
   {
@@ -16627,14 +16899,14 @@ Each lesson has 3 steps and a field tip. Complete lessons to earn XP and level u
   },
   {
     title: "Credits and Gear",
-    body: `Every run earns <strong>◈ Credits</strong>. Spend them in the <strong>Field Gear</strong> tab to purchase equipment that gives you better starting loadouts in scenarios.<br><br>
+    body: `Every run earns <strong>◈ Credits</strong>. Spend them in the <strong>Loadout</strong> section of the Simulate tab to purchase equipment that gives you better starting kits in scenarios.<br><br>
 You start with ◈${char.credits}. Run scenarios to earn more.`,
     highlight: null,
   },
   {
     title: "Start with Learning",
     body: `Best way to learn the system: <strong>complete a lesson right now</strong>.<br><br>
-Hit the Learning tab, pick any Phase 0 skill, and work through your first lesson. Structured training first — the Simulator will still be there when you're ready to test yourself under pressure.`,
+Hit the <strong>Learn</strong> tab at the bottom, pick any Phase 0 skill, and work through your first lesson. Structured training first — the Simulator will still be there when you're ready to test yourself under pressure.`,
     highlight: "The system will surface what you need to know as you need it.",
   },
 ];
@@ -17121,20 +17393,21 @@ function getSkillIcon(skillId) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LEARN_TABS = [
-  { id: "lessons",      label: "Lessons",      icon: "◈" },
-  { id: "encyclopedia", label: "Encyclopedia", icon: "📖" },
-  { id: "atlas",        label: "Atlas",        icon: "🗺" },
-  { id: "phases",       label: "Phases",       icon: "⬡" },
+  { id: "lessons", label: "Lessons", icon: "◈" },
+  { id: "phases",  label: "Phases",  icon: "⬡" },
+];
+const LIBRARY_TABS = [
+  { id: "articles", label: "Articles", icon: "📖" },
+  { id: "atlas",    label: "Atlas",    icon: "🗺" },
 ];
 
-function renderLearningHub(root) {
-  const activeTab = store.ui.learnTab || "lessons";
-
-  // Render shell with tab bar, then inject content
+// Generic two-tab hub shell. Tab switches are lateral (replace), so the
+// global back button skips them and returns to real destinations.
+function renderHubShell(root, tabs, activeTab, onTab) {
   root.innerHTML = `
     <div class="knowledge-hub">
       <div class="hub-tabs">
-        ${LEARN_TABS.map(t => `
+        ${tabs.map(t => `
           <button class="hub-tab ${t.id === activeTab ? "active" : ""}" data-tab="${t.id}">
             <span class="hub-tab-icon">${t.icon}</span>
             <span class="hub-tab-label">${t.label}</span>
@@ -17142,37 +17415,104 @@ function renderLearningHub(root) {
       </div>
       <div id="hub-content" class="hub-content"></div>
     </div>`;
-
-  // Wire tab buttons
   root.querySelectorAll(".hub-tab").forEach(btn =>
-    btn.addEventListener("click", () => {
-      store.ui.learnTab = btn.dataset.tab;
-      root.querySelectorAll(".hub-tab").forEach(b => b.classList.toggle("active", b === btn));
-      mountHubTab(root.querySelector("#hub-content"), btn.dataset.tab);
-    })
-  );
-
-  // Mount initial tab
-  mountHubTab(root.querySelector("#hub-content"), activeTab);
+    btn.addEventListener("click", () => onTab(btn.dataset.tab)));
+  return root.querySelector("#hub-content");
 }
 
-function mountHubTab(contentEl, tab) {
+// ── LEARN screen: structured training (lessons + civilisation phases) ──
+function renderLearnScreen(root, opts = {}) {
+  const tab = opts.tab === "phases" ? "phases" : "lessons";
+  const content = renderHubShell(root, LEARN_TABS, tab,
+    (t) => goTo("learning", { tab: t, replace: true }));
   if (tab === "lessons") {
-    renderLearning(contentEl);
-  } else if (tab === "encyclopedia") {
-    renderEncyclopedia(contentEl, (articleId) => {
-      store.ui.currentArticleId = articleId;
-      // Stay in hub but re-render encyclopedia with article open
-      renderEncyclopedia(contentEl, (id) => {
-        store.ui.currentArticleId = id;
-      });
-    });
-  } else if (tab === "atlas") {
-    atlasState.stack = [];
-    renderAtlas(contentEl);
-  } else if (tab === "phases") {
-    renderPhasesTab(contentEl);
+    renderLearning(content);
+    if (opts.lessonId) openLessonById(content, opts.skillId, opts.lessonId);
+  } else {
+    renderPhasesTab(content);
   }
+}
+
+// Open a lesson as a real navigation entry (back returns to where you came from)
+function openLessonById(root, skillId, lessonId) {
+  const skill = LEARN_SKILLS.find(s => s.id === skillId);
+  if (!skill) return false;
+  const lesson = skill.lessons.find(l => l.id === lessonId) || skill.lessons[0];
+  if (!lesson) return false;
+  const state = loadLearnState();
+  const queueView  = root.querySelector("#learn-queue-view");
+  const lessonView = root.querySelector("#learn-lesson-view");
+  if (!queueView || !lessonView) return false;
+  queueView.classList.add("hidden");
+  renderLesson(lessonView, skill, lesson, state, () => goBack());
+  return true;
+}
+
+// ── LIBRARY screen: reference knowledge (encyclopedia articles + atlas) ──
+function renderLibraryScreen(root, opts = {}) {
+  const tab = opts.tab === "atlas" ? "atlas" : "articles";
+  store.ui.learnTab = tab === "atlas" ? "atlas" : "encyclopedia";
+  // Reset view state unless the nav entry explicitly carries it — otherwise a
+  // previously opened article would reopen when returning to the grid.
+  store.ui.currentDomainId  = opts.domainId  || null;
+  store.ui.currentArticleId = opts.articleId || null;
+  const content = renderHubShell(root, LIBRARY_TABS, tab,
+    (t) => goTo("library", { tab: t, replace: true }));
+  if (tab === "articles") {
+    renderEncyclopedia(content, (id) => goTo("library", { tab: "articles", articleId: id }));
+  } else {
+    if (opts.atlasStack) atlasState.stack = resolveAtlasStack(opts.atlasStack);
+    else if (opts.atlasRegion) atlasState.stack = resolveAtlasRegion(opts.atlasRegion) || [];
+    else atlasState.stack = [];
+    renderAtlas(content);
+  }
+}
+
+// Atlas stack entries are {name,type,ref}; history keeps [{type,id}] and
+// resolves refs back from loaded data.
+function serializeAtlasStack(stack) {
+  return stack.map(s => ({ type: s.type, id: s.ref && s.ref.id }));
+}
+function resolveAtlasStack(serial) {
+  if (!atlasState.loaded || !Array.isArray(serial)) return [];
+  const out = [];
+  for (const s of serial) {
+    const ref = findAtlasRef(s.type, s.id);
+    if (!ref) return out;
+    out.push({ name: ref.name, type: s.type, ref });
+  }
+  return out;
+}
+function findAtlasRef(type, id) {
+  if (!id) return null;
+  for (const c of atlasState.continents) {
+    if (type === "continent" && c.id === id) return c;
+    for (const co of (c.countries || [])) {
+      if (type === "country" && co.id === id) return co;
+      for (const r of (co.regions || [])) {
+        if (type === "region" && r.id === id) return { ...r, _country: co, _continent: c };
+      }
+    }
+  }
+  return null;
+}
+// Deep-link straight to a region's detail view: rebuild its ancestor chain.
+function resolveAtlasRegion(regionId) {
+  if (!atlasState.loaded) return null;
+  for (const c of atlasState.continents) {
+    for (const co of (c.countries || [])) {
+      for (const r of (co.regions || [])) {
+        if (r.id === regionId) {
+          return [
+            { name: c.name,  type: "continent", ref: c },
+            { name: co.name, type: "country",   ref: co },
+            { name: r.name,  type: "region",    ref: { ...r, _country: co, _continent: c } },
+          ];
+        }
+      }
+    }
+  }
+  return null;
 }
 
 function renderPhasesTab(el) {
@@ -17314,11 +17654,13 @@ function renderLearning(root) {
     </div>
   `;
 
-  // Wire skill card clicks
+  // Wire skill card clicks: open the first incomplete lesson as a nav entry
   root.querySelectorAll(".learn-skill-card:not(.locked-card)").forEach(card => {
     card.addEventListener("click", () => {
       const skill = LEARN_SKILLS.find(s => s.id === card.dataset.skill);
-      if (skill) openSkillLessons(root, skill, state);
+      if (!skill) return;
+      const firstIncomplete = skill.lessons.find(l => !isLessonComplete(state, l.id)) || skill.lessons[0];
+      goTo("learning", { skillId: skill.id, lessonId: firstIncomplete.id });
     });
   });
 
@@ -17335,20 +17677,9 @@ function renderLearning(root) {
 }
 
 function openSkillLessons(root, skill, state) {
-  const queueView = root.querySelector("#learn-queue-view");
-  const lessonView = root.querySelector("#learn-lesson-view");
-  queueView.classList.add("hidden");
-
-  // Find first incomplete lesson, or first lesson if all done
+  // Legacy shim: lessons are navigation entries now (see openLessonById).
   const firstIncomplete = skill.lessons.find(l => !isLessonComplete(state, l.id)) || skill.lessons[0];
-  renderLesson(lessonView, skill, firstIncomplete, state, () => {
-    // On back: restore queue
-    queueView.classList.remove("hidden");
-    lessonView.classList.remove("open");
-    lessonView.innerHTML = '';
-    // Refresh queue to show updated progress
-    renderLearning(root);
-  });
+  goTo("learning", { skillId: skill.id, lessonId: firstIncomplete.id });
 }
 
 function renderLesson(lessonView, skill, lesson, state, onBack) {
@@ -17487,9 +17818,7 @@ function renderLesson(lessonView, skill, lesson, state, onBack) {
     const articleLink = lessonView.querySelector("#learn-article-link");
     if (articleLink && lesson.articleId) {
       articleLink.addEventListener("click", () => {
-        document.dispatchEvent(new CustomEvent("nav:goto", {
-          detail: { screen: "encyclopedia", articleId: lesson.articleId }
-        }));
+        goTo("library", { tab: "articles", articleId: lesson.articleId });
       });
     }
   }
