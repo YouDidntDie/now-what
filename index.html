@@ -1719,6 +1719,24 @@ body::after {
 }
 .profile-section-body > .psb-inner { overflow: hidden; }
 
+/* ── Profile → Store link (Field-Tested Kit lives in the Store tab) ───────── */
+.profile-store-link {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 13px 16px; margin: 0 0 14px;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); font-family: inherit; cursor: pointer; text-align: left;
+  transition: border-color 140ms, background 140ms;
+}
+.profile-store-link:hover { border-color: var(--amber-dk); background: rgba(0,0,0,.35); }
+.profile-store-link .pst-icon { color: var(--amber); font-size: 16px; flex-shrink: 0; }
+.profile-store-link-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.profile-store-link-title {
+  font-family: var(--font-m); font-size: 10px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--text);
+}
+.profile-store-link-sub { font-size: 11px; color: var(--text-faint); }
+.profile-store-link-arrow { color: var(--text-faint); font-size: 18px; flex-shrink: 0; }
+
 /* ── Operator Stats ──────────────────────────────────────────────────────── */
 .points-badge { font-family: var(--font-m); font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--amber); background: var(--amber-pale); border: 1px solid var(--amber-dk); padding: 3px 8px; border-radius: var(--radius); }
 .points-hint { font-size: 11px; color: var(--text-faint); margin-bottom: 12px; line-height: 1.5; padding: 8px 10px; background: rgba(191,126,28,.06); border-left: 2px solid var(--amber-dk); border-radius: 0 3px 3px 0; }
@@ -2723,6 +2741,10 @@ body::after {
         <span class="di">⚄</span> Simulate
       </div>
 
+      <div class="drawer-item" data-nav="store">
+        <span class="di">◫</span> Store
+      </div>
+
       <div class="drawer-item" data-nav="profile">
         <span class="di">◉</span> Profile
       </div>
@@ -2968,6 +2990,9 @@ body::after {
     </button>
     <button class="tabbar-tab" data-screen="simulator">
       <span class="tabbar-icon">⚄</span><span class="tabbar-label">Simulate</span>
+    </button>
+    <button class="tabbar-tab" data-screen="store">
+      <span class="tabbar-icon">◫</span><span class="tabbar-label">Store</span>
     </button>
     <button class="tabbar-tab" data-screen="profile">
       <span class="tabbar-icon">◉</span><span class="tabbar-label">Profile</span>
@@ -12047,7 +12072,7 @@ function renderArticle(root, article, onOpenArticle, onBack) {
         <div class="go-further-group">
           <div class="go-further-label">◈ Gear</div>
           <div class="go-further-links">
-            <button class="go-further-link" id="art-loadout">Browse loadout gear →</button>
+            <button class="go-further-link" id="art-loadout">Browse the Store →</button>
           </div>
         </div>
       </div>
@@ -12107,7 +12132,7 @@ function renderArticle(root, article, onOpenArticle, onBack) {
     }));
 
   root.querySelector("#art-loadout").addEventListener("click", () => {
-    goTo("simulator", { section: "loadout" });
+    goTo("store", { view: "outfit" });
   });
 }
 
@@ -13391,7 +13416,7 @@ function renderMenu(root) {
   const lsSub = root.querySelector("#menu-loadout-sub");
   if (lsSub) lsSub.textContent = `${char.credits ?? 0} credits · ${ownedCount} item${ownedCount === 1 ? "" : "s"} owned`;
   root.querySelector("#menu-loadout")?.addEventListener("click", () =>
-    goTo("simulator", { section: "loadout" }));
+    goTo("store", { view: "outfit" }));
 
   root.querySelectorAll(".scenario-row").forEach(btn =>
     btn.addEventListener("click", () => startScenarioById(root, btn.dataset.id)));
@@ -15413,18 +15438,14 @@ function renderProfile(root, opts = {}) {
         </div></div>
       </div>
 
-      <div class="profile-section">
-        <div class="profile-section-head" data-sec="fieldkit">
-          <div class="profile-section-left">
-            <span class="profile-section-title"><span class="pst-icon">▣</span> Field-Tested Kit</span>
-            <span class="profile-section-badge">real gear</span>
-          </div>
-          <span class="profile-section-chevron">▾</span>
-        </div>
-        <div class="profile-section-body"><div class="psb-inner">
-          ${renderFieldKitHTML()}
-        </div></div>
-      </div>
+      <button class="profile-store-link" id="profile-store-link">
+        <span class="pst-icon">◫</span>
+        <span class="profile-store-link-text">
+          <span class="profile-store-link-title">Field-Tested Kit</span>
+          <span class="profile-store-link-sub">Real-world gear lives in the Store</span>
+        </span>
+        <span class="profile-store-link-arrow">›</span>
+      </button>
 
       ${renderSkillTree(char)}
 
@@ -15436,11 +15457,10 @@ function renderProfile(root, opts = {}) {
     </div>`;
 
   // ── Collapsible sections ─────────────────────────────────────────────────
-  // "fieldkit" starts collapsed: real-world gear stays optional, one tap away.
   const COLLAPSED_KEY = "fp_profile_collapsed";
   let collapsedSecs;
-  try { collapsedSecs = new Set(JSON.parse(localStorage.getItem(COLLAPSED_KEY) || '["fieldkit"]')); }
-  catch(e) { collapsedSecs = new Set(["fieldkit"]); }
+  try { collapsedSecs = new Set(JSON.parse(localStorage.getItem(COLLAPSED_KEY) || '[]')); }
+  catch(e) { collapsedSecs = new Set([]); }
 
   if (opts.section) collapsedSecs.delete(opts.section);
   root.querySelectorAll(".profile-section-head[data-sec]").forEach(head => {
@@ -15492,6 +15512,8 @@ function renderProfile(root, opts = {}) {
   );
 
   root.querySelector("#btn-orientation").addEventListener("click", () => window.showOnboarding(0));
+  root.querySelector("#profile-store-link")?.addEventListener("click", () =>
+    goTo("store", { view: "fieldkit" }));
   // Two-tap arm-and-confirm: native confirm() is unreliable (suppressed in
   // some webviews/automation), so the button arms on first tap and executes
   // on the second. Wipes all progress keys; keeps display prefs (phosphor,
@@ -15709,19 +15731,34 @@ const RW_CATALOG = [
   },
 ];
 
-// ── Store mode state ─────────────────────────────────────────────────────────
+// ── STORE (Console v2): restored as a primary tab, per the bible ─────────
+// Bible §3 / §15 — the Store is a major section: optional equipment, sim or
+// real, and it must never gate knowledge. Two views: SIM OUTFIT (credits
+// shop, feeds the simulator loop) and FIELD KIT (real-world gear, honest
+// recommendations, no fake ratings).
+const STORE_TABS = [
+  { id: "outfit",   label: "Sim Outfit", icon: "◈" },
+  { id: "fieldkit", label: "Field Kit",  icon: "▣" },
+];
 
-// ── Loadout (Console v2): sim-gear shop moved out of the old Store ────────
-// Gear is game economy: it belongs to the simulator loop, not a top-level tab.
-function openLoadoutSection(root) {
+function renderStoreScreen(root, opts = {}) {
+  const view = opts.view === "fieldkit" ? "fieldkit" : "outfit";
+  const content = renderHubShell(root, STORE_TABS, view,
+    (t) => goTo("store", { view: t, replace: true }));
+  if (view === "fieldkit") {
+    content.innerHTML = `<div class="store-page">${renderFieldKitHTML()}</div>`;
+  } else {
+    renderStoreOutfit(content);
+  }
+}
+
+function renderStoreOutfit(el) {
   refreshChar();
   const activeCat = store.ui.storeCategory || "All";
   const owned = new Set(char.ownedGear || []);
 
-  root.innerHTML = `
+  el.innerHTML = `
     <div class="store-page">
-      <button class="back-btn" id="loadout-back">← Back to Simulator</button>
-
       <div class="store-credits-bar">
         <div class="store-credits-left">
           <span class="store-credits-label">Credits</span>
@@ -15746,18 +15783,16 @@ function openLoadoutSection(root) {
       <div id="store-item-grid" class="store-item-grid">${storeItemsHTML(activeCat)}</div>
     </div>`;
 
-  root.querySelector("#loadout-back").addEventListener("click", goBack);
-
-  root.querySelectorAll(".store-cat-tabs .chip").forEach(btn =>
+  el.querySelectorAll(".store-cat-tabs .chip").forEach(btn =>
     btn.addEventListener("click", () => {
       store.ui.storeCategory = btn.dataset.cat;
-      root.querySelector("#store-item-grid").innerHTML = storeItemsHTML(btn.dataset.cat);
-      root.querySelectorAll(".store-cat-tabs .chip").forEach(b => b.classList.toggle("chip-on", b === btn));
-      wireStoreBuyButtons(root);
+      el.querySelector("#store-item-grid").innerHTML = storeItemsHTML(btn.dataset.cat);
+      el.querySelectorAll(".store-cat-tabs .chip").forEach(b => b.classList.toggle("chip-on", b === btn));
+      wireStoreBuyButtons(el);
     })
   );
 
-  wireStoreBuyButtons(root);
+  wireStoreBuyButtons(el);
 }
 
 function storeItemsHTML(activeCat) {
@@ -15822,13 +15857,13 @@ function wireStoreBuyButtons(root) {
       saveCharacter(char);
       const newBadges = checkAndAwardBadges(char);
       newBadges.forEach((b, i) => setTimeout(() => showBadgeToast(b), 400 + i * 1600));
-      openLoadoutSection(root);
+      renderStoreOutfit(btn.closest("#hub-content") || root);
     });
   });
 }
 
 // ── Real-World Gear Store ─────────────────────────────────────────────────────
-// ── Field-Tested Kit (Console v2): the real-gear catalog, now a Profile section ──
+// ── Field-Tested Kit (Console v2): the real-gear catalog, now a Store view ──
 // Honest by design: no star ratings, no review counts — just the recommendation,
 // an estimated price, and an Amazon search link.
 function renderFieldKitHTML() {
@@ -15878,9 +15913,9 @@ function rwCardHTML(item, ownedIds) {
     </div>`;
 }
 
-// Legacy shims — the old Store screen no longer exists (see Console v2 notes)
+// Legacy shims — the old standalone Store screen is now the Store tab
 function gearListHTML() { return ""; }
-function renderItemsStore(root) { if (root) openLoadoutSection(root); }
+function renderItemsStore(root) { goTo("store", { view: "outfit" }); }
 
 
 
@@ -16629,9 +16664,9 @@ let navCurrent = null;   // { screen, opts } currently shown
 
 function goTo(screenName, opts = {}) {
   // Legacy aliases from the old information architecture
+  // ("store" is a real primary screen again — no alias needed)
   if (screenName === "encyclopedia")      { screenName = "library";   opts = { ...opts, tab: "articles" }; }
   else if (screenName === "atlas")       { screenName = "library";   opts = { ...opts, tab: "atlas" }; }
-  else if (screenName === "store")       { screenName = "simulator"; opts = { ...opts, section: "loadout" }; }
 
   if (!opts.replace && navCurrent && !sameNavEntry(navCurrent, { screen: screenName, opts })) {
     navStack.push(navCurrent);
@@ -16680,7 +16715,8 @@ function renderScreen(screenName, opts = {}) {
     if (RUN.scenario && (RUN.phase === "setup" || RUN.phase === "run") && !opts.keepRun && !opts.scenarioId) resetRun();
     renderSimulator(root, (articleId) => goTo("library", { tab: "articles", articleId }));
     if (opts.scenarioId) startScenarioById(root, opts.scenarioId);
-    else if (opts.section === "loadout") openLoadoutSection(root);
+  } else if (screenName === "store") {
+    renderStoreScreen(root, opts);
   } else if (screenName === "library") {
     renderLibraryScreen(root, opts);
   } else if (screenName === "profile") {
@@ -16838,7 +16874,7 @@ async function init() {
       entry = localStorage.getItem("yddnw_last_screen") || "simulator";
     localStorage.setItem("yddnw_visited", "1");
   } catch (e) {}
-  const validEntry = ["simulator","learning","library","profile"];
+  const validEntry = ["simulator","learning","library","profile","store"];
   goTo(validEntry.includes(entry) ? entry : "learning");
 
   try {
@@ -16879,7 +16915,7 @@ Pick a scenario. Read the brief. Make decisions. The system tracks your choices 
   {
     title: "The Library",
     body: `The <strong>Library</strong> is the knowledge base: <strong>Articles</strong> cover everything from fire-making to wound care, and the <strong>Atlas</strong> maps the world's regions.<br><br>
-Articles lead somewhere — related lessons, atlas regions, simulator scenarios, and loadout gear are linked at the bottom of every article. Follow them to build fluency.`,
+Articles lead somewhere — related lessons, atlas regions, simulator scenarios, and store gear are linked at the bottom of every article. Follow them to build fluency.`,
     highlight: null,
   },
   {
@@ -16890,7 +16926,7 @@ Each lesson has 3 steps and a field tip. Complete lessons to earn XP and level u
   },
   {
     title: "Credits and Gear",
-    body: `Every run earns <strong>◈ Credits</strong>. Spend them in the <strong>Loadout</strong> section of the Simulate tab to purchase equipment that gives you better starting kits in scenarios.<br><br>
+    body: `Every run earns <strong>◈ Credits</strong>. Spend them in the <strong>Store</strong> tab to purchase equipment that gives you better starting kits in scenarios.<br><br>
 You start with ◈${char.credits}. Run scenarios to earn more.`,
     highlight: null,
   },
