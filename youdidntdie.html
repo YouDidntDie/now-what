@@ -1219,6 +1219,20 @@ body::after {
 .check-formula { font-family: var(--font-m); font-size: 11px; color: var(--text-dim); }
 .pen-note { color: var(--red-lt); margin-left: 4px; }
 .bon-note { color: var(--green-lt); margin-left: 4px; }
+/* ── Situation board — always visible, never collapsed ─────────────────── */
+.sit-board { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 18px; }
+.sb-threat { border-left: 2px solid var(--red); padding-left: 12px; margin-bottom: 12px; }
+.sb-threat p { font-size: 14px; color: var(--white); font-weight: 600; margin: 2px 0 0; }
+.sb-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.sb-cols p { font-size: 12px; color: var(--text); line-height: 1.5; margin: 2px 0 0; }
+@media (max-width: 560px) { .sb-cols { grid-template-columns: 1fr; } }
+.sb-vitals { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.vital-word { font-family: var(--font-m); font-size: 10px; letter-spacing: .04em; padding: 3px 9px; border-radius: var(--radius); border: 1px solid var(--border); color: var(--text-dim); }
+.vital-word.vw-warn { color: var(--red-lt); border-color: var(--red); background: var(--red-pale); }
+.vital-word.vw-caution { color: var(--amber); border-color: var(--amber); }
+.sb-kit { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+.sb-unknown { margin-top: 10px; font-size: 11px; color: var(--amber); font-family: var(--font-m); letter-spacing: .03em; }
+.sit-label { display: block; margin: 18px 0 8px; }
 .choices-header { margin-bottom: 8px; }
 .choices-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; }
 .choice-btn { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; text-align: left; width: 100%; transition: background var(--speed), border-color var(--speed); }
@@ -14198,41 +14212,86 @@ function briefDetailsHTML() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// SITUATION BOARD — plain-language briefing, always visible.
+// No stat math on screen: the doctrine engine still runs underneath, but the
+// player decides like a human, not like a character sheet.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// What kills you first, in plain words — keyed by the stage's challenge tag.
+const THREAT_LINES = {
+  shelter:    "Exposure — cold kills in hours, not days.",
+  water:      "Dehydration — your body is already running behind.",
+  fire:       "Cold and dark — you need heat before nightfall.",
+  navigation: "Getting lost — every wrong turn costs warmth and water.",
+  medical:    "Your injury — untreated, it starts making decisions for you.",
+  food:       "Hunger — it rots your judgment long before it kills you.",
+  signal:     "Rescue — nobody comes if nobody knows where you are.",
+  warmth:     "Cold — your body is losing heat faster than it makes it.",
+};
+function threatFor(stage, scenario) {
+  return THREAT_LINES[stage.check.tag]
+      || THREAT_LINES[scenario.relatedDomain]
+      || "The clock — every choice costs time you don't get back.";
+}
+
+// Body states in human words — what a person actually feels and checks.
+function vitalWord(key, val) {
+  switch (key) {
+    case "health":      return val < 30 ? ["Critical", "warn"]    : val < 60 ? ["Hurt", "caution"]     : ["Holding", ""];
+    case "morale":      return val < 30 ? ["Breaking", "warn"]    : val < 60 ? ["Shaken", "caution"]    : ["Steady", ""];
+    case "thirst":      return val > 65 ? ["Parched", "warn"]     : val > 35 ? ["Thirsty", "caution"]   : ["Hydrated", ""];
+    case "fatigue":     return val > 65 ? ["Exhausted", "warn"]   : val > 35 ? ["Tired", "caution"]     : ["Fresh", ""];
+    case "stress":      return val > 70 ? ["Panicking", "warn"]   : val > 40 ? ["On edge", "caution"]   : ["Calm", ""];
+    case "temperature": return val < 35 ? ["Hypothermic", "warn"] : val < 36 ? ["Freezing", "warn"]
+                       : val > 39.5 ? ["Overheating", "warn"]     : val > 38 ? ["Running hot", "caution"] : ["Warm enough", ""];
+    default:            return ["", ""];
+  }
+}
+
+function situationBoardHTML(stage) {
+  const s   = RUN.scenario;
+  const sys = RUN.systems;
+  const vitals = HUD_SYSTEMS.map(key => {
+    const def = CORE_SYSTEM_DEFS[key];
+    const [word, tone] = vitalWord(key, sys[key] ?? def.default);
+    return `<span class="vital-word${tone ? " vw-" + tone : ""}" title="${def.label}">${def.icon} ${word}</span>`;
+  }).join("");
+  const kit = Object.values(RUN.inventory);
+  return `
+    <div class="sit-board">
+      <div class="sb-threat">
+        <span class="card-label" style="color:var(--red-lt)">What kills you first</span>
+        <p>${threatFor(stage, s)}</p>
+      </div>
+      <div class="sb-cols">
+        <div><span class="card-label">Where you are</span><p>${s.environment}</p></div>
+        <div><span class="card-label">Conditions</span><p>${s.weather}</p></div>
+      </div>
+      <div class="sb-vitals">${vitals}</div>
+      ${kit.length ? `
+      <div><span class="card-label">What you have</span></div>
+      <div class="sb-kit">
+        ${kit.map(item => `<span class="inv-tray-item ${item.remaining <= 0 ? "inv-depleted" : ""}" title="${item.name}: ${item.desc}">${item.icon}<span class="inv-uses">${item.remaining >= 99 ? "∞" : item.remaining}</span></span>`).join("")}
+      </div>` : ""}
+      ${stage.randomEvents && stage.randomEvents.length ? `
+      <div class="sb-unknown">? Unknown factors in play — not everything here is knowable in advance. Decide with what you have.</div>` : ""}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // STAGE — stage body + wiring (rendered inside the run screen)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function stageBodyHTML() {
   const stage = RUN.scenario.stages[RUN.stageIndex];
 
+  // Readiness math stays under the hood — the player never sees the formula.
   const pen      = condPenalty();
   const bon      = condBonus();
   const envMod   = envDiffMod(stage.check.tag);
   const adjDiff  = Math.max(4, stage.check.difficulty + pen - bon + envMod);
   const stageNum = RUN.stageIndex + 1;
   const total    = RUN.scenario.stages.length;
-  const sys      = RUN.systems;
-  const gearW    = gearWord(RUN.scenario.gear || "kit");
-
-  const hudBars = HUD_SYSTEMS.map(key => {
-    const def  = CORE_SYSTEM_DEFS[key];
-    const val  = sys[key] ?? def.default;
-    const pct  = Math.round(((val - def.min) / (def.max - def.min)) * 100);
-    const warn = key === "health" ? val < 30
-               : key === "morale" ? val < 30
-               : key === "thirst" ? val > 65
-               : key === "fatigue" ? val > 65
-               : key === "stress"  ? val > 70
-               : key === "temperature" ? (val < 35 || val > 39.5)
-               : false;
-    return `
-      <div class="sys-bar-row">
-        <span class="sys-bar-icon" title="${def.label}">${def.icon}</span>
-        <div class="sys-bar-track">
-          <div class="sys-bar-fill ${warn ? "sys-bar-warn" : ""}" style="width:${pct}%"></div>
-        </div>
-        <span class="sys-bar-val">${Number.isInteger(val) ? val : val.toFixed(1)}${def.unit}</span>
-      </div>`;
-  }).join("");
 
   return `
       <div class="run-hud">
@@ -14241,10 +14300,9 @@ function stageBodyHTML() {
             `<div class="hud-pip ${i < stageNum ? "pip-done" : i === stageNum-1 ? "pip-active" : ""}"></div>`
           ).join("")}
         </div>
-        <div class="hud-systems">${hudBars}</div>
         ${RUN.conditions.length ? `
           <div class="condition-row">
-            ${RUN.conditions.map(c => `<span class="cond-tag">${c.replace(/_/g," ")}</span>`).join("")}
+            ${RUN.conditions.map(c => `<span class="cond-tag">${c.replace(/_/g," ")} </span>`).join("")}
           </div>` : ""}
       </div>
 
@@ -14256,55 +14314,35 @@ function stageBodyHTML() {
 
       ${buildRegionTipChip(stage.check.tag)}
 
+      ${situationBoardHTML(stage)}
+
+      <span class="card-label sit-label">Situation</span>
       <p class="stage-situation">${stage.situation}</p>
 
-      <div class="check-block">
-        <span class="card-label">${stage.check.label}</span>
-        <span class="check-formula">
-          ${STAT_DEFS.find(s=>s.id===stage.check.stat)?.label} + ${gearW} + effort
-          vs <strong>${adjDiff}</strong> demand
-          ${pen > 0 ? `<span class="pen-note">(+${pen} penalty)</span>` : ""}
-          ${bon > 0 ? `<span class="bon-note">(−${bon} bonus)</span>` : ""}
-          ${envMod > 0 ? `<span class="pen-note">(+${envMod} region)</span>` : ""}
-          ${envMod < 0 ? `<span class="bon-note">(${envMod} region)</span>` : ""}
-        </span>
-      </div>
-
-      <div class="choices-header"><span class="card-label">Choose Your Action</span></div>
+      <div class="choices-header"><span class="card-label">Your call — decide</span></div>
       <div class="choices-list">
         ${stage.choices.map(ch => {
           const statId  = ch.statHint || stage.check.stat;
-          const { value: statVal, mod: statMod } = effStat(statId);
-          const statDef = STAT_DEFS.find(s=>s.id===statId);
-          const { item, bonus } = getBestItem(RUN.inventory, ch.tag || stage.check.tag);
+          const { value: statVal } = effStat(statId);
+          const { bonus } = getBestItem(RUN.inventory, ch.tag || stage.check.tag);
           const readiness = statVal + bonus + STEADY_EFFORT;
           const margin = readiness - adjDiff;
-          // Price forecast only — never reveals whether the call itself is sound.
-          // READY: you can afford this. TAXING: it will cost you. DESPERATE: heavy price.
-          const tierInfo = margin >= 2 ? ["READY", "tier-ready"]
-                       : margin >= 0 ? ["TAXING", "tier-taxing"]
-                       : ["DESPERATE", "tier-desperate"];
+          // Cost forecast in plain words — never the formula.
+          const tierInfo = margin >= 2 ? ["You can handle this", "tier-ready"]
+                       : margin >= 0 ? ["This will cost you", "tier-taxing"]
+                       : ["Desperate — heavy price", "tier-desperate"];
           return `
             <button class="choice-btn" data-id="${ch.id}">
               <div class="choice-content">
                 <div class="choice-label">${ch.label}</div>
                 <div class="choice-desc">${ch.desc}</div>
                 <div class="choice-meta">
-                  <span class="choice-stat">${statDef?.icon} ${statDef?.label} ${statVal}${statMod ? ` <span class="stat-mod">(${statMod > 0 ? "+" : ""}${statMod})</span>` : ""}</span>
-                  ${item ? `<span class="choice-item">${item.icon} +${bonus}</span>` : ""}
                   <span class="choice-tier ${tierInfo[1]}">${tierInfo[0]}</span>
                 </div>
               </div>
               <span class="choice-arrow">›</span>
             </button>`;
         }).join("")}
-      </div>
-
-      <div class="inv-tray">
-        ${Object.values(RUN.inventory).map(item => `
-          <span class="inv-tray-item ${item.remaining <= 0 ? "inv-depleted" : ""}" title="${item.name}: ${item.desc}">
-            ${item.icon}<span class="inv-uses">${item.remaining >= 99 ? "∞" : item.remaining}</span>
-          </span>`).join("")}
       </div>
 `;
 }
@@ -14435,8 +14473,7 @@ function resultBodyHTML() {
   const whyInner = `
     ${factors.length ? `
       <div class="factors-static">
-        ${factors.map(r => `<div class="factor-row"><span>${r.k}</span><span class="factor-val${r.neg ? " f-neg" : r.pos ? " f-pos" : ""}">${r.v}</span></div>`).join("")}
-        <div class="factor-row factor-total"><span>Readiness vs demand</span><span class="factor-val">${assess.readiness} vs ${assess.demand}</span></div>
+        ${factors.map(r => `<div class="factor-row"><span>${r.k}</span><span class="factor-val${r.neg ? " f-neg" : r.pos ? " f-pos" : ""}">${r.neg ? "worked against you" : r.pos ? "worked for you" : "helped"}</span></div>`).join("")}
       </div>` : ""}
     ${rule ? `
       <div class="result-tip" style="border-left-color:var(--green-dk);margin-top:10px">
@@ -14507,11 +14544,14 @@ function resultBodyHTML() {
         ${RUN.conditions.map(c => `<span class="cond-tag">${c.replace(/_/g," ")}</span>`).join("")}
       </div>` : ""}`;
 
+  const priceWords = { solid: "Clean execution", costly: "Costly — but done", desperate: "Barely pulled off", mitigated: "Damage contained", botched: "Botched", fatal: "Fatal" };
+  const priceWord  = priceWords[res.priceTier] || "";
+
   return `
       <div class="result-stage-banner ${won ? "rsb-ok" : "rsb-fail"}">
         <span class="rsb-badge">${vd.badge}</span>
         <span class="rsb-stage">Stage ${stageNum} of ${RUN.scenario.stages.length}</span>
-        <span class="rsb-roll">${assess.readiness} vs ${assess.demand} readiness</span>
+        ${priceWord ? `<span class="rsb-roll">${priceWord}</span>` : ""}
       </div>
       <div class="result-verdict ${vd.cls}">${vd.text}</div>
 
@@ -14716,7 +14756,7 @@ function renderDebrief(root, onOpenArticle) {
                 </div>` : ""}
             </div>
             <div class="log-right">
-              <span class="log-roll">${entry.assess.readiness} vs ${entry.assess.demand} · ${(entry.resolve ? entry.resolve.quality + " · " + entry.resolve.priceTier : entry.assess.tier).toUpperCase()}</span>
+              <span class="log-roll">${(() => { const q = entry.resolve ? entry.resolve.quality : null; const qw = { sound: "Sound call", risky: "Gamble", poor: "Poor call", fatal: "Fatal call" }[q] || ""; const pw = { solid: "clean", costly: "costly", desperate: "desperate", mitigated: "contained", botched: "botched", fatal: "fatal", failed: "failed" }[(entry.resolve && entry.resolve.priceTier) || entry.assess.tier] || ""; return [qw, pw].filter(Boolean).join(" · "); })()}</span>
               <span class="log-xp">+${entry.xp} xp</span>
             </div>
           </div>`).join("")}
