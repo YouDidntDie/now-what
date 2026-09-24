@@ -9317,7 +9317,1844 @@ const SCENARIOS = [
       },
     },
   ],
+},
+// ══ Batch 4 — From Fiber to Cloth / Mud That Holds Water / Ashes and Fat ══
+{
+  id: "textile-production",
+  gear: "kit",
+  biomes: [
+    "temperate_forest",
+    "boreal",
+    "grassland"
+  ],
+  title: "From Fiber to Cloth",
+  icon: "🧵",
+  difficulty: 2,
+  phase: 1,
+  timeOfDay: "09:00",
+  environment: "An established camp two weeks in — a solid lean-to, a reliable fire, a knife, an axe, fire gear, and one campmate. A dense stand of tall nettles and hemp-like bast plants grows at the treeline, and the weather talk from the last scout is blunt: a hard cold snap is coming within a week.",
+  weather: "Late summer sliding toward autumn. Mornings at 6°C, afternoons near 18°C, damp creek air in the evenings.",
+  relatedDomain: "textiles",
+  intro: "Cloth isn't decoration — it's insulation you can wear and carry. But fiber from stalk to thread is a pipeline, and pipelines break at their weakest step. Harvest right, ret it patiently, spin it strong, and make cordage first: lashings, snares, and fishing line keep the camp alive. Cloth comes later. Rush any step and you get thread that snaps — or worse.",
+  stages: [
+    {
+      id: "s1",
+      title: "Stage 1 — Day 1, 09:00, The Harvest",
+      situation: "The fiber stand is dense: six-foot stalks of nettle and hemp at the treeline, thick enough to matter. Your campmate's gloves have holes in them. The cold snap forecast says you have about a week — the stalks are ready now, and frost-damaged fiber rets poorly, so the best harvest window is now.",
+      check: {
+        stat: "knowledge",
+        difficulty: 10,
+        tag: "utility",
+        label: "Read the Stand"
+      },
+      choices: [
+        {
+          id: "cutAndBundle",
+          q: "sound",
+          label: "Cut, strip, bundle — leave the rest standing",
+          desc: "Cut stalks at the base with the knife, strip the leaves off (nettles sting through worn gloves), tie them into loose bundles. Harvest what you can actually process this week and leave the rest for a second pass.",
+          statHint: "knowledge",
+          tag: "utility"
+        },
+        {
+          id: "hugeHaul",
+          q: "risky",
+          label: "One giant harvest push — take the whole stand",
+          desc: "Cut everything worth cutting in one long day: all the nettles, all the hemp, armful after armful. Maximum material before the cold snap.",
+          statHint: "endurance",
+          tag: "utility"
+        },
+        {
+          id: "grabWhatever",
+          q: "poor",
+          label: "Grab what's closest, leaves and all",
+          desc: "Pull or break the nearest stalks, leaves still on, some rotten from the ground layer. Fast and easy — fiber is fiber.",
+          statHint: "perception",
+          tag: "utility"
+        }
+      ],
+      outcomes: {
+        cutAndBundle: {
+          success: {
+            narrative: "You work the stand with gloves and the knife: stalks cut at the base, leaves stripped away from the bundle zone, the good stalks tied into loose bundles while the short and damaged ones go to tinder. The leaf piles rot where they lie and you leave half the stand standing for a later pass. Two evenings of work, not one — but every bundle is clean processing material.",
+            effects: {
+              conditionAdd: "fiber_bundled",
+              moraleMod: 6,
+              xpBonus: 20
+            },
+            tip: "Harvest only what you can process before rot takes it, strip the leaves and seed heads (they foul the retting soak), and bundle the stalks loose enough that water can reach every one. What you don't take today stays standing for tomorrow.",
+            learnMore: [
+              "tx001",
+              "f003"
+            ]
+          },
+          failure: {
+            narrative: "The harvest is good but the stripping is sloppy — half the bundles still carry handfuls of leaves, and some stalks are bent and crushed from being dragged through the underbrush. The leaf matter will foul the soak later and the crushed fibers will break short. You re-strip the worst of it and learn to cut, not drag.",
+            effects: {
+              conditionAdd: "bundles_needy",
+              moraleMod: -4
+            },
+            tip: "Leaves and seed heads left in the retting soak rot and foul the water, staining the fibre and feeding the bacteria that over-ret it; crushed stalks give short, weak strands. Cut clean at the base, strip fully, carry — never drag.",
+            learnMore: [
+              "tx001"
+            ]
+          }
+        },
+        hugeHaul: {
+          success: {
+            narrative: "You go at it from first light to dusk and the whole stand comes down — armful after armful of tall stalks stacked at camp like a harvest festival. It cost you a full day and your shoulders are wrecked, but the material is all there: enough fiber for cordage, fishing line, and a first piece of cloth, if the processing holds up.",
+            effects: {
+              conditionAdd: "big_harvest",
+              conditionAdd2: "arms_sore",
+              moraleMod: 8,
+              xpBonus: 10
+            },
+            tip: "A big harvest only pays off if you can process it before it molds or freezes — fiber plants are a deadline crop. Bank the material fast, but the clock on retting and drying starts the moment you cut.",
+            learnMore: [
+              "tx001"
+            ]
+          },
+          failure: {
+            narrative: "You cut until dark and beyond, and by the end the work is careless — stalks dumped in a damp heap by the treeline, half of them still carrying leaves, the bottom layer already going soft and warm. A heap is not storage: the center heats and molds within days. You spend the next morning re-stacking everything loose and ventilated, and your back pays for two days.",
+            effects: {
+              conditionAdd: "heap_heating",
+              conditionAdd2: "exhausted",
+              moraleMod: -10
+            },
+            tip: "Cut stalks piled in a heap compost themselves — heat and moisture in the center breed mold that ruins fiber fast. Spread bundles loose, off the ground, in moving air.",
+            learnMore: [
+              "tx001"
+            ]
+          }
+        },
+        grabWhatever: {
+          success: {
+            narrative: "The armfuls are a mess — leaves, ground-rot stalks, half-green tops — but sorting by the fire that evening shows the stand's secret: even this lazy harvest has enough good stalks for a start, once the rotten and green ones are culled out. The 'fast and easy' method cost you an extra evening of sorting you wouldn't have needed.",
+            effects: {
+              conditionAdd: "sorted_stalks",
+              moraleMod: -4
+            },
+            tip: "Fiber is not fiber: ground-layer stalks rot where they touch soil, and unripe green tops haven't developed strong fiber. Select at the plant, not at the sorting pile — your time is worth more at the cutting edge.",
+            learnMore: [
+              "tx001"
+            ]
+          },
+          failure: {
+            narrative: "You stuff the rotten ground stalks and the green tops in with the good ones, and when the whole mess goes into the first processing soak the rotten fiber dissolves into mush and fouls the water for the good stalks. A week of potential fiber becomes a stinking tub and a hard lesson: garbage in, garbage out.",
+            effects: {
+              conditionAdd: "soak_fouled",
+              moraleMod: -12
+            },
+            tip: "Cull before processing — rotten or unripe stalks contaminate the whole batch. Inspect every stalk when you cut it: firm, straight, no soft spots, no mold smell.",
+            learnMore: [
+              "tx001"
+            ]
+          }
+        }
+      }
+    },
+    {
+      id: "s2",
+      title: "Stage 2 — Days 2–4, Processing the Fiber",
+      situation: "The bundles are stacked and the cold snap is four days out. The fiber inside those stalks is glued in by natural pectins — to free it you have to ret it: soak the stalks in water and let bacteria rot the glue away without rotting the fiber. Too fast and the fiber is still glued; too slow and it rots too.",
+      check: {
+        stat: "endurance",
+        difficulty: 11,
+        tag: "utility",
+        label: "Rot the Glue, Not the Fiber"
+      },
+      randomEvents: [
+        {
+          chance: 0.2,
+          text: "A cold night drops frost on the stalks early — the first batch of fiber takes longer to dry and retting in the cold pool slows to a crawl.",
+          effect: {
+            moraleMod: -6
+          }
+        }
+      ],
+      choices: [
+        {
+          id: "retPatiently",
+          q: "sound",
+          label: "Full retting: soak, check, rinse, dry",
+          desc: "Sink the bundles in the creek pool weighted with stones, check a stalk daily — when the fiber peels from the woody core easily, pull the batch, rinse it clean, and dry it fully before breaking.",
+          statHint: "knowledge",
+          tag: "utility"
+        },
+        {
+          id: "warmShortcut",
+          q: "risky",
+          label: "Warm-water quick retting in the shallows",
+          desc: "Soak the bundles in the sun-warmed shallow water at the creek edge — warmer water speeds the bacteria, cutting the retting time in half.",
+          statHint: "perception",
+          tag: "utility"
+        },
+        {
+          id: "skipRetting",
+          q: "poor",
+          label: "Skip the soak — break and scrape dry stalks",
+          desc: "No time to wait on water. Pound the dry stalks with a wooden mallet, split them, and scrape the fiber free by hand. Fiber is fiber.",
+          statHint: "strength",
+          tag: "utility"
+        }
+      ],
+      outcomes: {
+        retPatiently: {
+          success: {
+            narrative: "The bundles sink in the cold creek pool, weighted with stones, and you learn the test: pull one stalk each morning and see if the fiber strips clean from the woody core. On the fourth morning it does — you pull the whole batch, rinse it in clean water, and lay it to dry fully in the wind. What comes off the stalks is long, clean, silvery fiber that pulls strong between your hands.",
+            effects: {
+              conditionAdd: "fiber_processed",
+              moraleMod: 10,
+              xpBonus: 20
+            },
+            tip: "Retting is done when the fiber peels cleanly from the woody core (the shive) with a pull — not before, not a week after. Rinse retted fiber in clean water and dry it completely before spinning; damp fiber molds in storage and rots the work.",
+            learnMore: [
+              "tx001"
+            ]
+          },
+          failure: {
+            narrative: "You leave the bundles two days too long and the test tells the story — the fiber strips too easily, soft and breaking short: over-retted. (A sour smell is normal in a retting soak; it is not the alarm — the fibre-release test is.) You salvage the outer layers of the batch for rough cordage and throw the mushy center stalks on the compost. Retting needs a daily check, not a memory of one.",
+            effects: {
+              conditionAdd: "batch_overretted",
+              moraleMod: -8
+            },
+            tip: "Over-retting rots the fiber itself, not just the glue — the window is narrow. Test daily and pull the batch the moment fiber strips clean from the core; a day late can cost half the harvest.",
+            learnMore: [
+              "tx001"
+            ]
+          }
+        },
+        warmShortcut: {
+          success: {
+            narrative: "The shallow warm soak works — the bacteria move fast in the sun-heated water and by the second evening the fiber strips clean. You rinse hard in the cold current, because the warm pool was starting to smell, and dry the fiber before nightfall. Half the time, and you got out before the rot did.",
+            effects: {
+              conditionAdd: "fiber_quick",
+              moraleMod: 6,
+              xpBonus: 10
+            },
+            tip: "Warm water retting is real and faster — but the same heat that speeds the bacteria speeds rot. Check twice a day, rinse in cold clean water the moment the fiber strips free, and never leave a warm soak unattended overnight.",
+            learnMore: [
+              "tx001"
+            ]
+          },
+          failure: {
+            narrative: "The warm shallows work too well. You check on the morning of the third day and the water is soupy, the stalks slimy, the fiber gummy and tearing — the whole batch cooked past retted into rotted. You lose most of it and burn half a day washing the stink off everything it touched. Speed is a tool, not a plan.",
+            effects: {
+              conditionAdd: "batch_rotted",
+              moraleMod: -12
+            },
+            tip: "In warm water the margin between retted and rotted narrows sharply — the batch can pass the point of no return within a day. Test the fiber constantly and pull early rather than late: a sour smell is normal in a retting soak, so judge by the fibre-release test, not the smell. Slightly under-retted fiber can be re-soaked; rotted fiber is gone.",
+            learnMore: [
+              "tx001"
+            ]
+          }
+        },
+        skipRetting: {
+          success: {
+            narrative: "You beat and scrape three stalks into a handful of fiber and it looks like fiber — until you test it. Short strands, still full of woody bits, snapping under a light pull. The afternoon's work yields what one good retted stalk would give, and your arms ache. You set the dry bundles aside and start a proper soak with the rest: the lesson is paid, the method is changed.",
+            effects: {
+              conditionAdd: "lesson_paid",
+              moraleMod: -6
+            },
+            tip: "Unretted fiber never fully separates from the woody core — you get short, dirty strands that snap under load. The soak isn't optional decoration; it's the step that makes the rest of the work possible.",
+            learnMore: [
+              "tx001"
+            ]
+          },
+          failure: {
+            narrative: "Two full days of pounding and scraping produce a pile of short, dirty strands full of splinters — and cordage spun from it snaps when you pull a lashing tight. The whole 'shortcut' has to be thrown on the compost and the real retting started from zero, days lost with the cold snap closing in. The fiber was never going to cooperate; the glue was still in it.",
+            effects: {
+              conditionAdd: "fiber_weak",
+              conditionAdd2: "days_lost",
+              moraleMod: -14
+            },
+            tip: "Cordage made from unretted fiber fails at the worst moment — snares springing open, lashings loosening on a shelter frame. Never trust structural cordage to fiber you rushed through processing.",
+            learnMore: [
+              "tx001",
+              "k008"
+            ]
+          }
+        }
+      }
+    },
+    {
+      id: "s3",
+      title: "Stage 3 — Days 5–7, Spinning and the First Product",
+      situation: "Clean fiber, dried and waiting — and the cold snap is now two days out. Now the real decision: how to spin it, and what to make first. Your campmate wants cloth — a proper warm garment for the cold. But the camp's snare line is down to its last loops and the fishing rig needs re-rigging. Cordage is what keeps the camp fed and standing.",
+      check: {
+        stat: "knowledge",
+        difficulty: 11,
+        tag: "utility",
+        label: "Turn Fiber Into Tools"
+      },
+      choices: [
+        {
+          id: "spindleCordage",
+          q: "sound",
+          label: "Drop spindle, then cordage first",
+          desc: "Carve a simple drop spindle from a stick and a weighted whorl, spin the fiber into strong even thread, then ply it into cordage for lashings, snare loops, and fishing line. Cloth waits.",
+          statHint: "knowledge",
+          tag: "utility"
+        },
+        {
+          id: "handRollTwine",
+          q: "risky",
+          label: "Hand-roll twine fast, straight into snares",
+          desc: "Roll fiber into two-ply twine between your palms and thigh — no spindle, no setup — and get the snare line and fishing rig rebuilt today.",
+          statHint: "endurance",
+          tag: "utility"
+        },
+        {
+          id: "weaveClothFirst",
+          q: "poor",
+          label: "Start weaving cloth right away",
+          desc: "Stretch a simple frame, warp it, and start weaving the camp's first cloth while the cold snap is still days off. Garments beat gadgets.",
+          statHint: "composure",
+          tag: "utility"
+        }
+      ],
+      outcomes: {
+        spindleCordage: {
+          success: {
+            narrative: "The spindle works like it has for ten thousand years: the whorl's spin drafts the fiber into even thread, the thread plied back on itself into strong two-ply cordage. By dusk the lashing box is full — snare loops re-hung on the trails, the fishing rig re-rigged, the lean-to's guy-lines replaced before the wind comes. Cordage first, and the camp is fed and standing when the cold hits.",
+            effects: {
+              conditionAdd: "cordage_made",
+              moraleMod: 10,
+              xpBonus: 20
+            },
+            tip: "A drop spindle uses the whorl's weight and spin to draft fiber evenly — steadier thread than hand-rolling, and ply two threads together against each other so the twist locks. Make cordage before cloth: lashings, snares, and fishing line are the highest-utility first products.",
+            learnMore: [
+              "tx002",
+              "k008",
+              "k005"
+            ]
+          },
+          failure: {
+            narrative: "The spindle wobbles and the thread comes out lumpy — thick, thin, thick — and the first lengths of cordage snap at the thin spots when you tension a lashing. You slow down, weight the whorl more evenly, and re-spin the bad lengths. The technique was right; the execution needed a steadier hand and slower drafts.",
+            effects: {
+              conditionAdd: "cordage_lumpy",
+              moraleMod: -6
+            },
+            tip: "Uneven thread is weak thread — the thin spots are where it almost always breaks. Draft a little fiber at a time, keep the twist consistent, and test every length with a hard pull before it holds anything that matters.",
+            learnMore: [
+              "tx002",
+              "k008"
+            ]
+          }
+        },
+        handRollTwine: {
+          success: {
+            narrative: "Your palms know the rhythm from years of camp life — fiber rolled against the thigh into two-ply twine, fast and even enough. The snare line is rebuilt by evening and two fishing rigs are re-rigged before dark. It's not spindle-smooth, but it's strong enough for the night's work, and speed was the point.",
+            effects: {
+              conditionAdd: "twine_rushed",
+              moraleMod: 6,
+              xpBonus: 10
+            },
+            tip: "Hand-rolling works for quick twine, but keep the strands even and the ply tight — roll two strands separately, then ply them together in the opposite direction of their twist so they lock instead of unraveling.",
+            learnMore: [
+              "k008",
+              "tx002"
+            ]
+          },
+          failure: {
+            narrative: "Fast becomes sloppy — the twine is uneven, one strand thicker than the other, and the ply loosens as it dries. A snare loop re-hung with it fires and the twine snaps; a fish is lost with your hook. You re-spin the critical lines with the spindle after all, having learned that 'fast enough' wasn't.",
+            effects: {
+              conditionAdd: "twine_failed",
+              moraleMod: -10
+            },
+            tip: "Uneven hand-rolled twine can shift and loosen as it dries — what held damp may fail dry. Check every critical line again once it is fully dry and re-tension anything that has slackened, or it'll fail when it's loaded.",
+            learnMore: [
+              "k008"
+            ]
+          }
+        },
+        weaveClothFirst: {
+          success: {
+            narrative: "Three days of weaving gives you a rough, uneven panel of cloth — lumpy, full of gaps, but recognizably cloth, and your campmate wraps it around their shoulders like a trophy. It took three days, the snare line stayed down the whole time, and the camp ate from the last of the stores. The cloth is real; so is the cost.",
+            effects: {
+              conditionAdd: "first_cloth",
+              conditionAdd2: "stores_low",
+              moraleMod: -4
+            },
+            tip: "Weaving eats days — warping, wefting, fixing tension — while cordage takes hours and feeds the camp. If you must weave early, weave cordage-weight work first and treat cloth as the reward for a fed camp, not the start of one.",
+            learnMore: [
+              "tx003"
+            ]
+          },
+          failure: {
+            narrative: "The frame warps on day two — uneven tension, and half the weft pulls out when you try to fix it. Three days gone for a tangled panel that won't hold together, the snare line still down, the stores nearly empty, and the cold snap now tomorrow. You cut your losses, spin cordage for the snares, and vow never to lead with the loom again.",
+            effects: {
+              conditionAdd: "loom_failed",
+              conditionAdd2: "stores_empty",
+              moraleMod: -14
+            },
+            tip: "A loom without proper tensioning is a tangled mess waiting to happen — but the deeper failure was sequencing. Weave cloth after the camp's tools are fed: cordage, snares, fishing line first, always.",
+            learnMore: [
+              "tx003",
+              "k008"
+            ]
+          }
+        }
+      }
+    },
+    {
+      id: "s4",
+      title: "Stage 4 — Days 8–9, The Cold Snap",
+      situation: "The cold snap arrives a day early — wind driving frost sideways, the temperature falling fast. There is a mountain of dried fiber still to spin and finish, and you want it done before the deep cold locks in. The fire is the warmest place in camp, and the night is long.",
+      check: {
+        stat: "composure",
+        difficulty: 12,
+        tag: "fire",
+        label: "Finish Without Burning"
+      },
+      choices: [
+        {
+          id: "storeFarFromFire",
+          q: "sound",
+          label: "Fiber store far from the fire; work by daylight",
+          desc: "Move all the dried fiber to the lean-to's far end, away from the hearth, and do the final spinning in daylight hours only. Slower, but the fire stays small and attended.",
+          statHint: "composure",
+          tag: "fire"
+        },
+        {
+          id: "firelightFinish",
+          q: "risky",
+          label: "Finish by firelight — fiber racked well clear",
+          desc: "Work the last cordage by the fire into the evening, with the bulk of the fiber stored well back from the flames and only a working handful at a time near the light.",
+          statHint: "composure",
+          tag: "fire"
+        },
+        {
+          id: "pileFiberByFire",
+          q: "fatal",
+          label: "Night shift: pile the dried fiber beside the fire and weave through the night",
+          desc: "Stack every bundle of dried fiber within arm's reach of the fire so it stays dry and close, keep the flames high for light, and work through the night to finish before the worst of the cold.",
+          statHint: "endurance",
+          tag: "fire"
+        }
+      ],
+      outcomes: {
+        storeFarFromFire: {
+          success: {
+            narrative: "The fiber goes to the far end of the lean-to, stacked off the ground, and the fire is kept small and banked — you spin in the pale daylight hours and let the night be night. The work finishes two days into the cold snap instead of before it, but the camp is warm, the fiber is dry, and nothing burned but firewood. Patience survived the deadline.",
+            effects: {
+              conditionAdd: "fiber_safe",
+              moraleMod: 8,
+              xpBonus: 20
+            },
+            tip: "Dry processed fiber is fuel — store it as far from flame as your space allows, off the ground, and never work a heap of it beside an open fire. Cold patience beats warm haste every time.",
+            learnMore: [
+              "f010",
+              "tx001"
+            ]
+          },
+          failure: {
+            narrative: "You bank the fire small and work by the grey morning light — and it's slow, freezing, miserable work. The spinning finishes days behind schedule and your fingers go numb at the worst moments. But the fiber is all there, the shelter is standing, and the cold is outside where it belongs. Slow survived.",
+            effects: {
+              conditionAdd: "fiber_safe",
+              conditionAdd2: "work_delayed",
+              moraleMod: -6
+            },
+            tip: "Working fiber in the cold is miserable but survivable; working it beside a roaring open fire is not. Keep the bulk store far from the hearth even when the deadline screams — deadlines don't kill, fires do.",
+            learnMore: [
+              "f010"
+            ]
+          }
+        },
+        firelightFinish: {
+          success: {
+            narrative: "You work into the evening with the fire high and the fiber racked well back — one working handful at a time, the rest of the store safely downwind of the sparks. A cinder pops and lands on your sleeve, not the pile; you brush it off and bank the fire before sleep. The last cordage gets finished and the fire never touched the store.",
+            effects: {
+              conditionAdd: "work_finished",
+              moraleMod: 8,
+              xpBonus: 10
+            },
+            tip: "If you must work fiber near flame, bring only a handful at a time and keep the bulk store well clear and downwind of sparks. Bank the fire before you sleep — an unattended open fire beside dry fiber is a countdown, not a plan.",
+            learnMore: [
+              "f010"
+            ]
+          },
+          failure: {
+            narrative: "Halfway through the evening a gust lifts a sheet of sparks across the work area — one lands in your handful of fiber and flares it up in a flash. You slap it out on the ground with your glove and your heart hammering. The fire caught only the handful, not the store, but the message is written in the scorch mark: next time, smaller fire or no night work.",
+            effects: {
+              conditionAdd: "spark_scare",
+              moraleMod: -10
+            },
+            tip: "Dry fiber ignites from a single spark — what burned in your hand would have taken the whole store in seconds. Keep the bulk pile upwind and far back, and if the wind gusts, bank the fire and stop.",
+            learnMore: [
+              "f010",
+              "m005"
+            ]
+          }
+        },
+        pileFiberByFire: {
+          success: {
+            narrative: "You got lucky — that's the whole story. Some time past midnight a coal rolls out of the banked fire and lands in the fiber pile's edge, and you wake to the smell and the glow just in time to drag the smoldering bundle outside and stamp it out, the shelter filling with smoke. Half the fiber is ruined, your campmate is coughing, and you spend the rest of the night with the fire cold and your hands shaking. Lucky is not a method. Never again.",
+            effects: {
+              conditionAdd: "fiber_ruined",
+              conditionAdd2: "smoke_scare",
+              moraleMod: -16
+            },
+            tip: "You survived a coal in the fiber pile — most don't get the warning. Dry flax and hemp fiber ignites from a single coal and burns fast and hot: never pile it beside an open fire, never work it through the night by flame, and always bank the fire fully before sleep.",
+            learnMore: [
+              "f010",
+              "m005"
+            ]
+          },
+          failure: {
+            narrative: "The night work goes fine until it doesn't — a shift of your leg knocks a coal out of the fire's edge and into the piled fiber. A coal in dry flax tow can catch in moments, and the loose pile is fully involved within a minute or two — a fast, hot fire inches from the sleeping shelter. Smoke fills the lean-to before you can stand, the heat drives you out, and the shelter — with your campmate's spare gear and the winter stores inside — goes up with the fiber. A fiber fire in a shelter at night may give you a minute or two at most — and asleep, smoke can kill before the flames ever reach you.",
+            effects: {
+              fatal: true
+            },
+            tip: "Dry flax tow ignites from a single ember and burns fast and hot — and dispersed flax dust is genuinely explosive: a flax-dust explosion at a Harbin textile plant in 1987 killed 58 workers. Keep bulk fiber far from any open flame, never store or work it beside a fire at night, and bank fires fully before sleep — a night shelter fire leaves almost no time to escape.",
+            learnMore: [
+              "f010",
+              "m005",
+              "s036"
+            ]
+          }
+        }
+      }
+    }
+  ]
 }
+,
+{
+  id: "pottery",
+  gear: "kit",
+  biomes: [
+    "temperate_forest",
+    "grassland",
+    "wetland"
+  ],
+  title: "Mud That Holds Water",
+  icon: "🏺",
+  difficulty: 2,
+  phase: 1,
+  timeOfDay: "08:30",
+  environment: "An established camp on a creek bend — mixed hardwoods, a grassy flat, the creek curving past a cutbank on the far side. Two weeks in, with cordage, a knife, a spade, a basket, and a tarp.",
+  weather: "Late summer. Days near 26°C, nights cool, thunderstorms building most afternoons.",
+  relatedDomain: "fire",
+  intro: "Two weeks in at the creek bend, and the camp's water problem has become a container problem: the leather bucket leaks, the wooden trough is heavy and half-rotted, and every trip to the creek costs an hour. Clay is the answer the whole human story leaned on — dig it, shape it, dry it, fire it. But every step has a way to fail, and unfired clay softens back toward mud if it sits in water. This is slow work. That is the point.",
+  stages: [
+    {
+      id: "s1",
+      title: "Stage 1 — Day 1, 08:30, Reading the Bank",
+      situation: "Morning on the creek. The far bend shows a cutbank with clean grey layers — the richest-looking clay in the valley, right at the base where the water carved under it. Upstream the bank is low and stable, with surface clay you can test in minutes. The hillside seep above the creek shows grey a spade down. Three possible digs, and the shovel only goes in one place first.",
+      check: {
+        stat: "knowledge",
+        difficulty: 10,
+        tag: "water",
+        label: "Read the Bank"
+      },
+      choices: [
+        {
+          id: "testFirstDig",
+          q: "sound",
+          label: "Test the clay before you dig",
+          desc: "Walk the creek: ribbon-test and ring-test the surface clays at a low, stable bank upstream. Dig shallow, above the waterline, carry it back in the basket.",
+          statHint: "knowledge",
+          tag: "water"
+        },
+        {
+          id: "deepSeam",
+          q: "risky",
+          label: "Dig a deeper test pit at the hillside seep",
+          desc: "The seep above the creek shows grey clay a spade down — dig a proper pit for the purer seam, deeper than the surface stuff, and haul more in one trip.",
+          statHint: "endurance",
+          tag: "building"
+        },
+        {
+          id: "cutbankDig",
+          q: "fatal",
+          label: "Dig the cutbank — the clay is perfect there",
+          desc: "The undercut bank shows layers of clean grey clay, soft as butter, right at the base where the creek carved it. Crawl in under the overhang and dig where it's richest.",
+          statHint: "perception",
+          tag: "water"
+        }
+      ],
+      outcomes: {
+        testFirstDig: {
+          success: {
+            narrative: "The ribbon holds — a smooth band of clay squeezes out between your thumb and forefinger without breaking — and the pencil-thick coil bends into a ring without cracking. This clay has body. You dig a shallow scoop above the waterline, well clear of any overhang, and carry a full basket back to camp by midday.",
+            effects: {
+              conditionAdd: "clay_tested",
+              moraleMod: 6,
+              xpBonus: 20
+            },
+            tip: "The ribbon test and the ring test tell you the truth before you haul a single basket: squeeze moist clay into a ribbon between thumb and forefinger — if it holds together without breaking, the clay has body. Bend a pencil-thick coil into a ring — if it bends without cracking, it has plasticity. Fail either, keep walking.",
+            learnMore: [
+              "f031",
+              "w023"
+            ]
+          },
+          failure: {
+            narrative: "The first bank fails the test — the ribbon crumbles in your fingers, too sandy to hold. You move on instead of arguing with it, and lose half a day walking the creek before the second bend gives you a seam that passes both tests. The basket comes home late but full of clay that will actually work.",
+            effects: {
+              conditionAdd: "half_day_lost",
+              moraleMod: -4
+            },
+            tip: "Sandy clay that won't hold a ribbon lacks the clay content to form and hold together — the test costs five minutes and saves a week of building pots that were doomed from the dig.",
+            learnMore: [
+              "f031"
+            ]
+          }
+        },
+        deepSeam: {
+          success: {
+            narrative: "The pit goes down a spade, then two — the walls holding, the grey seam getting cleaner and more plastic as you dig. You haul a full basket of the best clay you've touched yet, and the pit walls are sloped back stable before you leave it. One trip, done right.",
+            effects: {
+              conditionAdd: "deep_clay",
+              moraleMod: 8,
+              xpBonus: 10
+            },
+            tip: "Dig test pits, not tunnels: keep the walls sloped or stepped back, never dig straight down into a deep narrow hole, and get out if the walls start slumping. A slumping wall is the ground telling you to stop.",
+            learnMore: [
+              "f031",
+              "s025"
+            ]
+          },
+          failure: {
+            narrative: "Halfway down the 'pure seam' turns to a gravel lens — the basket fills with clay so full of stones you'd spend a day picking them out. Worse, one pit wall slumps in on your spade and you spend an hour digging the tool out. You backfill the pit, slope the walls, and walk back with half a basket of gritty clay and a full lesson.",
+            effects: {
+              conditionAdd: "pit_slumped",
+              conditionAdd2: "exhausted",
+              moraleMod: -10
+            },
+            tip: "A deeper dig is a gamble on what's underneath: gravel lenses, slumping walls, groundwater. Test the seam with a small hole before you commit a day to a big one.",
+            learnMore: [
+              "f031"
+            ]
+          }
+        },
+        cutbankDig: {
+          success: {
+            narrative: "You are on your knees under the overhang, spade deep in the grey seam, when you hear it — a deep cracking sound from above, like ice going out. You throw yourself backward as a slab of bank drops exactly where you were crouching, burying your spade and half the basket. You stand there shaking for a long time, staring at the fresh scar. You got lucky. That is the only reason you are standing here. Never dig under an overhang again — never.",
+            effects: {
+              conditionAdd: "shaken",
+              conditionAdd2: "spade_lost",
+              moraleMod: -14
+            },
+            tip: "An undercut bank is a collapse waiting for a trigger — your digging, a rain, nothing at all. The perfect clay at the base of a cutbank is never worth the ground above it. Take clay from low, stable banks and walk away from the seam under the overhang.",
+            learnMore: [
+              "s025"
+            ]
+          },
+          failure: {
+            narrative: "The face lets go with a crack you feel in your teeth — a slab of wet bank dropping as one piece. You are buried to the chest before you can move, and then the rest comes down. Wet bank soil weighs well over a tonne per cubic metre, and on your chest it stops your ribs from moving. You cannot dig yourself out from under it, and nobody reaches you in time. That is how bank collapses kill: fast, quiet, and usually final.",
+            effects: {
+              fatal: true
+            },
+            tip: "Never dig, sleep, or shelter at the base of an undercut bank or in a steep-sided pit. Collapsed soil suffocates in minutes, and rescue from a burial almost never comes in time. Take clay from low stable banks, above the waterline, and leave the perfect seam under the overhang alone.",
+            learnMore: [
+              "s025"
+            ]
+          }
+        }
+      }
+    },
+    {
+      id: "s2",
+      title: "Stage 2 — Day 1, Afternoon, Wedging and Tempering",
+      situation: "The clay is back at camp in a damp heap under the tarp. Now it has to become workable: every stone and root picked out, the air wedged out of it, and temper mixed through it — coarse sand from the creek bar, or grog crushed from a broken fired pot. This is the unglamorous half of pottery, and skipping it is how pots die later.",
+      check: {
+        stat: "endurance",
+        difficulty: 11,
+        tag: "building",
+        label: "Work the Clay"
+      },
+      choices: [
+        {
+          id: "cleanAndTemper",
+          q: "sound",
+          label: "Pick it clean, wedge it, temper with sand",
+          desc: "Pick out every stone and root, wedge the clay hard to drive out air pockets, then work a handful of coarse sand into every lump — and crush one old broken pot for grog.",
+          statHint: "endurance",
+          tag: "building"
+        },
+        {
+          id: "buildRaw",
+          q: "risky",
+          label: "Build straight from the fine clay, untempered",
+          desc: "The clay feels like butter — skip the sand, skip the grog, pinch the pots thin and hope the fine body holds together.",
+          statHint: "composure",
+          tag: "building"
+        },
+        {
+          id: "gritAndGo",
+          q: "poor",
+          label: "Use the clay as dug — stones, roots and all",
+          desc: "Cleaning and wedging takes hours and the clay looks fine enough. Pinch the pots straight from the dug heap.",
+          statHint: "perception",
+          tag: "building"
+        }
+      ],
+      outcomes: {
+        cleanAndTemper: {
+          success: {
+            narrative: "An hour of picking, then the wedging — cut, slam, fold, repeat until every lump is even and airless — then the sand worked through, and the crushed grog from the old broken pot. The clay that comes out of your hands is smooth, even, and tempered. The first pinch pot rises without slumping and holds its rim. This is clay you can trust.",
+            effects: {
+              conditionAdd: "clay_ready",
+              moraleMod: 6,
+              xpBonus: 20
+            },
+            tip: "Temper is what keeps a pot from tearing itself apart as it dries: coarse sand, crushed fired pottery (grog), or crushed shell open up the clay body so it shrinks less and survives the fire. Fine untempered clay shrinks hard and cracks.",
+            learnMore: [
+              "f031",
+              "bd005"
+            ]
+          },
+          failure: {
+            narrative: "You wedge thoroughly but rush the tempering — a few small stones slip through, and one pot slumps at the shoulder while you're building it. You catch it in time, crush the failed pot for grog, and re-wedge the rest properly. The clay is good; the pace was wrong. Slow down and finish the job.",
+            effects: {
+              conditionAdd: "clay_rough",
+              moraleMod: -4
+            },
+            tip: "Wedging isn't kneading for fun — it homogenizes the clay and drives out air pockets and trapped moisture; it is water flashing to steam in the fire that blows pots apart, not the air itself. Slow, thorough, every lump.",
+            learnMore: [
+              "f031"
+            ]
+          }
+        },
+        buildRaw: {
+          success: {
+            narrative: "You build thin — pinch pots with walls you can almost see through — and dry them with obsessive evenness, turning them constantly. The fine clay holds. The pots are delicate and you know it, but they stand, and they will fire. This time, the gamble paid.",
+            effects: {
+              conditionAdd: "thin_pots",
+              moraleMod: 8,
+              xpBonus: 10
+            },
+            tip: "Untempered clay can work for small thin-walled pots dried very slowly and evenly — but it shrinks more and punishes any rush or unevenness. It is a gamble, not a method.",
+            learnMore: [
+              "f031"
+            ]
+          },
+          failure: {
+            narrative: "The rims crack first, then the shoulders — the fine untempered clay shrinks hard as it dries and the shrinkage has nowhere to go but cracks. Two pots split beyond saving. You crush them for grog, because at least the failure becomes temper, and start the next batch the slow way.",
+            effects: {
+              conditionAdd: "pots_cracked",
+              moraleMod: -10
+            },
+            tip: "Fine clay shrinks as the water leaves it — untempered, that shrinkage tears the walls open. Temper gives the clay body room to move as it dries and fires.",
+            learnMore: [
+              "f031",
+              "bd005"
+            ]
+          }
+        },
+        gritAndGo: {
+          success: {
+            narrative: "The pots look fine at first — then a pebble pops out of one wall during drying, leaving a pit, and a hairline crack follows a root fibre through another. You spend the whole evening picking the batch apart, fishing stones out of clay you should have cleaned hours ago. The pots survive; your evening doesn't.",
+            effects: {
+              conditionAdd: "lesson_grit",
+              moraleMod: -8
+            },
+            tip: "Limestone or shell fragments left in the clay can calcine in the fire and expand later when they meet moisture, popping chips out of the wall — the classic 'lime pop'. Roots burn out and leave weak channels. Clean clay isn't fussy; it's structural.",
+            learnMore: [
+              "f031"
+            ]
+          },
+          failure: {
+            narrative: "The batch is a write-off. The walls are gritty and uneven, one stone spalls a hole clean through a pot at the first heat, and the rest are too weak to trust with water. A full day of building, gone — and the clay has to be cleaned anyway before you can start over.",
+            effects: {
+              conditionAdd: "batch_lost",
+              moraleMod: -14
+            },
+            tip: "Every stone and root you leave in the clay is a flaw waiting for the fire to find. The cleaning hour is the cheapest hour in pottery.",
+            learnMore: [
+              "f031"
+            ]
+          }
+        }
+      }
+    },
+    {
+      id: "s3",
+      title: "Stage 3 — Days 2–4, The Slow Dry",
+      situation: "Six pots stand on the drying rack — pinch pots and small coil-built jars, walls even, rims true. Now comes the hardest part: waiting. The clay is still full of water, and it has to leave slowly and evenly, or the pots will tear themselves open as they shrink. Afternoon thunderstorms have been building all week.",
+      check: {
+        stat: "composure",
+        difficulty: 11,
+        tag: "fire",
+        label: "Wait It Out"
+      },
+      randomEvents: [
+        {
+          chance: 0.2,
+          text: "A squall blows through at dusk — fine wind-driven rain on the drying rack. The covered pots hold; anything left uncovered softens at the rims.",
+          effect: {
+            moraleMod: -6
+          }
+        }
+      ],
+      choices: [
+        {
+          id: "shadeDrySlow",
+          q: "sound",
+          label: "Slow dry under cover, turned daily",
+          desc: "Pots up off the damp ground on the rack, under the tarp overhang, out of sun and wind — turned each morning, left for days until bone dry.",
+          statHint: "composure",
+          tag: "fire"
+        },
+        {
+          id: "fireHasten",
+          q: "risky",
+          label: "Hasten them by the fire",
+          desc: "Move the drying rack close to the campfire — the heat will pull the moisture out by tomorrow and the camp needs pots.",
+          statHint: "composure",
+          tag: "fire"
+        },
+        {
+          id: "rushTheFire",
+          q: "poor",
+          label: "They feel dry — fire them today",
+          desc: "The surfaces are dry to the touch and the camp needs pots now. Build the pit fire this afternoon and get it done.",
+          statHint: "perception",
+          tag: "fire"
+        }
+      ],
+      outcomes: {
+        shadeDrySlow: {
+          success: {
+            narrative: "Three days of turning and waiting. The pots lighten in your hand day by day, and by the third morning they feel room-warm all the way through, with no cool spots — bone dry. (A dry pot rings when tapped, but the ring can lie; coolness never does.) Not a crack on any of them. The waiting was the work, and the work held.",
+            effects: {
+              conditionAdd: "pots_dry",
+              moraleMod: 6,
+              xpBonus: 20
+            },
+            tip: "Dry slow and even: shade, cover, moving air, off the damp ground. The outside of a pot always dries first — if it dries much faster than the inside, the difference tears the wall open. Drying takes days, not hours.",
+            learnMore: [
+              "f031"
+            ]
+          },
+          failure: {
+            narrative: "One pot sat at the tarp's edge where a draught hit it all afternoon — a hairline crack opens at its base by the second day. You catch the pattern, shift the whole rack out of the draught, and the rest come through clean. The cracked one becomes grog.",
+            effects: {
+              conditionAdd: "one_cracked",
+              moraleMod: -4
+            },
+            tip: "Cracks tell you where the drying was uneven — move the pots, slow that spot down. A draught on one side of a pot is enough to split it.",
+            learnMore: [
+              "f031"
+            ]
+          }
+        },
+        fireHasten: {
+          success: {
+            narrative: "You babysit them all day — rack at arm's warmth from the fire, never in the heat, every pot rotated on the hour so no side dries faster than another. By evening they are genuinely dry and uncracked. Faster, yes — but it cost you a full day of undivided attention.",
+            effects: {
+              conditionAdd: "pots_dried_fast",
+              moraleMod: 8,
+              xpBonus: 10
+            },
+            tip: "Gentle warmth speeds drying only if it stays even — rotate the pots constantly, keep them where the heat is mild, and never let one side bake while the other stays damp.",
+            learnMore: [
+              "f031"
+            ]
+          },
+          failure: {
+            narrative: "The fire-side walls dry fast and shrink while the far sides stay wet — and the pots split around the middle like fault lines, three of them, in a single afternoon. You stare at the wreckage and move the survivors back under the tarp to dry the slow way, like you should have from the start.",
+            effects: {
+              conditionAdd: "heat_cracked",
+              moraleMod: -12
+            },
+            tip: "Uneven heat is how pots die: one side shrinks, the other doesn't, and the wall tears between them. Fire-hastened drying is a full-time job, and the fire always wins the argument.",
+            learnMore: [
+              "f031"
+            ]
+          }
+        },
+        rushTheFire: {
+          success: {
+            narrative: "Halfway through the firing you hear it — a faint ticking from inside the pit. Two pots develop hairline cracks from the inside out as trapped moisture turns to steam. You pull them before they shatter, lose half the batch, and finally learn what 'bone dry' actually means: dry all the way through, not dry to the touch.",
+            effects: {
+              conditionAdd: "steam_lesson",
+              moraleMod: -8
+            },
+            tip: "Surface-dry is a lie the pot tells you — the inside can stay damp for days after the outside feels dry. Water trapped inside turns to steam in the fire, and steam needs room: it cracks the wall to make it.",
+            learnMore: [
+              "f031"
+            ]
+          },
+          failure: {
+            narrative: "The firing sounds like popcorn. Trapped moisture flashing to steam blows two pots apart outright and cracks the rest beyond use. The whole batch is shards in the ashes — a week of digging, wedging, and building, undone in an afternoon by impatience.",
+            effects: {
+              conditionAdd: "batch_shattered",
+              moraleMod: -14
+            },
+            tip: "Never fire a pot that isn't dry all the way through — feel it all over for cool spots (cool means still damp), weigh it against yesterday, and break a test piece if you must: the broken cross-section is the strongest witness. Steam inside a sealed wall is a small bomb.",
+            learnMore: [
+              "f031",
+              "f010"
+            ]
+          }
+        }
+      }
+    },
+    {
+      id: "s4",
+      title: "Stage 4 — Day 5, The Pit Fire",
+      situation: "The pots are bone dry — they ring faintly when tapped and feel light in the hand. Time to dig the pit and fire. A pit fire is simple and unforgiving: preheat the pots, build the heat gradually, and respect the fact that cold clay meeting sudden heat is a crack waiting to happen.",
+      check: {
+        stat: "knowledge",
+        difficulty: 12,
+        tag: "fire",
+        label: "Fire the Pit"
+      },
+      choices: [
+        {
+          id: "slowPitFire",
+          q: "sound",
+          label: "Preheat, coal bed, slow build",
+          desc: "Warm the pots around the fire first, dig the pit on high dry ground, lay an even coal bed, nestle the pots in, build the fire up gradually — then let it burn down and cool overnight.",
+          statHint: "knowledge",
+          tag: "fire"
+        },
+        {
+          id: "hotLoad",
+          q: "risky",
+          label: "Set the pots straight into the hot fire",
+          desc: "The pit is already roaring — nestle the cold pots straight into the coals and let the big heat do its work fast.",
+          statHint: "composure",
+          tag: "fire"
+        },
+        {
+          id: "dampPit",
+          q: "poor",
+          label: "Fire in the low hollow by the creek",
+          desc: "There's a natural hollow by the creek, damp but convenient and already dug. Build the fire there and save the digging.",
+          statHint: "perception",
+          tag: "fire"
+        }
+      ],
+      outcomes: {
+        slowPitFire: {
+          success: {
+            narrative: "The pots warm by the fire for an hour before they ever see the pit. The coal bed goes down even, the pots nestle in, and the fire builds slowly — no rush, no shock. By midnight it's burned to coals, and you leave it alone until morning. The pots come out hard, ring when tapped, and hold water — weeping a little at first, the way low-fired earthenware does. The camp has vessels.",
+            effects: {
+              conditionAdd: "pots_fired",
+              moraleMod: 10,
+              xpBonus: 20
+            },
+            tip: "A pit fire reaches roughly 600–900 °C — hot enough to harden earthenware, though most pit-fired pots stay porous and may weep at first, since full vitrification needs higher sustained heat. Preheat the pots, build the heat gradually so no wall is shocked, and let the whole thing cool slowly — cooling too fast can crack pots too, since thermal shock works in both directions.",
+            learnMore: [
+              "f031",
+              "f006"
+            ]
+          },
+          failure: {
+            narrative: "A cold wind finds the pit's edge overnight and one side fires cooler than the rest — two pots come out soft and crumbly on one side, underfired where the wind stole the heat. You mark them for dry storage only, bank the pit against the wind, and resolve to shelter the next firing properly.",
+            effects: {
+              conditionAdd: "uneven_fire",
+              moraleMod: -8
+            },
+            tip: "Uneven heat makes uneven pots — the cool side stays soft and underfired where the wind stole the heat. Shelter the pit from wind and keep the fuel bed even all the way around the pots.",
+            learnMore: [
+              "f031",
+              "f006"
+            ]
+          }
+        },
+        hotLoad: {
+          success: {
+            narrative: "You think fast: before the pots touch the coals, you bury each one in warm ash, buffering the shock, and set them at the fire's edge first so the temperature climbs on them instead of slamming into them. Most survive — one spalls a small chip off its shoulder, a scar you can live with. Fast, and barely clean.",
+            effects: {
+              conditionAdd: "fired_fast",
+              moraleMod: 8,
+              xpBonus: 10
+            },
+            tip: "If pots must meet heat fast, buffer them — nestle them in warm ash or pre-warmed sand at the fire's edge first. Cold clay straight into roaring coals is thermal shock by definition.",
+            learnMore: [
+              "f031"
+            ]
+          },
+          failure: {
+            narrative: "Thermal shock, textbook: within minutes of touching the hot coals, two pots crack clean across and a third spalls a flake off its shoulder. The outside of each wall expanded violently while the inside was still cold, and the pots tore themselves apart. The fire did exactly what fire does to cold clay.",
+            effects: {
+              conditionAdd: "shock_cracked",
+              moraleMod: -12
+            },
+            tip: "Thermal shock is simple physics: one part of the wall expands fast, the rest doesn't, and the pot tears itself apart. Always bring pots up to heat gradually — preheat near the fire, then the warm edge, then the heart.",
+            learnMore: [
+              "f031",
+              "f010"
+            ]
+          }
+        },
+        dampPit: {
+          success: {
+            narrative: "The damp ground hisses and steams under the fire almost immediately — and the pot sitting on the wettest spot cracks from the steam rising beneath it. You drag the rest onto dry ground mid-firing, re-bed the coals, and salvage most of the batch. The hollow stays empty from now on.",
+            effects: {
+              conditionAdd: "steam_scare",
+              moraleMod: -8
+            },
+            tip: "Never fire on damp ground — water under the fire turns to steam that can crack any pot sitting in it, while the wet ground saps heat unevenly from the firing. A pit belongs on high, dry ground, full stop.",
+            learnMore: [
+              "f031",
+              "f010"
+            ]
+          },
+          failure: {
+            narrative: "The hollow is wetter than it looked. Steam billows up through the coal bed for hours, the pots sit in a bath of it, and the batch cracks and crumbles — a week of digging, wedging, drying, and building dissolving back toward mud in a single night.",
+            effects: {
+              conditionAdd: "pit_failed",
+              moraleMod: -14
+            },
+            tip: "Wet ground and fire make steam, and steam plus hot clay makes shards. Dig the pit where the ground is dry, or don't dig it at all.",
+            learnMore: [
+              "f031"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+,
+{
+  id: "soap-production",
+  gear: "kit",
+  biomes: [
+    "boreal",
+    "temperate_forest",
+    "highland"
+  ],
+  title: "Ashes and Fat",
+  icon: "🧼",
+  difficulty: 2,
+  phase: 1,
+  timeOfDay: "07:30",
+  environment: "An established camp in its second week — maple and beech around the fire circle, a rain barrel under the tarp edge, fat scraps saved from every cook, and a fire pit that produces hardwood ash every night.",
+  weather: "Late summer. Warm days, cool nights, afternoon showers moving through.",
+  relatedDomain: "chemistry",
+  intro: "Two weeks in, the camp has a hygiene problem — and the fix is already on site. The fire pit makes hardwood ash every night, the cook pot leaves fat scraps, and between them sits soap: fat transformed by lye, the oldest chemistry there is. But the middle of this project is a caustic liquid that burns skin, destroys eyes, and can kill if swallowed. Make it right, respect it the whole way, and the camp washes for months. Get casual with it, and it will remind you what caustic means.",
+  stages: [
+    {
+      id: "s1",
+      title: "Stage 1 — Day 1, 07:30, Ash and the Hopper",
+      situation: "Morning at the fire pit, and the ash barrel is the project's first ingredient. Hardwood ash — oak, maple, beech — holds the alkali that becomes lye; pine and spruce ash is resinous and weak, and anything from charcoal briquettes or treated lumber carries additives that end up in your soap and on your skin. The hopper is a wooden barrel with a drain hole near the bottom, a straw-and-gravel filter bed, and ash packed in loose so water can seep through. Rainwater is the solvent — hard mineral water interferes with the leach.",
+      check: {
+        stat: "knowledge",
+        difficulty: 10,
+        tag: "utility",
+        label: "Know the Ash"
+      },
+      choices: [
+        {
+          id: "siftHardwood",
+          q: "sound",
+          label: "Hardwood ash only, sifted and loose",
+          desc: "Oak, maple, and beech ash, sifted clean of charcoal and nails, packed loosely into the hopper over a straw-and-gravel filter bed, with the rain barrel as your water supply.",
+          statHint: "knowledge",
+          tag: "utility"
+        },
+        {
+          id: "fastFlood",
+          q: "risky",
+          label: "Flood the hopper in one fast pass",
+          desc: "Pack the ash in, pour all the water through at once, and drain it today. One day's work instead of three — if the lye comes out strong enough.",
+          statHint: "endurance",
+          tag: "utility"
+        },
+        {
+          id: "anyAsh",
+          q: "poor",
+          label: "Ash is ash — use the sweepings",
+          desc: "Whatever is in the ash pile goes in: pine and spruce sweepings, charcoal bits, the briquette dust from the old grill. Ash is ash, right?",
+          statHint: "knowledge",
+          tag: "utility"
+        }
+      ],
+      outcomes: {
+        siftHardwood: {
+          success: {
+            narrative: "By evening the hopper is loaded right: hardwood ash sifted free of charcoal chunks and nails, poured in loose over a bed of straw and gravel, the drain hole clear, rainwater measured out beside it. You pour the first slow pass over the ash and leave it to percolate — the foundation is sound, and everything downstream depends on it.",
+            effects: {
+              conditionAdd: "hopper_set",
+              moraleMod: 6,
+              xpBonus: 20
+            },
+            tip: "Hardwood ash only — oak, maple, beech, hickory, ash. Pack it loose so water seeps through, and leach with soft rainwater; hard mineral water interferes with the extraction.",
+            learnMore: [
+              "ch001",
+              "w009"
+            ]
+          },
+          failure: {
+            narrative: "The ash is right but the hopper is not — you packed it tight to fit more in, and the water ponds on top instead of seeping through. Half a day lost unpacking and reloading it loose. The rule is structural: water has to percolate, not sit.",
+            effects: {
+              conditionAdd: "hopper_rebuilt",
+              moraleMod: -4
+            },
+            tip: "Never pack the hopper hard — the water must seep through the ash bed. Tight packing gives you a puddle on top and weak lye below.",
+            learnMore: [
+              "ch001"
+            ]
+          }
+        },
+        fastFlood: {
+          success: {
+            narrative: "You keep the pour slow enough at the start and the drain drips steady all afternoon — by dusk the catch vessel holds brown lye water, not great but usable, and the hopper is ready for a second pass. You bought speed without quite paying for it.",
+            effects: {
+              conditionAdd: "lye_first_run",
+              moraleMod: 6,
+              xpBonus: 10
+            },
+            tip: "A fast single pass gives weak lye — pour it back through fresh ash, or several times through the same bed, to build strength. Lye gets stronger with re-pouring, not rushing.",
+            learnMore: [
+              "ch001"
+            ]
+          },
+          failure: {
+            narrative: "The water channels straight through the packed ash and comes out pale and thin — barely lye at all. You burned a day's water and effort on a weak first run that now has to be re-poured through fresh ash anyway. Speed bought you nothing.",
+            effects: {
+              conditionAdd: "weak_lye",
+              conditionAdd2: "water_wasted",
+              moraleMod: -8
+            },
+            tip: "Weak, pale lye means the water did not work the ash — channeling through packed beds is a common cause. Loosen the bed, re-pour through fresh ash, and let percolation take the time it takes.",
+            learnMore: [
+              "ch001"
+            ]
+          }
+        },
+        anyAsh: {
+          success: {
+            narrative: "The hopper drains a thin, greyish liquid that barely reacts with fat and smells of resin. Days of work for a lye that cannot make soap — you dump the batch, re-sift for hardwood ash only, and start over, having learned the difference the slow way.",
+            effects: {
+              conditionAdd: "lye_too_weak",
+              moraleMod: -8
+            },
+            tip: "Softwood ash is too low in alkali, and briquette or treated-lumber ash carries additives that contaminate the soap and irritate skin. Hardwood ash from clean, untreated wood only.",
+            learnMore: [
+              "ch001"
+            ]
+          },
+          failure: {
+            narrative: "The resinous pine ash makes a weak, foul lye, and the briquette dust in the mix leaves the test batch smelling chemical and stinging skin. You scrap the whole hopper, haul fresh hardwood ash, and lose the better part of a week.",
+            effects: {
+              conditionAdd: "batch_ruined",
+              moraleMod: -12
+            },
+            tip: "Never use ash from charcoal briquettes, treated lumber, or anything with additives — the contaminants end up in your soap and on your skin.",
+            learnMore: [
+              "ch001"
+            ]
+          }
+        }
+      }
+    },
+    {
+      id: "s2",
+      title: "Stage 2 — Days 2–3, The Lye Water",
+      situation: "The hopper is dripping brown liquid — yellowish-brown, the color the leach is supposed to be. That is lye water, and it is already dangerous: it burns skin, destroys eyes on contact, and can kill if swallowed. Before it touches fat, two things have to be decided: how strong it is, and what it lives in. Gloves on, goggles on, work outdoors.",
+      check: {
+        stat: "perception",
+        difficulty: 11,
+        tag: "utility",
+        label: "Judge the Lye"
+      },
+      choices: [
+        {
+          id: "eggTest",
+          q: "sound",
+          label: "Egg-test the lye, seal it in safe vessels",
+          desc: "Float a fresh egg in the lye water. A quarter-sized patch of shell above the surface means soap strength. Too weak gets re-poured through fresh ash; too strong gets diluted with rainwater. Store only in wood, iron, stainless steel, or heat-safe plastic — sealed and labeled.",
+          statHint: "knowledge",
+          tag: "utility"
+        },
+        {
+          id: "eyeballIt",
+          q: "risky",
+          label: "Skip the test — it looks brown enough",
+          desc: "The liquid is brown, brown means strong. Mix it with the fat by feel and adjust the batch if it misbehaves. Testing is for people with spare eggs.",
+          statHint: "perception",
+          tag: "utility"
+        },
+        {
+          id: "aluminumCatch",
+          q: "poor",
+          label: "Catch the lye in the aluminum pot",
+          desc: "It is the biggest vessel you have got. Drain the hopper straight into it and store the lye there.",
+          statHint: "knowledge",
+          tag: "medical"
+        }
+      ],
+      outcomes: {
+        eggTest: {
+          success: {
+            narrative: "The egg floats with a coin-sized patch of shell riding above the surface — soap strength, first run. The weak second pass goes back through fresh ash; the one strong batch gets a splash of rainwater and a retest. Every vessel is wood or stainless, sealed, and marked LYE in charcoal. You know exactly what you have, and nobody has to guess.",
+            effects: {
+              conditionAdd: "lye_tested",
+              moraleMod: 8,
+              xpBonus: 20
+            },
+            tip: "The egg test is the traditional gauge: a fresh egg floats with about a quarter-sized patch of shell above the surface at soap-making strength. It sinks when weak, bobs almost clear when too strong. It is a rough field gauge, not a laboratory measure — retest every batch.",
+            learnMore: [
+              "ch001"
+            ]
+          },
+          failure: {
+            narrative: "You misread the first float — the egg sat low and you called it good, and the test batch of soap comes out greasy and soft. Back to the hopper: re-pour the weak lye through fresh ash, retest honestly, and do not argue with the egg.",
+            effects: {
+              conditionAdd: "lye_retest",
+              moraleMod: -4
+            },
+            tip: "If the egg sinks, the lye is too weak — pour it back through fresh ash or gently boil it down to concentrate. If it bobs almost entirely above the surface, dilute with a little soft water and retest.",
+            learnMore: [
+              "ch001"
+            ]
+          }
+        },
+        eyeballIt: {
+          success: {
+            narrative: "You guess lucky — the ratio lands close enough that the batch cooks down into usable soft soap, a little harsh, a little soft, but soap. You know it was luck, not method, and the next batch gets the egg.",
+            effects: {
+              conditionAdd: "lucky_batch",
+              moraleMod: 4,
+              xpBonus: 10
+            },
+            tip: "Ash lye varies with the wood, the burn, and the leaching — no two runs are the same strength. The egg test is how you make it consistent from batch to batch; never skip it.",
+            learnMore: [
+              "ch001"
+            ]
+          },
+          failure: {
+            narrative: "The untested lye was weak and the whole cook never thickens — hours of stirring for a greasy liquid that will not become soap. The batch is a loss and the fat is gone. The egg would have told you in ten seconds.",
+            effects: {
+              conditionAdd: "soap_failed",
+              moraleMod: -10
+            },
+            tip: "Soap that will not thicken almost always means the lye was too weak — retest with the egg and concentrate by boiling down before you waste fat on it.",
+            learnMore: [
+              "ch001"
+            ]
+          }
+        },
+        aluminumCatch: {
+          success: {
+            narrative: "By morning the pot's interior is pitted and grey, the lye is cloudy with dissolved metal, and the pot — your only large cook vessel — is ruined for cooking. You salvage the lesson: lye attacks aluminum and releases hydrogen gas. The lye goes into a wooden bucket; the pot goes into the scrap pile.",
+            effects: {
+              conditionAdd: "pot_ruined",
+              moraleMod: -8
+            },
+            tip: "Never use aluminum for lye — it corrodes the metal, contaminates the lye, and releases hydrogen gas. Use wood, stainless steel, iron, or heat-safe plastic only.",
+            learnMore: [
+              "ch001",
+              "m005"
+            ]
+          },
+          failure: {
+            narrative: "The lye sits in the aluminum pot overnight and the reaction is worse than pitted metal — the vessel thins, seeps, and tips, spilling caustic lye water across the work area. You spend the morning flushing the ground, your boots, and a splash on your forearm with bucket after bucket of water, and the pot is scrap.",
+            effects: {
+              conditionAdd: "lye_spill",
+              conditionAdd2: "forearm_burn",
+              moraleMod: -12
+            },
+            tip: "Lye on skin: flush immediately with plenty of water for at least 15 minutes, and strip contaminated clothing while you flush. Never try to neutralize it with vinegar — the reaction generates heat and makes the burn worse.",
+            learnMore: [
+              "m005",
+              "ch001"
+            ]
+          }
+        }
+      }
+    },
+    {
+      id: "s3",
+      title: "Stage 3 — Day 4, Fat, Fire, and the Long Stir",
+      situation: "The fat is the second half of the equation — tallow, lard, saved cooking grease. It has to be rendered clean: melted slowly over gentle heat, every solid strained out, because dirty fat makes rancid-smelling soap. Then the long cook: egg-tested lye water into warm fat, stirred constantly with a long wooden paddle at a steady simmer, for hours, until the mass turns thick and translucent like taffy.",
+      check: {
+        stat: "endurance",
+        difficulty: 12,
+        tag: "fire",
+        label: "Hold the Long Cook"
+      },
+      randomEvents: [
+        {
+          chance: 0.2,
+          text: "A cold rain squall hisses across the cook fire mid-stir — you nurse the coals back and lose an hour, the mixture holding.",
+          effect: {
+            moraleMod: -6
+          }
+        }
+      ],
+      choices: [
+        {
+          id: "slowRender",
+          q: "sound",
+          label: "Render clean, stir the whole long cook",
+          desc: "Melt the fat slow and strain out every crackling and membrane. Warm fat, tested lye, constant stirring with a long wooden paddle, steady simmer for hours — plus a small test batch before committing the fat.",
+          statHint: "endurance",
+          tag: "fire"
+        },
+        {
+          id: "rushCook",
+          q: "risky",
+          label: "Crank the heat, stir when you pass by",
+          desc: "High fire, fast cook, stir between other chores. Hours of stirring is for people with nothing else to do.",
+          statHint: "composure",
+          tag: "fire"
+        },
+        {
+          id: "dirtyFat",
+          q: "poor",
+          label: "Render it rough — bits and all",
+          desc: "Melt the fat fast and skip the straining. Cracklings, membrane, browned bits — it is all fat, is it not?",
+          statHint: "knowledge",
+          tag: "food"
+        }
+      ],
+      outcomes: {
+        slowRender: {
+          success: {
+            narrative: "The fat renders clear and clean, strained twice through cloth. The cook takes the whole afternoon — constant stirring, steady simmer — and the mixture moves from cloudy to thick and translucent, taffy-like on the paddle. The test batch firms up properly. This is soap, made right, and the camp will wash for months.",
+            effects: {
+              conditionAdd: "soap_cooking",
+              moraleMod: 10,
+              xpBonus: 20
+            },
+            tip: "Saponification is fat plus strong alkali, driven by heat and stirring — undercooked soap stays greasy. A traditional starting ratio is roughly three parts egg-tested lye water to one part fat by volume, but ash lye varies, so always run a small test batch first and adjust: greasy and soft needs more lye or a longer cook, harsh and caustic needs more fat.",
+            learnMore: [
+              "ch001"
+            ]
+          },
+          failure: {
+            narrative: "Midway through the long stir your arms give out and you let it sit — the mixture separates into oil and liquid and will not come back together on its own. You reheat it, stir harder and longer until the emulsion forms, and lose half a day learning that the paddle does not rest until the mass does.",
+            effects: {
+              conditionAdd: "batch_separated",
+              moraleMod: -6
+            },
+            tip: "If the soap separates into oil and liquid, the emulsion never formed — reheat and stir harder and longer until it holds together before it cooks down.",
+            learnMore: [
+              "ch001"
+            ]
+          }
+        },
+        rushCook: {
+          success: {
+            narrative: "You push the heat and the batch scorches at the edges — but constant last-minute rescue stirring keeps it moving, and it thickens into a dark, strong-smelling but usable soap. It works; it also nearly boiled over twice, and you will not do it that way again.",
+            effects: {
+              conditionAdd: "scorched_soap",
+              moraleMod: 4,
+              xpBonus: 10
+            },
+            tip: "A steady simmer and constant stirring is the cook — high heat scorches the fat and a walked-away pot boils over or separates. The long cook is not optional with variable-strength ash lye.",
+            learnMore: [
+              "ch001",
+              "f006"
+            ]
+          },
+          failure: {
+            narrative: "The pot boils over onto the fire while you are across camp — fat and lye foam everywhere, the fire flares, and the batch is half on the ground. You spend the evening cleaning caustic mess in gloves, with a scorched pot and a lost batch.",
+            effects: {
+              conditionAdd: "cook_lost",
+              conditionAdd2: "fire_scare",
+              moraleMod: -12
+            },
+            tip: "Never walk away from a soap cook — hot fat plus lye boils over fast, and the spill is both a fire risk and a caustic burn risk. Stir it or kill the heat; there is no third option.",
+            learnMore: [
+              "f006",
+              "m005"
+            ]
+          }
+        },
+        dirtyFat: {
+          success: {
+            narrative: "The soap comes out of the mold smelling like old meat and turns rancid within days — usable for scrubbing boots, nothing you would put on skin. You re-render the remaining fat properly, strained clean, and keep the rancid batch for the laundry pile.",
+            effects: {
+              conditionAdd: "rancid_soap",
+              moraleMod: -6
+            },
+            tip: "Strain out every solid — cracklings, membrane, impurities — before the fat meets lye. Clean fat makes clean soap; dirty fat makes rancid-smelling soap that spoils fast.",
+            learnMore: [
+              "ch001"
+            ]
+          },
+          failure: {
+            narrative: "The unstrained solids scorch during the cook, the batch separates, and the finished cakes reek of rancid grease and grow spots within the week. The whole fat supply is wasted on soap nobody can stand to use.",
+            effects: {
+              conditionAdd: "fat_wasted",
+              moraleMod: -10
+            },
+            tip: "Render slowly over gentle heat and strain twice if you have to — the solids are what turn soap rancid. There is no fixing dirty fat after it meets lye.",
+            learnMore: [
+              "ch001"
+            ]
+          }
+        }
+      }
+    },
+    {
+      id: "s4",
+      title: "Stage 4 — Days 5+, Curing and the Leftover Lye",
+      situation: "The soap is in the molds — wooden boxes, hardening. It needs a day or two to firm up, then cutting into cakes, then curing: four to six weeks in a dry, airy place while the saponification finishes and the bars harden. Used too early it stays harsh and melts away fast. And there is leftover lye water — caustic, clear-looking, and currently sitting in camp. What it lives in, and whether it is marked, is now the most important decision of the whole project.",
+      check: {
+        stat: "composure",
+        difficulty: 12,
+        tag: "community",
+        label: "Run a Safe Camp"
+      },
+      choices: [
+        {
+          id: "moldCure",
+          q: "sound",
+          label: "Mold, cut, cure the full wait",
+          desc: "Harden in the molds, cut into cakes, cure four to six weeks dry and airy. The leftover lye goes into sealed, clearly marked containers — labeled LYE — stored away from the kitchen, the children's area, and the water supply.",
+          statHint: "knowledge",
+          tag: "utility"
+        },
+        {
+          id: "earlyUse",
+          q: "risky",
+          label: "Wash with a cake after a few days",
+          desc: "It is soap-shaped. The camp is filthy. Cut a cake early and use it — curing is just waiting, right?",
+          statHint: "composure",
+          tag: "medical"
+        },
+        {
+          id: "waterJug",
+          q: "fatal",
+          label: "Stash the lye in the spare water jug",
+          desc: "The leftover lye needs a vessel and the spare drinking-water jug is right there, same shape as the drinking one, unmarked. It is just for now — you will label it later.",
+          statHint: "perception",
+          tag: "community"
+        }
+      ],
+      outcomes: {
+        moldCure: {
+          success: {
+            narrative: "The cakes harden, get cut, and go onto the airy shelf to cure — the full wait, no shortcuts. The leftover lye is sealed, marked LYE in charcoal on every vessel, and stored up and away from food, water, and children. Weeks later the camp washes with mild soap that lasts. The system is closed, and it is safe.",
+            effects: {
+              conditionAdd: "soap_cured",
+              moraleMod: 10,
+              xpBonus: 20
+            },
+            tip: "Cure at least four to six weeks in a dry, airy place — curing finishes the saponification and hardens the soap. Store leftover lye water sealed and clearly labeled, away from children and animals; it weakens over time as it absorbs carbon dioxide from the air, so keep it covered.",
+            learnMore: [
+              "ch001",
+              "w017"
+            ]
+          },
+          failure: {
+            narrative: "You cure it right but store the lye sloppily — one jar unmarked on the workbench. Nobody drinks it, but a campmate grabs it thinking it is water for washing and gets a caustic splash on their hands. Gloves, flushing, a scare — and every vessel in camp gets labeled that same hour.",
+            effects: {
+              conditionAdd: "lye_splash_scare",
+              moraleMod: -8
+            },
+            tip: "Every lye vessel gets sealed and marked, no exceptions — one unmarked jar is one mistake away from a burn or worse. Keep lye away from children and animals, always.",
+            learnMore: [
+              "ch001",
+              "m005"
+            ]
+          }
+        },
+        earlyUse: {
+          success: {
+            narrative: "The early cake is harsh — it leaves skin tight, red, and itchy — but it cleans, and the camp is cleaner tonight than it has been in weeks. You ration the early cakes for laundry and boots and let the rest cure properly.",
+            effects: {
+              conditionAdd: "harsh_soap_used",
+              moraleMod: 4,
+              xpBonus: 10
+            },
+            tip: "Soap used before its cure is harsher on skin and melts away much faster — the saponification is not finished. If you must use it early, keep it to laundry and scrubbing, not skin.",
+            learnMore: [
+              "ch001"
+            ]
+          },
+          failure: {
+            narrative: "Two days of washing with uncured soap leaves half the camp with red, cracked, burning hands — caustic soap on skin, day after day. The cakes go back on the shelf for the full cure and the camp treats its hands with clean water and rest. The cure is chemistry, not patience theater.",
+            effects: {
+              conditionAdd: "skin_burns",
+              moraleMod: -10
+            },
+            tip: "If finished soap burns skin in use, it carried too much unreacted lye — re-cook it with additional fat and cure it longer. When in doubt, demote it to laundry soap rather than skin soap.",
+            learnMore: [
+              "ch001",
+              "m005"
+            ]
+          }
+        },
+        waterJug: {
+          success: {
+            narrative: "At dusk you see a campmate reach for the familiar jug, half-asleep, and you knock it out of their hand before it reaches their mouth — lye splashes across the dirt. Their hands burn where it splashed; yours too, grabbing it. You got lucky — one swallow and it would have been their throat. Never again. Every lye vessel in camp is sealed and marked LYE that night, and the spare jug is smashed so nobody ever reaches for it by habit.",
+            effects: {
+              conditionAdd: "lye_near_miss",
+              conditionAdd2: "hands_burned",
+              moraleMod: -16
+            },
+            tip: "You got lucky — never again. Lye water is clear-looking enough to pass for water in a familiar jug, and a tired person reaches for familiar shapes. Sealed, labeled, stored away from anything drinkable: those three rules are the whole difference between a scare and a funeral.",
+            learnMore: [
+              "ch001",
+              "m020"
+            ]
+          },
+          failure: {
+            narrative: "In the night, half-asleep, a campmate lifts the familiar jug and drinks deep before the burn registers — lye water, caustic, swallowed. It keeps burning all the way down: mouth, throat, esophagus, the tissue dying on contact, and there is no undoing a swallowed caustic. Rinsing the mouth and drinking water is all the field can offer, and it is not enough against a deep esophageal burn. By morning they are gone — killed by a drinking jug that held lye.",
+            effects: {
+              fatal: true
+            },
+            tip: "Swallowed lye is a field death sentence: do NOT induce vomiting — it burns a second time on the way up — rinse the mouth, drink water, and get medical help immediately. The prevention is everything: sealed, clearly labeled containers, stored away from children, animals, and anything anyone might drink from. One unmarked jug is all it takes.",
+            learnMore: [
+              "m020",
+              "ch001"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+,
+// ══ Batch 5 — Raise the Bent / Sand Into Glass / The Still ══
+{
+  id: "timber-framing",
+  gear: "kit",
+  biomes: ["boreal", "temperate_forest", "highland"],
+  title: "Raise the Bent",
+  icon: "🪵",
+  difficulty: 2,
+  phase: 1,
+  timeOfDay: "07:30",
+  environment: "A phase-1 work camp in a spruce stand: a canvas wall tent, a fire pit, and a tool rack holding felling axes, a two-man crosscut saw, steel wedges, a maul, and coils of rope. Today's job is the main shelter's timber frame — two posts and a tie beam per bent, raised and braced before dark.",
+  weather: "Overcast, -6°C, light snow. Wind calm now, forecast to pick up by afternoon.",
+  relatedDomain: "building",
+  intro: "The camp needs a real shelter, and a shelter needs a frame. You've got the tools — axes, saws, wedges, rope, a maul — and a stand of straight spruce. Today you fell the timber, work it into a bent, and raise it. The axe swing is the easy part. The killing part of timber work is everything that falls out of the sky: limbs, tops, and whole trees going where you didn't plan. Respect the fall and you'll raise a frame. Rush it and the woods will collect.",
+  stages: [
+    {
+      id: "s1", title: "Stage 1 — 07:30, Reading the Tree",
+      situation: "You need two straight posts and one long tie beam. The stand gives you options: a cluster of live spruce with clean canopies — and, closer to camp, one big dead spruce, leaning, its crown full of broken dead limbs. The dead one is tempting: dry wood, less hauling, and the lean points roughly where you'd want it to go. But dead limbs overhead have a name for a reason.",
+      check: { stat: "perception", difficulty: 11, tag: "building", label: "Read the Tree" },
+      randomEvents: [
+        { chance: 0.2, text: "A gust moves through the stand — dead branches rattle in the canopy overhead.", effect: { moraleMod: -6 } },
+      ],
+      choices: [
+        { id: "walkItOff", q: "sound", label: "Size it up properly: lean, canopy, lay, escape", desc: "Walk every candidate tree. Sight the lean from two sides, scan the whole crown for dead limbs, pick a lay away from camp, and clear an escape route at 45° behind the fall line. Keep every work area at least two tree lengths from any other occupied work area — more on slopes or hazardous ground — and keep everyone out of the fall path.", statHint: "perception", tag: "building" },
+        { id: "fellTheLeaner", q: "risky", label: "Take the leaning dead one — the lean does half the work", desc: "It's leaning the way you want it to fall, the trunk is straight, and you'll steer it with wedges. But the crown is full of dead limbs and you're not clearing the zone or warning anyone — you'll be quick.", statHint: "strength", tag: "building" },
+        { id: "dropTowardCamp", q: "fatal", label: "Drop the big dead one toward camp — shortest haul", desc: "Fell the widowmaker-laden dead tree so it lands near the tent: no zone cleared, nobody warned, a quick shallow notch. The hauling you save is measured in minutes. The risk is measured in falling timber.", statHint: "strength", tag: "building" },
+      ],
+      outcomes: {
+        walkItOff: {
+          success: { narrative: "You walk the tree twice — lean, crown, ground, wind. The dead spruce near camp stays standing; you pick two live ones with clean crowns and a lay into open ground. Escape route cleared at 45°, wedges in your pocket, everyone at the tent told to stay clear of the zone. The first tree takes the hinge and goes down exactly on the lay — and the crown lands where nobody was standing, because nobody was allowed to stand there.", effects: { conditionAdd: "timber_down", moraleMod: 10, xpBonus: 20 }, tip: "The rule is spacing: adjacent work areas stay at least two tree lengths apart (more on slopes), and no tree falls into an occupied area — nobody inside the fall path, ever. And the widowmaker rule: more timber workers are killed by falling trees, logs, limbs and tops than by the cutting tool itself. Clear the canopy risk before you clear the cut.", learnMore: ["bd004"] },
+          failure: { narrative: "You read everything right but the second tree has a lean you underestimated — the hinge tears early on one side and it sits back toward you. You stop cutting, drive wedges, and talk it over onto the lay. It lands fine, twenty feet off your mark, and your escape route is why you're telling the story instead of bleeding in it.", effects: { conditionAdd: "strength_spent", moraleMod: -6 }, tip: "If a tree sits back on the cut, stop. Drive wedges behind the back cut to lift it and commit it — never reach in with the saw to cut deeper from a compromised position. A pinched, half-cut tree is patient; you don't have to be.", learnMore: ["bd004", "eq005"] },
+        },
+        fellTheLeaner: {
+          success: { narrative: "The notch goes in, the back cut leaves a clean hinge, wedges bite — and the lean carries the dead spruce exactly where you aimed. It hits the ground and the whole crown shatters, throwing a dead limb the thickness of your leg ten feet past where you'd been standing a minute before. You got the timber. You also got the message.", effects: { conditionAdd: "timber_down", conditionAdd2: "shaken", moraleMod: 4, xpBonus: 10 }, tip: "Dead trees are liars: dead wood holds a hinge weakly and unpredictably — it can let go without warning — and dead tops break apart on the way down. If you must fell a dead tree, fell it away from everything, clear the widest zone you can, and assume the crown is coming down in pieces.", learnMore: ["bd004"] },
+          failure: { narrative: "Halfway down, the dead top disintegrates — a limb breaks free and comes down across your escape line. You take a glancing blow to the shoulder that spins you into the snow and leaves your arm numb for an hour. The tree landed on the lay. The canopy landed on you.", effects: { conditionAdd: "injured", conditionAdd2: "strength_spent", moraleMod: -14 }, tip: "This is the mechanism: struck-by. Falling trees, logs, limbs and tops kill more fellers than the saw or axe ever will. A widowmaker doesn't need the whole tree to fall on you — one dead limb from height is enough. Clear the crown risk or don't make the cut.", learnMore: ["bd004"] },
+        },
+        dropTowardCamp: {
+          success: { narrative: "The shallow notch closes, the tree hangs up in a neighbour — and for a full minute it just leans there, creaking, crown swaying over the tent. Then the top breaks apart and a limb spears into the ground exactly where your partner had been standing seconds earlier. Nobody died. You stand in the snow with your heart hammering and understand, completely, that you will never do that again.", effects: { moraleMod: -10 }, tip: "You got lucky: the hang-up bought the seconds that saved a life. Luck is not a felling plan. Never fell toward camp, never skip the zone, never trust a dead crown — 'it worked' is the most dangerous sentence in timber work.", learnMore: ["bd004"] },
+          failure: { narrative: "The notch is shallow and the hinge never forms — the trunk splits up the stem with a crack like a gunshot, the butt kicks back off the stump, and the whole dead crown comes apart as it falls toward the tent. A falling limb finds you before the trunk finds the ground. You cleared nothing, warned no one, and the zone you didn't clear is the one you're lying in.", effects: { fatal: true }, tip: "Documented and final: dropping a dead, leaning, widowmaker-laden tree toward people without clearing the zone. The dead top shatters, the un-notched stem barber-chairs, and the cutter is inside the fall. This is how felling kills — not the axe swing, the falling wood.", learnMore: ["bd004"] },
+        },
+      },
+    },
+    {
+      id: "s2", title: "Stage 2 — 09:15, The Cuts",
+      situation: "The posts are down and limbed. Now the tie beam — a bigger spruce, thicker than the others, with a slight lean you need to fight. This is the cut that matters: face cut, back cut, hinge wood, wedges, and your feet already knowing the escape route. Get the hinge right and the tree is steered. Get it wrong and the tree steers you.",
+      check: { stat: "knowledge", difficulty: 12, tag: "building", label: "Cut the Hinge" },
+      choices: [
+        { id: "faceAndHinge", q: "sound", label: "Open-face notch, level back cut, leave the hinge", desc: "Cut an open-face notch about a third of the trunk's diameter, aiming the lay. Back cut level with the notch apex (or with slight stump shot, per your cutting system), stopping short to leave a clean strap of hinge wood. Drive wedges early, then walk the 45° escape watching the crown.", statHint: "knowledge", tag: "building" },
+        { id: "rushTheBack", q: "risky", label: "Cut the back fast and let the wedges do the talking", desc: "Your notch is shallow and you're in a hurry — skip fussing over the hinge, cut the back quickly, and drive the wedges hard. The wedges will steer it.", statHint: "strength", tag: "building" },
+        { id: "noNotch", q: "poor", label: "Just saw straight through — it's only wood", desc: "Skip the notch entirely. Cut straight across the trunk and push it the way you want it to go.", statHint: "strength", tag: "building" },
+      ],
+      outcomes: {
+        faceAndHinge: {
+          success: { narrative: "The notch opens clean — about a third of the diameter, faces meeting on the lay line. The back cut stays level and stops where the hinge should be: a strap of wood roughly a tenth of the trunk's thickness, holding the tree to the stump. Wedges go in before it can think about sitting back. You walk the 45° escape with your eyes on the crown, and the hinge folds exactly as designed — the tree commits, the crown swings down the lay, and the butt stays put. Textbook.", effects: { conditionAdd: "tie_beam_down", moraleMod: 12, xpBonus: 20 }, tip: "The hinge is the steering: an uncut strap of wood between face and back cut that holds the tree to the stump and guides it down the lay. Notch about a third of the diameter, leave about a tenth as hinge, back cut level with the notch apex (stump shot has its schools too — pick a system and cut it clean) — and the escape route is planned at 45° behind the fall, walked while watching the tree, never with your back to it, and re-checked against where the tree actually goes.", learnMore: ["bd004"] },
+          failure: { narrative: "The hinge tears through on the lean side a second early — the tree is heavier on that side than you read. It still goes down the lay, but the butt jumps a foot off the stump and you feel the ground thump through your boots from the escape line. Right plan, imperfect read; the tree told you the lean was stronger than the cut.", effects: { conditionAdd: "strength_spent", moraleMod: -6 }, tip: "When the hinge breaks through on one side, the lean beat your geometry. Next tree: read the lean from two directions, widen the escape, and fell with the lean or not at all — wedges can correct a small lean, not argue with a big one.", learnMore: ["bd004"] },
+        },
+        rushTheBack: {
+          success: { narrative: "The wedges bite and lift the trunk off the back cut before it can sit back — the shallow notch closes, the tree hesitates, and the wedges talk it over onto the lay. It goes down fast and a little wild; the butt kicks sideways a foot as it leaves the stump. Down is down. But you were steering with insurance, not with the wheel.", effects: { conditionAdd: "tie_beam_down", conditionAdd2: "shaken", moraleMod: 6, xpBonus: 10 }, tip: "Wedges are insurance, not steering: they lift the tree off the back cut so it can't sit back and pinch your saw, and they commit a tree that's already going. The notch and hinge do the aiming. A shallow notch plus hard wedges is a gamble that pays until the day it doesn't.", learnMore: ["bd004", "eq005"] },
+          failure: { narrative: "The shallow notch closes before the wedges are set — the tree sits back on the back cut and pinches your saw solid. You spend an hour driving wedges behind the cut to free it, and when it finally goes, the lay is anybody's guess: it lands twenty degrees off, across the limbing pile. The rest of the morning is rework.", effects: { conditionAdd: "strength_spent", conditionAdd2: "tool_stuck", moraleMod: -12 }, tip: "A pinched saw in a half-cut tree is how people get creative in dangerous ways. Don't reach in with the saw to cut deeper from a compromised position, and never pull it by hand — drive wedges into the back cut behind the pinch and lift the tree off the blade. Prevention is a proper notch and wedges in early.", learnMore: ["bd004"] },
+        },
+        noNotch: {
+          success: { narrative: "It falls — straight off the cut with no hinge to hold it, rolling sideways off the stump and missing your lay by twenty degrees. It lands across the bucking pile instead of the open ground, and the morning's careful layout is firewood arrangement now. Nobody was in the way, because for once the zone was clear.", effects: { conditionAdd: "timber_down", moraleMod: -10 }, tip: "Without a notch there is no hinge, and without a hinge the tree goes where it wants — which is wherever the lean, the crown weight, and the wind agree. And on a leaning tree, a straight-through cut can split the trunk up the stem: the barber chair, which kicks the butt back at the cutter.", learnMore: ["bd004"] },
+          failure: { narrative: "The leaner splits up the stem with a rifle-crack — the barber chair. The trunk peels vertically, the butt kicks back off the stump toward where you were standing, and the crown whips sideways into the standing timber and hangs up, dead limbs raining down around you. You dive clear. The tree is now a hung-up widowmaker factory and the saw is still in the cut.", effects: { conditionAdd: "injured", conditionAdd2: "strength_spent", moraleMod: -16 }, tip: "The barber chair is the classic no-notch kill mechanism on a leaning tree: the stem splits upward, the butt kicks back, the crown goes anywhere. It is prevented by a proper face notch and an intact hinge — the two things a straight-through cut skips.", learnMore: ["bd004"] },
+        },
+      },
+    },
+    {
+      id: "s3", title: "Stage 3 — 13:20, Limbs, Joints, Hewing",
+      situation: "Three trunks on the ground, limbed from the uphill side — the spring poles are cut with respect, never with your body in the release path. Bucked to length, barked, the posts hewn square-ish with the axe. Now the joinery. There are no nails in this camp and no store to walk to: the bent goes together with mortise and tenon, rope lashings, or rough green notches. Green wood is honest about one thing — it shrinks as it dries, and every joint you cut today will be tested by that.",
+      check: { stat: "strength", difficulty: 12, tag: "building", label: "Work the Timber" },
+      choices: [
+        { id: "peggedJoints", q: "sound", label: "Mortise-and-tenon, drawbored, pinned with hardwood pegs", desc: "Chop mortises with the grain, shape tenons with shoulders, bore the peg holes slightly offset so the peg draws the joint tight. Pegs of seasoned, straight-grained hardwood. Cut every joint knowing the green timber will shrink as it dries.", statHint: "knowledge", tag: "building" },
+        { id: "lashIt", q: "risky", label: "Lash the bent together — fast, strong, done by supper", desc: "Rope lashings at every joint, frapped tight. Quick to build, drum-tight today, and you can re-tension later.", statHint: "endurance", tag: "utility" },
+        { id: "greenAndFast", q: "poor", label: "Frame it green — rough notches, no pegs, trust the fit", desc: "Hack square notches fast, drop the green timbers together, no pegs, no drawbore. It's tight now, and tight is tight.", statHint: "strength", tag: "building" },
+      ],
+      outcomes: {
+        peggedJoints: {
+          success: { narrative: "Mortises chopped with the grain, tenons seated on their shoulders, peg holes bored a hair offset — and when the seasoned hardwood pegs drive home, each joint draws itself tight with an audible creak. The bent is square, the shoulders are bearing, and the drawbored pegs hold the joints tight as the green spruce shrinks around them. This frame will outlast the winter.", effects: { conditionAdd: "bent_framed", moraleMod: 12, xpBonus: 20 }, tip: "Green timber shrinks as it dries — mostly across the grain, several percent — so a joint that's perfect today can be loose next season unless the joinery takes up the movement. Drawbored pegs are the answer: offset holes pull the joint tight at assembly, and seasoned hardwood pegs hold it there as the wood moves. No nails needed; the pegs draw the joint tight.", learnMore: ["bd001", "bt002"] },
+          failure: { narrative: "One mortise blows out — a hidden check in the grain lets the cheek split. You don't curse; you pare back to sound wood, fit a pegged repair block, and move on. The joint is sound, the morning is shorter, and your hands have learned something about reading grain.", effects: { conditionAdd: "strength_spent", moraleMod: -6 }, tip: "Work the mortise walls with the grain and pare the end walls clean — never force a chisel through a knot. A blown mortise is pared back to sound wood and repaired with a fitted, pegged patch, not with wishing. Sharp tools and patience are the whole joint.", learnMore: ["bd001", "tl003"] },
+        },
+        lashIt: {
+          success: { narrative: "The bent goes together fast — round lashings, frapping turns pulled tight, every joint drum-tight by supper. You sight down the frame: square. It will hold. And you know, honestly, that rope stretches and weather works it loose, so re-tensioning is already on the chore list.", effects: { conditionAdd: "bent_framed", conditionAdd2: "needs_retension", moraleMod: 8, xpBonus: 10 }, tip: "Lashings are strong today and honest about tomorrow: rope stretches under load, and weather and sustained loading work lashings loose — wetting can shrink natural fiber, then drying and load slacken it again. Frapping turns lock the wraps, and regular re-tension checks keep a lashed frame standing. Fast to build, forever to maintain.", learnMore: ["k005", "bd001"] },
+          failure: { narrative: "You're test-loading the tie beam joint when a lashing slips — the wraps walk, the frapping gives, and the beam drops a foot before you jump clear. It lands on the sill log, not on you. You re-lash it slower, with more frapping turns and a better knot, and it holds. The lesson cost you an hour and very nearly a foot.", effects: { conditionAdd: "strength_spent", moraleMod: -10 }, tip: "A lashing is only as good as its frapping turns and its knot — the wraps carry the load, the frapping locks the wraps. Test every joint under load before you trust it, and never put a body part under a joint you're testing.", learnMore: ["k005"] },
+        },
+        greenAndFast: {
+          success: { narrative: "It stands — today. The rough notches seat, the green timbers wedge together, and the bent looks like a frame. You know exactly what's coming: as the wood dries it will shrink across the grain, every one of those tight fits will open, and within a season you'll be re-cutting joints or watching the frame rack. Tight today is not tight tomorrow.", effects: { conditionAdd: "bent_framed", moraleMod: -8 }, tip: "Green wood shrinks as it dries — that's not opinion, it's the material. Unpegged rough notches in green timber are a countdown: the joints open, the frame loosens, and gravity collects. If you must build green and fast, plan the re-cut before the wood moves, not after.", learnMore: ["bd001", "bd004"] },
+          failure: { narrative: "Test-fitting the tie beam, a rough notch crushes under the load — green end grain compresses, the cheek splits along a grain run, and your hand is in the wrong place when it gives. Smashed knuckles, a split notch, and a joint that has to be re-cut properly anyway. Fast built this twice.", effects: { conditionAdd: "injured", conditionAdd2: "strength_spent", moraleMod: -14 }, tip: "Tenons bear on their shoulders, not on a rough notch — bearing loaded across the grain crushes, and a rough notch concentrates every pound on the weakest fibers. Rough notches concentrate every pound on the weakest fibers. The pegged mortise-and-tenon exists precisely because this failure is old and well documented.", learnMore: ["bd001"] },
+        },
+      },
+    },
+    {
+      id: "s4", title: "Stage 4 — 15:45, Raising the Bent",
+      situation: "The bent is framed on the ground beside the sill logs — two posts, one tie beam, pegged and true, and heavy: at these timber sizes, several hundred pounds of green spruce. Three of you, one gin pole, coils of rope. The wind is picking up. Raising order matters, bracing matters, and the one rule that matters most: nobody — nobody — stands under a bent that isn't braced.",
+      check: { stat: "composure", difficulty: 11, tag: "community", label: "Command the Raise" },
+      choices: [
+        { id: "ginPoleCrew", q: "sound", label: "Gin pole, guy lines, braces — raise it like a crew", desc: "Set the gin pole at the bent's balance point, rig guy lines to the tie beam, two people on ropes, one tending the pole. Temporary braces ready to go in the second it's vertical — braced in two directions before anyone lets go of a rope.", statHint: "composure", tag: "community" },
+        { id: "muscleIt", q: "risky", label: "Walk it up by hand — three people, no rigging", desc: "Skip the gin pole. Lift together and walk the bent up by main strength — faster than rigging, and you're strong.", statHint: "strength", tag: "community" },
+        { id: "noBrace", q: "poor", label: "Raise it and let go — it'll stand", desc: "Get it vertical and trust the weight to hold it. Bracing is a tomorrow problem.", statHint: "composure", tag: "building" },
+      ],
+      outcomes: {
+        ginPoleCrew: {
+          success: { narrative: "The gin pole takes the weight and the crew takes the strain — rope by rope, the bent walks up smooth, the guy lines holding it plumb against the rising wind. At vertical the braces go in, lashed and pegged in two directions, and only then do the ropes come off. The bent stands true, square, and braced. The shelter has a spine.", effects: { conditionAdd: "bent_raised", moraleMod: 14, xpBonus: 20 }, tip: "The gin pole turns three people into a raising crew: a vertical spar that carries the hoisting tackle — the block-and-tackle reeved through it multiplies your pull, and guy lines are your hands at a distance. Rule of the raise: nobody under the bent, clear commands, and braces in two directions before a single rope is released.", learnMore: ["en003", "k015"] },
+          failure: { narrative: "Halfway up, a guy line slips its anchor — the bent leans, the wind catches the tie beam, and for three long seconds the whole crew is holding several hundred pounds of spruce on rope. Nobody panics, nobody lets go, you re-set the anchor and finish the raise slow. It stands. Your hands are shaking and your commands are better now.", effects: { conditionAdd: "strength_spent", moraleMod: -6 }, tip: "Anchors are the rigging: a guy line is only as good as what it's tied to. Set anchors before the lift, test them under load, keep one person per rope with clear commands — and when something slips, the answer is hold and re-set, never grab and muscle.", learnMore: ["k015", "en003"] },
+        },
+        muscleIt: {
+          success: { narrative: "You lift together and walk it up — shoulders screaming, boots slipping in the snow, the tie beam swaying — and sheer stubbornness gets it vertical. Braces go in fast before the wind can argue. It worked. Your back will file a complaint, but the bent is up and braced.", effects: { conditionAdd: "bent_raised", conditionAdd2: "exhausted", moraleMod: 8, xpBonus: 10 }, tip: "Muscle is a one-time budget and a bent is a recurring expense — rigging multiplies people instead of spending them. If you must muscle a raise, brace the instant it's vertical: an unbraced bent held by tired arms is one gust from a disaster.", learnMore: ["en003"] },
+          failure: { narrative: "Halfway up it stalls — three pairs of arms at full extension, the bent hanging, the wind pushing the tie beam sideways. It starts to come back down and you all do the only right thing: dive clear and let it go. Several hundred pounds of green spruce hits the deck, the pegged joints hold, nobody is under it because nobody was under it. Lower it controlled, rig the gin pole, try again properly.", effects: { conditionAdd: "strength_spent", conditionAdd2: "shaken", moraleMod: -12 }, tip: "If a raise stalls, lower it under control — never try to catch a falling bent. Human reflex says grab; physics says several hundred pounds always wins. Clear the fall zone first, and the worst case is rework instead of injury.", learnMore: ["en003"] },
+        },
+        noBrace: {
+          success: { narrative: "It stands — vertical, balanced, alone. For about ten seconds you believe it. Then a gust nudges the tie beam and the whole bent sways, and your stomach drops through your boots: it's a domino with a roof beam on top. You brace it in a frantic minute, hands shaking, and it survives its own raising. Never again.", effects: { conditionAdd: "bent_raised", moraleMod: -8 }, tip: "An unbraced bent is a domino: vertical is not stable, it's balanced. Temporary bracing in two directions goes in the moment it's vertical — before anyone steps away, before anyone celebrates. 'It'll stand' is how frames become firewood.", learnMore: ["bd007", "en003"] },
+          failure: { narrative: "It stands for three breaths. Then the wind takes the tie beam, the bent leans, and slowly — then all at once — it goes over sideways onto the sill corner. The impact splits a post tenon, scatters your joinery work across the snow, and the day's frame is wreckage. Nobody was under it, which is the only reason this is a rebuilding story instead of a worse one.", effects: { conditionAdd: "bent_wrecked", moraleMod: -16 }, tip: "Raising order and bracing are the frame: end bents first, braced before the next one goes up, every bent braced in two directions before release. A frame is only as finished as its bracing — the raise isn't done when it's vertical, it's done when it's braced.", learnMore: ["bd007"] },
+        },
+      },
+    },
+  ],
+}
+,
+{
+  id: "glassmaking",
+  gear: "kit",
+  biomes: ["temperate_forest", "highland", "boreal"],
+  title: "Sand Into Glass",
+  icon: "🏺",
+  difficulty: 3,
+  phase: 2,
+  timeOfDay: "09:10",
+  environment: "Late autumn in the boreal forest. Your established camp sits in a clearing: a clay pit dug down to clean grey clay, a sand bed by the stream, a stockpile of plant ash from months of cookfires, and — most importantly — the woodpile. Cordwood stacked under bark, meant to carry the camp through winter.",
+  weather: "Overcast, -2°C, light north wind. Tonight it drops below freezing. Winter is not a season here; it is a siege you are already preparing for.",
+  relatedDomain: "glassmaking",
+  intro: "You have clean sand, good clay, and a barrel of plant ash. That is everything needed to make glass — except the one thing that matters most: fuel. Pure silica needs around 1700°C, unreachable in a wood fire; plant-ash soda and lime bring the melt down to roughly 1400–1500°C, which a well-built, well-drafted wood furnace can just barely reach. Barely. A glass firing burns firewood at a rate that makes winter heating look thrifty. You can walk away from this project with your woodpile intact — and that is an honest, respectable choice. Or you can burn winter for a handful of vessels, a lens, and trade goods. Decide before you build.",
+  stages: [
+    {
+      id: "s1", title: "Stage 1 — 09:10, The Question",
+      situation: "The raw materials are ready: sacks of washed sand, grey clay, ash stockpiled from the cookfire. The furnace doesn't exist yet — and once it does, every firing will eat firewood faster than the camp uses it for heat. Your woodpile is finite, and winter is coming. The question on the table is not 'can I make glass?' It is 'can I afford to?'",
+      check: { stat: "knowledge", difficulty: 11, tag: "utility", label: "Fuel Arithmetic" },
+      choices: [
+        { id: "countTheWood", q: "sound", label: "Run the fuel numbers before a single stone is laid", desc: "Count the cordwood, count the winter weeks, count what a full firing costs. Commit only if the woodpile survives the arithmetic — otherwise walk away and say so plainly.", statHint: "knowledge", tag: "utility" },
+        { id: "commitAndHope", q: "risky", label: "Commit to the furnace now, stretch the woodpile as you go", desc: "The payoff — vessels, a lens, trade glass — is real. Build the furnace, fire it, and cut winter corners somewhere else if the numbers get tight.", statHint: "composure", tag: "psychology" },
+        { id: "skipTheMath", q: "poor", label: "Skip the arithmetic — build first, figure fuel out later", desc: "Glass is worth it. The woodpile looks big enough. Nobody is going to do arithmetic about firewood on a good morning.", statHint: "perception", tag: "utility" },
+      ],
+      outcomes: {
+        countTheWood: {
+          success: { narrative: "You stack, measure, and do the ugly math twice. The woodpile covers winter with a margin — and one full glass firing, if you build the furnace lean and fire it once. The doctrine is clear: the furnace gets one campaign, no more, and the winter margin stays untouched. You write the limit down so you can't negotiate with it later.", effects: { conditionAdd: "fuel_budgeted", moraleMod: 10, xpBonus: 20 }, tip: "Glass is a luxury fuel expense. Price the whole campaign in cordwood before you start — melt, anneal, and the furnace pre-firing — and cap it. A furnace with a written fuel budget is a project; one without is a fire that eats your winter.", learnMore: ["gl001", "f014"] },
+          failure: { narrative: "The math comes back ugly: the woodpile covers winter and barely that. No honest firing fits. So you walk away — for now. The sand, clay, and ash keep; the forest keeps growing wood. You bank the project for a season with a fat surplus instead of forcing it into a lean one.", effects: { conditionAdd: "project_shelved", moraleMod: 6 }, tip: "Walking away is a sound outcome, not a failure. Glass can wait a season; winter cannot. The materials don't spoil — but a camp that burns its heating fuel for craft does.", learnMore: ["gl001", "f014"] },
+        },
+        commitAndHope: {
+          success: { narrative: "You commit. The furnace plan is lean, the firing schedule is tight, and you set a hard line: winter's share of the woodpile is marked and untouchable. It holds. The melt happens inside the budget — barely — and the discipline costs you sleep but not safety.", effects: { conditionAdd: "fuel_stretched", moraleMod: 8, xpBonus: 10 }, tip: "If you commit without full numbers, set the hard line anyway: mark the winter wood physically and never cross the mark. Hope is not a fuel plan — a visible boundary is.", learnMore: ["gl001", "f014"] },
+          failure: { narrative: "You build first and count later — and the count lands like an axe. The firing ate deep into the winter stack. Now you're facing the cold months short on fuel, and every warm night in November will be a night you chose this trade in September.", effects: { conditionAdd: "winter_short", conditionAdd2: "fuel_spent", moraleMod: -14 }, tip: "This is how craft projects kill camps: not in the firing, but in February. If the numbers scare you mid-build, stop the build. Unburned wood is recoverable; burned wood is not.", learnMore: ["f014", "gl001"] },
+        },
+        skipTheMath: {
+          success: { narrative: "You fire ahead on instinct — and the woodpile turns out to be deeper than it looked. The furnace gets built, the glass gets made, and winter arrives on a full stack. You were right. You were also one bad guess away from being wrong.", effects: { conditionAdd: "fuel_spent", moraleMod: -6 }, tip: "Getting away with it is not a method. If the arithmetic would have said no, the only reason you're warm is luck — and luck doesn't restock. Next time, count first.", learnMore: ["f014"] },
+          failure: { narrative: "Days into the furnace build you've burned an alarming share of the winter stack on construction and drying fires alone, and the math finally catches up with you. The project stalls half-built, the woodpile is gutted, and you're staring at a clay ruin that ate your winter.", effects: { conditionAdd: "winter_short", conditionAdd2: "project_stalled", moraleMod: -18 }, tip: "A half-built furnace is the worst of both worlds: all of the fuel cost, none of the glass. This is why the count comes first. Cut your losses, break the ruin down for clay, and start restocking wood like your life depends on it — it does.", learnMore: ["f014", "gl001"] },
+        },
+      },
+    },
+    {
+      id: "s2", title: "Stage 2 — 08:00, Day Two: The Furnace",
+      situation: "Day two. The fuel budget is set and the woodpile's winter share is marked. Now the furnace itself: a clay-and-sand dome with a fire chamber, a chimney throat for draft, and air inlets low at the base. Hot air rises through the chimney and pulls fresh air in below — that draft is what pushes a wood fire toward the temperatures glass needs. But clay holds water, and water turns to steam. Fire a wet furnace hard and the steam blows the walls apart from inside.",
+      check: { stat: "knowledge", difficulty: 12, tag: "building", label: "Kiln Craft" },
+      randomEvents: [
+        { chance: 0.2, text: "A cold gust slams down the chimney throat — the test fire flares hard, then settles. Draft is a living thing; respect it.", effect: { moraleMod: -6 } },
+      ],
+      choices: [
+        { id: "buildAndDry", q: "sound", label: "Build thick, then dry the furnace for days before any real fire", desc: "Lay the clay-and-sand walls thick for heat containment, shape a proper chimney and low air inlets, form a clay crucible — then run small drying fires for days, driving the water out slowly. No full heat until the structure is dry.", statHint: "knowledge", tag: "building" },
+        { id: "fastFire", q: "risky", label: "Build it, dry it one day, fire it the next", desc: "Time is fuel too. Build the walls thinner, run one hard drying day, and go for a full firing while the weather holds. The walls might hold.", statHint: "strength", tag: "building" },
+        { id: "wetFire", q: "poor", label: "Fire the wet furnace hard on day one", desc: "The clay is shaped, the wood is stacked, the sun is out. Light the big fire now — the heat will dry the walls as it goes.", statHint: "endurance", tag: "fire" },
+      ],
+      outcomes: {
+        buildAndDry: {
+          success: { narrative: "You build the dome thick — clay mixed with sand for body and heat retention — cut the chimney throat tall for a strong pull, and set the air inlets low where the draft can feed the fire bed. Then you run small fires for three days, steam sighing out of the clay, the walls ringing harder each evening. On the fourth day the structure takes full heat without a crack. The crucible — a heavy clay pot, dried with the rest — sits ready inside.", effects: { conditionAdd: "furnace_built", moraleMod: 12, xpBonus: 20 }, tip: "A glass furnace is insulation plus draft. Thick clay-sand walls hold the heat in; a tall chimney pulls air through the fire bed. And the drying fires are structural, not optional — wet clay plus full heat equals steam spalling: trapped water flashing to steam and cracking the walls from inside.", learnMore: ["gl001", "f024"] },
+          failure: { narrative: "You do everything right and the weather still costs you: three days of drying fires, then a cold rain soaks the dome overnight. You extend the drying, burning more of the budget, and the walls survive — but the delay eats time and wood you had earmarked for the melt.", effects: { conditionAdd: "furnace_built", conditionAdd2: "fuel_spent", moraleMod: -6 }, tip: "Even a correct build can cost more than planned. Shelter the furnace while it dries — a simple roof over the dome keeps rain from resetting days of drying fires.", learnMore: ["gl001", "f024"] },
+        },
+        fastFire: {
+          success: { narrative: "You build fast and dry hard for one long day, feeding the drying fire by hand and watching the steam plume thin out by dusk. The walls hold when you push to full heat. It's a working furnace — thinner-walled and thirstier for wood than a slow build, but working.", effects: { conditionAdd: "furnace_built", conditionAdd2: "fuel_spent", moraleMod: 8, xpBonus: 10 }, tip: "A fast build trades wood for time: thinner walls leak heat, so the firing burns more fuel to hold temperature. It works — but the fuel budget you set in Stage 1 just got tighter. Re-count it.", learnMore: ["gl001", "f024"] },
+          failure: { narrative: "One drying day wasn't enough. Halfway to full heat you hear it — a deep cracking, then a slab of the dome wall slumps inward, steam hissing out of the fracture. The furnace is crippled: it will never hold the temperatures a melt needs, and the wood you burned getting there is gone.", effects: { conditionAdd: "furnace_cracked", conditionAdd2: "fuel_spent", moraleMod: -14 }, tip: "Steam spalling doesn't negotiate. If a wall cracks in the drying phase, stop and rebuild that section — do not push a cracked furnace to melt temperature. A breach at full heat throws flame and heat where you don't expect it.", learnMore: ["gl001", "f024"] },
+        },
+        wetFire: {
+          success: { narrative: "Against every rule of kiln craft, you light the big fire in the wet dome — and the walls survive, cracked but standing, because the clay was sandier than you knew and vented the steam. The furnace limps to temperature. You did not earn this; the clay mixture did.", effects: { conditionAdd: "furnace_cracked", moraleMod: -8 }, tip: "Surviving a wet firing is luck, not technique. The cracks in those walls are now weak points at full heat — inspect them before every firing, and never stand in line with a cracked wall at melt temperature.", learnMore: ["gl001"] },
+          failure: { narrative: "Twenty minutes into the big fire the dome starts ticking — then a section of the wall blows outward with a crack like a rifle shot, throwing hot clay across the clearing. Steam did that: water trapped in the wet clay flashing to vapor faster than it could escape. The furnace is a ruin, the wood is ash, and you're lucky the wall blew outward instead of at you.", effects: { conditionAdd: "furnace_ruined", conditionAdd2: "fuel_spent", moraleMod: -18 }, tip: "This is why drying fires exist. Water expands to roughly 1,600 times its volume as steam — inside wet clay, that expansion has nowhere to go. Never fire wet clay hard. If you hear ticking and popping in a fresh structure, back off the fire and let it dry.", learnMore: ["gl001", "f024"] },
+        },
+      },
+    },
+    {
+      id: "s3", title: "Stage 3 — 18:30, Day Four: The Batch",
+      situation: "Day four, evening. The furnace is dry and proven. The clay crucible is charged with the batch: washed sand for silica, plant ash for the alkali flux, and lime to stabilize the glass. Here's the chemistry that makes or breaks the firing: pure silica melts around 1700°C — beyond any wood fire. The soda in plant ash breaks up the silica network and drags the melting range down toward roughly 1400–1500°C; the lime keeps the soda from making the finished glass water-soluble. Too little flux and the batch never fully melts; too much and the glass goes weak and cloudy. The furnace is lit. The melt takes hours of steady, blistering heat — and every hour is wood.",
+      check: { stat: "knowledge", difficulty: 12, tag: "utility", label: "Batch Chemistry" },
+      choices: [
+        { id: "measureTheBatch", q: "sound", label: "Weigh out sand, ash flux, and lime by measure", desc: "Proportion the batch deliberately — mostly sand, a measured share of plant-ash alkali, a smaller share of lime. Stir the charge, keep the heat steady, and give the melt the hours it needs to go fully liquid.", statHint: "knowledge", tag: "utility" },
+        { id: "eyeballIt", q: "risky", label: "Eyeball the batch — you've watched enough fires", desc: "You know what ash looks like, you know what sand looks like. Mix by feel, charge the crucible, and push the heat. Precision is for people with scales.", statHint: "perception", tag: "utility" },
+        { id: "sandOnly", q: "poor", label: "Melt sand alone — skip the flux, it's just chemistry", desc: "Sand is what glass is made of. The ash and lime are refinements. Charge the crucible with clean sand and let the furnace do the work.", statHint: "strength", tag: "fire" },
+      ],
+      outcomes: {
+        measureTheBatch: {
+          success: { narrative: "You measure the batch like it matters — because it does. Sand, ash, lime, in their proportions; the charge stirred as it heats. Hours in, the mass slumps, then flows: a glowing, honey-thick liquid. You draw a gather on the end of an iron blowpipe, and it hangs there, molten and workable, glowing orange in the dark. That is glass — soda-lime glass, melted at temperatures your furnace could actually reach, because the chemistry did half the lifting.", effects: { conditionAdd: "melt_ready", moraleMod: 14, xpBonus: 20 }, tip: "The flux is not optional — it is the reason the project is possible at all. Plant ash supplies the alkali (soda/potash) that breaks the silica network down so the batch melts near 1400–1500°C instead of 1700°C, and lime stabilizes the result so the finished glass doesn't dissolve in water. Measure both. If you have any broken glass (cullet), adding it to the charge melts easier than raw batch and saves fuel.", learnMore: ["gl001", "ch001", "ch002"] },
+          failure: { narrative: "You measure carefully, but the ash is weaker alkali than you judged — plant ash varies with the wood it came from. The melt stalls: half the batch stays grainy and unmelted no matter how hard you push the fire. You hold temperature for two more expensive hours and finally accept it: this charge won't finish. The wood is spent; the crucible holds a half-melted failure.", effects: { conditionAdd: "batch_ruined", conditionAdd2: "fuel_spent", moraleMod: -12 }, tip: "Plant ash is not standardized — ash from different woods carries different alkali strength. If a batch stalls, don't just burn more wood hoping; the chemistry is wrong, not the fire. Next time, test a small sample melt first, or leach the ash stronger. A failed batch is cheaper than a failed batch plus a wasted firing.", learnMore: ["gl001", "ch001"] },
+        },
+        eyeballIt: {
+          success: { narrative: "You mix by feel — and your feel is good. The batch melts down to a workable gather on the blowpipe, a little streaky, a little green from the iron in the sand, but glass. Not laboratory glass: camp glass, honest and usable.", effects: { conditionAdd: "melt_ready", moraleMod: 10, xpBonus: 10 }, tip: "Eyeballing works only when you've internalized the proportions — and even then, streaky or cloudy glass is the price. Note what ratio worked while it's fresh; memory is a poor scale. Write the recipe down before the fire cools.", learnMore: ["gl001"] },
+          failure: { narrative: "Your feel was off — too much ash, and the melt goes thin and watery, then the cooled test piece clouds and crumbles at the edge. Over-fluxed glass is weak glass: the alkali that lowers the melting point also weakens the structure if there's too much of it. The crucible holds a glowing mistake, and the firing's wood is gone.", effects: { conditionAdd: "batch_ruined", conditionAdd2: "fuel_spent", moraleMod: -12 }, tip: "More flux is not better. Excess alkali makes glass that melts easy and fails easy — cloudy, brittle, sometimes water-soluble. The batch is a recipe, not a suggestion. Measure next time.", learnMore: ["gl001", "ch002"] },
+        },
+        sandOnly: {
+          success: { narrative: "You burn a heroic amount of wood holding the furnace at its absolute limit — and at the very edge of what the fire can do, a skin of the sand charge slumps and glazes. Not a melt: a crust. The crucible holds hot sand with a glassy skin, and the woodpile holds nothing. You proved the furnace can nearly do the impossible, and nearly is the whole story.", effects: { conditionAdd: "batch_ruined", conditionAdd2: "fuel_spent", moraleMod: -10 }, tip: "This is the experiment that teaches the lesson permanently: pure silica needs around 1700°C, and no wood-fired furnace you can build reaches it. The flux isn't a refinement — it's the difference between glass and hot sand. The chemistry is the project.", learnMore: ["gl001"] },
+          failure: { narrative: "Hour after hour at full heat, and the sand sits there — glowing, sintered at the edges, utterly unmelted. The furnace did everything a wood fire can do, and it wasn't close to enough. When the wood runs out, the crucible holds exactly what you put in: sand. The most expensive sand in the camp's history.", effects: { conditionAdd: "batch_ruined", conditionAdd2: "winter_short", moraleMod: -18 }, tip: "Without flux, there is no glass — only a fuel bill. If you ever catch yourself thinking 'the fire just needs to be hotter,' stop: the answer is chemistry, not more wood. Walk away from the firing before it eats the winter stack.", learnMore: ["gl001", "f014"] },
+        },
+      },
+    },
+    {
+      id: "s4", title: "Stage 4 — 02:10, The Night Watch",
+      situation: "Past two in the morning. The melt is alive in the crucible, the pieces are shaped — small vessels, a thick lens blank — and the furnace needs tending through the night to hold heat for the anneal. It's below freezing outside, you're running on fumes, and the lean-to beside the furnace is warm. The temptation is sitting right there: seal the lean-to against the cold, bank the furnace low so it smolders till dawn, and sleep an arm's length from the heat.",
+      check: { stat: "composure", difficulty: 13, tag: "fire", label: "Night Watch" },
+      choices: [
+        { id: "annealProperly", q: "sound", label: "Bed the pieces in hot ash and sand; tend the anneal through the night", desc: "Move each finished piece into a bed of hot ash and sand — an insulating nest that lets it cool over hours, not minutes. Keep the cooling slow and even, stay awake in rotations, and let the glass come down through its stress range gently.", statHint: "composure", tag: "fire" },
+        { id: "quickCool", q: "risky", label: "Cool the pieces faster — pull them at dawn and be done", desc: "Bury them shallow, let the night air do the work, and get some sleep. Glass is glass; it'll be hard by morning either way.", statHint: "endurance", tag: "warmth" },
+        { id: "sleepBesideIt", q: "fatal", label: "Seal the lean-to and sleep beside the smoldering furnace", desc: "Bank the furnace down to a smolder, close the lean-to tight against the freezing night, and sleep in the warmth. The fire will keep, and so will you.", statHint: "composure", tag: "shelter" },
+      ],
+      outcomes: {
+        annealProperly: {
+          success: { narrative: "You nest every piece deep in hot ash and sand and sit the long night out, feeding the furnace just enough to keep the cooling slow. By dawn the vessels are cool to the touch — and they stay whole. Days later, weeks later, they still hold water. The slow cool let the internal stresses relax instead of freezing into the glass. That is the whole craft, right there: anyone can melt sand; the anneal is what makes it glass you can trust.", effects: { conditionAdd: "glass_annealed", conditionAdd2: "glass_vessels", moraleMod: 16, xpBonus: 20 }, tip: "Annealing is controlled slow cooling through the range where glass can still relax its internal stresses — roughly 550°C down past 450°C for soda-lime glass. Cool too fast and the outside hardens while the inside is still shrinking: the stress locks in permanently, and the piece can shatter from a small knock or even on its own, hours later. An ash or sand bed is a poor camp's annealing oven — insulation that stretches the cool-down over hours.", learnMore: ["gl001"] },
+          failure: { narrative: "You do the anneal right — but exhaustion wins a round at 4 a.m. and you let the furnace dip too low, too fast, for one stretch. The pieces survive, but one vessel pings and crazes a hairline crack by morning: a partial anneal, a partial piece. It holds water if you don't look at it too hard. The rest are sound.", effects: { conditionAdd: "glass_annealed", conditionAdd2: "vessels_flawed", moraleMod: 4 }, tip: "A partial anneal gives partial glass. If a piece crazes or cracks fine lines while cooling, mark it and don't trust it with hot liquids or knocks — the stress is still in there. The sound pieces prove the method; the flawed one proves why it matters.", learnMore: ["gl001"] },
+        },
+        quickCool: {
+          success: { narrative: "You bury the pieces shallow and let the cold night strip the heat fast — and by some mercy of even cooling, they come through whole. They ring true when you tap them. You got away with it this time; the glass doesn't know how close it came.", effects: { conditionAdd: "glass_vessels", moraleMod: 8, xpBonus: 10 }, tip: "You got lucky: fast cooling through the stress range usually locks stress in. Tap-test every piece — a clear ring suggests no cracks; a dull thud means a cracked or flawed piece, so set it aside. But a ring test cannot reveal locked-in stress — only proper annealing does that. And never trust a rushed piece the way you'd trust an annealed one.", learnMore: ["gl001"] },
+          failure: { narrative: "The vessels look perfect at dawn — smooth, clear, whole. You're admiring one at midday when it goes off like a small firecracker in your hand: a clean, violent fracture from rim to base, no warning. By evening a second one lets go on the shelf. The fast cool locked the stress in, and the stress collected its debt hours later. That is what unannealed glass does.", effects: { conditionAdd: "vessels_shattered", moraleMod: -14 }, tip: "This is the signature failure of skipped annealing: the piece looks fine and fails later — from a small temperature change, a light knock, or nothing at all. If a piece shatters spontaneously, the whole batch is suspect. Re-melt and anneal properly, or don't trust any of it.", learnMore: ["gl001"] },
+        },
+        sleepBesideIt: {
+          success: { narrative: "You wake at 4 a.m. with a splitting headache and nausea rising — and the awful clarity of what almost happened. You crawl out of the sealed lean-to into the freezing air and the headache slowly loosens its grip. The banked furnace smoldered all night in a closed space, and carbon monoxide — colorless, odorless — filled it while you slept. You got lucky. Never again: no sleeping in sealed spaces with any fire, ever, for any reason.", effects: { conditionAdd: "co_poisoned", conditionAdd2: "sleepless", moraleMod: -16 }, tip: "You got lucky — this time. Carbon monoxide binds to blood far more strongly than oxygen, and a sleeping person cannot recognize the symptoms: headache, dizziness, nausea, then unconsciousness, then death. A smoldering fire in a sealed shelter is one of the classic ways people die in their sleep outdoors. Ventilation is not optional; it is the difference between waking up and not.", learnMore: ["gl001", "m020"] },
+          failure: { narrative: "You bank the furnace, seal the lean-to against the cold, and fall asleep in the warmth. The fire smolders. Carbon monoxide — colorless, odorless, undetectable without instruments — builds through the night. You never wake up: not from the headache, not from the nausea, not at all. In the morning the camp finds the furnace still warm and the lean-to still sealed.", effects: { fatal: true }, tip: "This is a documented killer: people die every year sleeping in enclosed spaces with smoldering fuel fires — tents, campers, sealed shelters. CO binds to hemoglobin hundreds of times more strongly than oxygen; sleeping victims cannot recognize the symptoms. Never sleep in a sealed space with a fire. Ventilate, or stay out.", learnMore: ["m020", "gl001"] },
+        },
+      },
+    },
+  ],
+}
+,
+{
+  id: "distillation",
+  gear: "kit",
+  biomes: ["temperate_forest", "boreal", "grassland"],
+  title: "The Still",
+  icon: "⚗️",
+  difficulty: 3,
+  phase: 2,
+  timeOfDay: "14:00",
+  environment: "An established camp at the edge of mixed forest, mid-afternoon. Fermenting vessels bubble beside the cook tent, a heavy copper pot sits by the fire ring, and somebody has been talking all morning about building a still.",
+  weather: "Clear, 16°C, light breeze. Long shadows by the fire ring; a steady evening coming on.",
+  relatedDomain: "chemistry",
+  intro: "The camp has a pot, a fire, and fermenting vessels — and a plan to distill spirit for the lamps and the medicine kit. A still is honest work when it's built for fuel and antiseptic. It turns lethal the moment anyone treats the jar like a drink: a simple pot still cannot separate methanol from ethanol, and the folk rule about discarding foreshots is only partly true. What comes out is poison until proven otherwise — and out here, there is no proving it.",
+  stages: [
+    {
+      id: "s1", title: "Stage 1 — 14:00, The Wash",
+      situation: "The talk around the fire has turned serious: build a still, and the lamps burn clean all winter, and the medicine kit finally has real antiseptic. But the wash you put in decides what comes out. What you ferment — grain and sugar, or pectin-heavy fruit — and how clean you keep it, is the first decision you can't take back.",
+      check: { stat: "knowledge", difficulty: 11, tag: "food", label: "Set the Ferment" },
+      choices: [
+        { id: "grainWash", q: "sound", label: "Set a clean sugar-and-grain wash", desc: "Sugar and malted grain in a scrubbed vessel, airlock on top. No fruit, no pectin — the wash that makes the least methanol from the start.", statHint: "knowledge", tag: "food" },
+        { id: "fruitMash", q: "risky", label: "Ferment the windfall apples", desc: "A heap of fallen apples, bruised and free. Fruit mash makes more methanol — but if the distillate is fuel and antiseptic, never drink, the risk stays on paper.", statHint: "perception", tag: "food" },
+        { id: "dirtyMix", q: "poor", label: "Throw it all in together", desc: "Grain, fruit, whatever's going soft — into yesterday's unwashed vessel. Wild yeast will figure it out; it always does.", statHint: "composure", tag: "food" },
+      ],
+      outcomes: {
+        grainWash: {
+          success: { narrative: "You scrub the vessel, set the sugar and grain, and fit the airlock. Within a day it is bubbling steady and clean — no rot, no vinegar sharpness. A fruit-free wash carries almost no pectin, which means almost no methanol is being made in the first place. The still will have the safest possible feedstock.", effects: { conditionAdd: "wash_clean", moraleMod: 8, xpBonus: 20 }, tip: "Methanol in the ferment comes mainly from pectin — and plain sugar has none. A clean sugar-and-grain wash makes the least methanol of anything you can ferment. Scrub the vessel, fit an airlock so CO2 escapes while air and flies stay out, and let it finish.", learnMore: ["d035", "ch006"] },
+          failure: { narrative: "The wash starts, then stalls — the airlock goes quiet on day two. You warm the vessel, stir the sediment back up, and wait. It finishes slow and thin, and the lesson is about patience, not chemistry: a stalled ferment still needs to finish before it meets the still.", effects: { conditionAdd: "wash_slow", moraleMod: -4 }, tip: "A ferment is finished when the bubbling stops and the wash clears — never distill a cloudy, still-active wash. Suspended solids scorch in the boiler and taint everything that comes after.", learnMore: ["d035"] },
+        },
+        fruitMash: {
+          success: { narrative: "The apples go in — bruised ones trimmed, rotten ones out, vessel scrubbed first. It ferments hard and smells like a cider house. And before the first drop is ever distilled, the camp agrees on the rule out loud: this wash makes more methanol because fruit carries pectin, so its spirit is fuel and antiseptic, never drink. Decide the use before you ferment, not after you taste.", effects: { conditionAdd: "mash_quarantined", moraleMod: 6, xpBonus: 10 }, tip: "Pectin-rich fruit makes more methanol in the ferment — that is chemistry, not opinion. A fruit mash can still be useful, but its distillate is fuel and wound antiseptic, never a cup. Set that rule before the first drip falls.", learnMore: ["ch006", "d035"] },
+          failure: { narrative: "You left the vessel uncovered 'to let the wild yeast in' — and the wild everything got in. By day three the mash smells of vinegar: acetic acid bacteria found the alcohol before you did. The whole batch is fit for salad dressing and nothing else. You pour it out far from camp and start over, this time with a lid.", effects: { conditionAdd: "wash_soured", moraleMod: -10 }, tip: "Wild yeast ferments, but so does everything else in the air — including the bacteria that turn alcohol into vinegar. Keep the ferment covered, sanitize the vessel, and cut out the rotten fruit: the rot is where the spoilage lives.", learnMore: ["ch003", "d058"] },
+        },
+        dirtyMix: {
+          success: { narrative: "The mixed mash turns fast — and turns obviously wrong: grey film, sour-rot smell, the works. Nobody has to be convinced to dump it, because nobody would drink anything that came out of it. The failure is total and visible, which is the only mercy in it: nothing ambiguous ever reaches the still.", effects: { conditionAdd: "batch_dumped", moraleMod: -8 }, tip: "Spoiled wash tells you — sour smell, slime, mold. When it does, dump it far from camp and start clean. A batch that looks and smells wrong is wrong; the danger is the batch that looks fine and isn't.", learnMore: ["d058", "d035"] },
+          failure: { narrative: "The mixed vessel ferments — sort of. Half vinegar, half rot, a smell that hangs over the cook tent for days and turns the whole camp against the still project before it's even built. You spent a week of feedstock to learn that a dirty vessel inoculates the wash with everything that lived there last.", effects: { conditionAdd: "wash_ruined", conditionAdd2: "camp_doubts", moraleMod: -12 }, tip: "Sanitation is not fussiness. A dirty vessel seeds your wash with every organism from the last batch — the wild yeast you wanted, plus the spoilage you didn't. Clean the vessel, start clean, or don't start.", learnMore: ["d058"] },
+        },
+      },
+    },
+    {
+      id: "s2", title: "Stage 2 — 16:30, The Build",
+      situation: "The pot is heavy copper, the lid is warped, and there's a length of tube for the condenser. A still has four parts and one rule that matters more than all of them: vapor-tight, never pressure-tight. Every joint downstream of the boiler must breathe to the open air — because a sealed still with a blocked vapor path isn't a still. It's a boiler bomb.",
+      check: { stat: "strength", difficulty: 12, tag: "building", label: "Build the Still" },
+      choices: [
+        { id: "ventedDesign", q: "sound", label: "Build it open — every joint vents to air", desc: "Loose-fitting lid, the condenser tube open at the far end, the collection jar open. It will leak a little vapor and make a little less — and it cannot build pressure.", statHint: "knowledge", tag: "building" },
+        { id: "tightSeal", q: "risky", label: "Seal it tight for yield", desc: "Clay and cloth packed around every joint — more vapor through the condenser, more spirit in the jar. The risk is a blockage with nowhere to vent.", statHint: "strength", tag: "building" },
+        { id: "sealedStill", q: "poor", label: "Cap the condenser — keep the vapors in", desc: "The far end of the condenser gets a cap, 'to hold the flavor.' Nothing vents. Nothing can vent.", statHint: "strength", tag: "building" },
+      ],
+      outcomes: {
+        ventedDesign: {
+          success: { narrative: "The still goes together the honest way: boiler no more than two-thirds full, vapor riser to the condenser, and the condenser's far end open to the air with the collection jar open beneath it. Vapor flows, drips fall, and the whole apparatus runs at atmospheric pressure. It will leak a little and yield a little less. It also cannot build pressure.", effects: { conditionAdd: "still_built", moraleMod: 10, xpBonus: 20 }, tip: "A pot still runs at atmospheric pressure: joints vapor-tight, never pressure-tight. The condenser's far end stays open to the air, the collection vessel stays open, and no valve, cap, or sealed joint ever goes anywhere downstream of the boiler.", learnMore: ["ch006"] },
+          failure: { narrative: "The joints leak more than you hoped — vapor wisps at every seam, and the yield is thin. But the rule held: nothing sealed, nothing that can trap pressure. You pack the worst seams with wet clay that will fail open if it must, and accept the smaller jar. Leaks cost yield. Seals cost lives.", effects: { conditionAdd: "yield_low", moraleMod: -4 }, tip: "Clay or flour paste improves vapor-tightness — but every seal must still fail open. A leak is a problem you can see and fix; a seal that can't leak is a hazard you can't. Never trade the vent for the yield.", learnMore: ["ch006"] },
+        },
+        tightSeal: {
+          success: { narrative: "The clay-and-cloth seals hold beautifully — vapor pours through the condenser, the jar fills fast, and nothing blocks the path all evening. It worked because nothing blocked the path, not because the seals were safe. You log the yield, and you log the luck beside it.", effects: { conditionAdd: "seal_held", moraleMod: 8, xpBonus: 10 }, tip: "A tight seal buys yield and sells safety — this one paid off only because the vapor path stayed clear. Pressure-tight and vapor-tight are not the same thing; never confuse them, and never leave a sealed still unattended.", learnMore: ["ch006"] },
+          failure: { narrative: "Mid-run the wash foams and surges up the riser — and the packed seal holds. Pressure climbs until the clay blows out with a scalding belch of steam, right across your hands. You get burned, the run is lost, and the camp learns the pressure rule the loud way: vapor-tight, never pressure-tight.", effects: { conditionAdd: "steam_burned", moraleMod: -12 }, tip: "Boiling wash foams and surges — that is why the boiler is never filled more than two-thirds, and why the vent is never blocked. If vapor stops flowing while the boiler is hot, kill the heat and back away. Do not tighten anything.", learnMore: ["ch006", "m005"] },
+        },
+        sealedStill: {
+          success: { narrative: "You cap the condenser — and ten minutes into the run the cap launches itself off with a bang and a gout of steam, arcing into the dirt. Nobody is hurt. The batch is destroyed, the camp is silent, and you understand exactly what you built: it was a pressure vessel, and it just proved it. The cap goes in the fire. It is never replaced.", effects: { conditionAdd: "cap_blew", moraleMod: -10 }, tip: "Luck is not a pressure relief. If any part of your still can pop off under pressure, you built a pressure vessel — and pressure vessels are built from steel and math, not luck. Nothing downstream of the boiler is ever capped.", learnMore: ["ch006"] },
+          failure: { narrative: "The boiler lid goes first — a ruptured seam, a white burst of scalding steam, and boiling wash spraying across the fire ring with a sheet of alcohol vapor that flashes as it lands. You take burns to your hands and face pulling back; the still is wreckage; the run is gone. Pressure kills, and it nearly did.", effects: { conditionAdd: "badly_burned", conditionAdd2: "still_wrecked", moraleMod: -16 }, tip: "Pressure kills. Boiling liquid in a closed vessel builds pressure until something bursts — and what bursts sprays boiling liquid and flammable vapor over your heat source. Never seal the apparatus; never leave it unattended.", learnMore: ["ch006", "m005"] },
+        },
+      },
+    },
+    {
+      id: "s3", title: "Stage 3 — 18:45, The Run",
+      situation: "The wash is in the boiler, the fire is lit, and the first drips are falling. Now comes the part everyone gets wrong: the cuts. The first liquid — the foreshots — carries the sharpest, lowest-boiling compounds, and you discard it. Here is the honest part, said once and plainly: methanol boils close to ethanol and rides the vapor with it through the whole run. Foreshots reduce the poison. They do not remove it.",
+      check: { stat: "composure", difficulty: 12, tag: "fire", label: "Run It Slow" },
+      randomEvents: [
+        { chance: 0.2, text: "A gust of wind kicks the fire sideways and the vapor arm shudders — you catch it before the kink can close the path.", effect: { moraleMod: -8 } },
+      ],
+      choices: [
+        { id: "slowLow", q: "sound", label: "Run it slow and low — discard foreshots and heads deep", desc: "Gentle heat, steady drips. The first of the run goes to the fuel jar, and a deep cut of heads follows it — and everything collected stays suspect regardless.", statHint: "composure", tag: "fire" },
+        { id: "tasteSip", q: "risky", label: "Taste-test the hearts", desc: "One small sip to judge the quality. People have always tested spirit this way — one sip can't hurt.", statHint: "perception", tag: "medical" },
+        { id: "fullBlast", q: "poor", label: "Run it hot and fast", desc: "Crank the fire — the sooner the run is done, the sooner the jar is full. Cuts are cuts; heat just hurries them along.", statHint: "composure", tag: "fire" },
+      ],
+      outcomes: {
+        slowLow: {
+          success: { narrative: "You nurse the fire all evening — low, steady, drips not a stream. The foreshots go to the fuel jar, sharp and solvent-smelling, and a deep cut of heads follows them. The hearts you keep are clean and strong, earmarked for the medicine kit and the lamps. And the rule stands over the whole jar: reduced, not proven. Suspect regardless.", effects: { conditionAdd: "clean_run", moraleMod: 10, xpBonus: 20 }, tip: "Discard the foreshots — the first of the run — into the fuel jar, and cut the heads deep. It reduces the methanol and the harsh volatiles. It does not make the rest safe to drink: methanol smears across the whole run, and no cut, smell test, or flame test proves it gone.", learnMore: ["ch006"] },
+          failure: { narrative: "The heat creeps up while you're watching the condenser and the drips turn to a stream — the cuts smear together before you catch it. You back the fire off, but the run's honesty is gone, so you stop early: half a jar, cautious, honest. A short clean run beats a full dishonest one.", effects: { conditionAdd: "run_cut_short", moraleMod: -4 }, tip: "Heat control is the whole game — hard heat smears every cut into the next and drags harsh compounds through. If the drips become a stream, back the fire off and start the cuts over. Gentle heat, steady drips.", learnMore: ["ch006", "f014"] },
+        },
+        tasteSip: {
+          success: { narrative: "One small sip of the hearts — clean going down, nothing happens. And it proves nothing: a sip too small to hurt you is too small to test anything. You pour no second sip, and the jar is marked for fuel and the medicine kit. The instrument was never your body.", effects: { conditionAdd: "lesson_learned", moraleMod: 4, xpBonus: 10 }, tip: "A sip that doesn't hurt you proves exactly nothing — a small taste of a bad batch won't poison you, which is why tasting can never test anything. Never use your body as the test instrument.", learnMore: ["ch006", "m020"] },
+          failure: { narrative: "The sip goes down — and whether it's the spirit or the fear, your head swims and your stomach turns. You stop dead. The rest of the jar goes straight to the fuel can, unlabeled hopes and all. You spend the evening shaky and furious at yourself, which is the correct price for testing poison with your mouth.", effects: { conditionAdd: "sip_scare", moraleMod: -12 }, tip: "If a sip makes you feel wrong, stop — that is the instrument telling you it was never a test. You don't get a second data point; the jar is fuel, or it's nothing.", learnMore: ["m020", "ch006"] },
+        },
+        fullBlast: {
+          success: { narrative: "The wash foams and surges up the riser halfway through the run — you kill the heat in time to save the still, but the boiler pukes wash into the condenser and the batch is scorched and ruined. The camp watches a full evening of firewood turn into a lesson: hard heat doesn't hurry the cuts, it destroys them.", effects: { conditionAdd: "batch_scorched", moraleMod: -8 }, tip: "Boiling wash foams and surges — that is why the boiler is filled no more than two-thirds and the heat stays gentle. Hard heat doesn't hurry the cuts; it ruins them and wastes the fuel.", learnMore: ["ch006", "f014"] },
+          failure: { narrative: "Boil-over. Foaming wash surges into the condenser and a slug of hot alcohol vapor hits the open flame — a sheet of blue fire rolls up the vapor arm and you're beating it out with a wet blanket while the camp scatters. The run is destroyed. Alcohol vapor burns, and a surging boiler will find your fire for you.", effects: { conditionAdd: "boilover", conditionAdd2: "batch_lost", moraleMod: -14 }, tip: "Alcohol vapor is flammable — a surging boiler can push it straight out of the condenser and onto your flame. Keep the still's fire low and steady, the collection end open and away from sparks, and never leave a running still.", learnMore: ["ch006", "tr008"] },
+        },
+      },
+    },
+    {
+      id: "s4", title: "Stage 4 — 21:00, The Decision",
+      situation: "The jar sits on the camp table, clear and sharp-smelling, and the celebration has already started without it. Someone reaches for a cup. This is the whole scenario in one moment: a simple pot still cannot separate methanol from ethanol — the two ride the vapor together, and the foreshots rule is only partly true. What is in that jar is poison until proven otherwise, and out here there is no proving it.",
+      check: { stat: "knowledge", difficulty: 13, tag: "medical", label: "Name the Poison" },
+      choices: [
+        { id: "fuelAndMedicine", q: "sound", label: "Fuel, lamps, and the medicine kit — never a cup", desc: "The jar is labeled and put to work: stove fuel, lamp oil, antiseptic for tools and wounds. Nobody drinks a drop, because nobody can prove it safe.", statHint: "knowledge", tag: "medical" },
+        { id: "smallShot", q: "risky", label: "One small celebratory shot", desc: "The run went well, the cuts were honest, the foreshots went to fuel. One small shot to mark the work — everyone did it back home.", statHint: "composure", tag: "medical" },
+        { id: "drinkTrustFolk", q: "fatal", label: "Drink deep — the foreshots took the methanol", desc: "You discarded the foreshots by the book, so the methanol is gone — that's the rule everyone knows. Pour generously. Celebrate.", statHint: "perception", tag: "medical" },
+      ],
+      outcomes: {
+        fuelAndMedicine: {
+          success: { narrative: "The jar is labeled — what it is, what it's for, and NOT FOR DRINKING — and put to work. The lamps burn clean and bright, the stove sips fuel instead of gulping firewood, and the medicine kit finally holds real antiseptic for tools and wounds. The still earns its keep for years, because nobody ever asked it to be something it isn't.", effects: { conditionAdd: "still_working", moraleMod: 12, xpBonus: 20 }, tip: "Strong spirit is a superb antiseptic and a clean fuel — those are the two jobs a camp still is for. The cleanest hearts go to wound care; everything else goes to lamps and stoves. The jar that never becomes a drink is the jar that keeps working.", learnMore: ["ch006", "tr008"] },
+          failure: { narrative: "Someone argues for a toast, and the argument ends with the jar shelved and unused for a week — labeled, at least, and undrunk. Then the lamps burn clean through a long dark evening and the argument dies on its own. A jar nobody will drink is still a jar full of fuel and antiseptic; value doesn't need a toast.", effects: { conditionAdd: "jar_shelved", moraleMod: -6 }, tip: "Label every jar: what it is, what it's for, and 'not for drinking.' Stored like any flammable — sealed, away from heat and living space, clearly marked. Fuel alcohol is a tool, not a trophy.", learnMore: ["ch006", "tr008"] },
+        },
+        smallShot: {
+          success: { narrative: "You drink the shot. Nothing happens — and the luck of it hits you harder than the spirit did. A small shot of a lucky batch proves nothing about the next jar, and you say it out loud before the cup is even down: never again. The camp hears it. The rule is carved from luck, not from loss.", effects: { conditionAdd: "never_again", moraleMod: -6, xpBonus: 10 }, tip: "You got lucky — a small shot of a lucky batch proves nothing about the next jar. Luck is not a testing method, and 'it was fine last time' is how the bad jar gets drunk.", learnMore: ["ch006", "m020"] },
+          failure: { narrative: "Hours pass — and then your vision goes swimmy at the edges, blurred and wrong, and your stomach turns to acid. You know exactly what you drank. The jar goes into the fire, and you spend a terrified night waiting to see if your sight comes back, understanding with total clarity that the field has no treatment for this — only a hospital, a world away.", effects: { conditionAdd: "vision_scare", conditionAdd2: "methanol_scare", moraleMod: -16 }, tip: "Methanol poisoning hides for hours — then the vision blurs and the body turns acid, and there is no field treatment. Blurred vision after unknown spirit is a medical emergency: hospital, not hope. Never drink what you can't prove.", learnMore: ["m020", "ch006"] },
+        },
+        drinkTrustFolk: {
+          success: { narrative: "You drink deep — and by some grace the batch was clean, or the dose was small. Hours later your vision swims and your stomach turns, and you spend the night certain you're going blind... and by morning the blur recedes. You got lucky. The jar's twin goes into the fire unopened, and the rule is carved in front of everyone: never again. 'It was fine' is the most dangerous sentence in distilling.", effects: { conditionAdd: "lucky_escape", moraleMod: -14 }, tip: "You got lucky — this time. Methanol smears across the whole run of a pot still, and the foreshots never carried all of it away. Luck is not chemistry, and a folk rule is not a guarantee.", learnMore: ["m020", "ch006"] },
+          failure: { narrative: "Twelve hours of nothing — then the headache, the nausea, the vision going white at the edges and closing in. Methanol turns to acid in the body: the blood goes acid, the optic nerve dies, and out here there is no antidote drip, no dialysis — only the wait. By the second night the breathing is wrong and the blindness is total, and the camp can do nothing but watch. Hospital-only treatment is a world away.", effects: { fatal: true }, tip: "This is the documented shape of methanol poisoning: a long quiet latency — often half a day — then blurred vision, then blindness, then metabolic acidosis and death. The field has no treatment; survival needs a hospital's antidote and dialysis. The only winning move with unknown distillate is not drinking it.", learnMore: ["m020", "ch006"] },
+        },
+      },
+    },
+  ],
+}
+
 
 ];
 
