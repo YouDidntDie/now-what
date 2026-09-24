@@ -8626,7 +8626,352 @@ const SCENARIOS = [
         },
       },
     ],
-  }
+  },
+{
+  id: "altitude-illness",
+  gear: "kit",
+  biomes: ["alpine", "highland"],
+  title: "Thin Air, Hard Calls",
+  icon: "🏔️",
+  difficulty: 3,
+  phase: 0,
+  timeOfDay: "16:40",
+  environment: "High camp at 4,200 m on an exposed ridge. You and your climbing partner — two days up, one long push from the summit. Tents pegged on a flattened shoulder above a long scree descent.",
+  weather: "Clear and brutally cold, −6 °C, wind strengthening from the west. At this height the light dies in under two hours.",
+  relatedDomain: "medical",
+  intro: "It's 16:40 at 4,200 metres. Your partner has had a pounding headache since lunch, couldn't keep dinner down, and is talking about pushing for the summit at dawn. At altitude the gap between a bad headache and a medical emergency is one wrong decision — and the mountain doesn't negotiate.",
+  stages: [
+    {
+      id: "s1", title: "Stage 1 — 16:40, High Camp",
+      situation: "Your partner's head has been pounding since midday. They vomited once after lunch, slept badly last night, and look grey and exhausted. Classic acute mountain sickness — and they're insisting they'll be fine by morning.",
+      check: { stat: "perception", difficulty: 11, tag: "medical", label: "Read the Signs" },
+      choices: [
+        { id: "rest-here", q: "sound", label: "Stop. Rest at 4,200 m, no higher", desc: "Acclimatization day. Hydrate, eat what stays down, acetazolamide, and reassess in the morning. Nobody sleeps a metre higher tonight.", statHint: "knowledge", tag: "medical" },
+        { id: "push-camp", q: "risky", label: "Tag Camp 3 at 4,700 m, sleep back here", desc: "Move up to cache gear at the higher camp while the weather holds — but return to sleep at 4,200 m. Climb high, sleep low.", statHint: "endurance", tag: "medical" },
+        { id: "mask-climb", q: "poor", label: "Painkillers and carry on", desc: "Ibuprofen for the headache, keep the itinerary. The summit window is tomorrow and you didn't come this far to sit in a tent.", statHint: "composure", tag: "medical" },
+      ],
+      outcomes: {
+        "rest-here": {
+          success: { narrative: "You hold the line: no higher sleeping altitude until every symptom is gone. Through the evening the headache eases, the nausea passes, and by morning your partner is pink-cheeked and hungry. The acetazolamide did its quiet work speeding acclimatization — but it was the stopped ascent that did the curing.", effects: { conditionAdd: "acclimatizing", moraleMod: 8, xpBonus: 20 }, tip: "Never ascend to sleep higher with symptoms. Sleeping altitude is what the body counts — hold the line until symptoms fully resolve.", learnMore: ["hz010", "m006"] },
+          failure: { narrative: "You stop the ascent, but the weather window you were chasing slams shut overnight and your food margin shrinks to nothing. Your partner stabilizes — no worse, no better. Right call, real price: the summit bid is now a maybe.", effects: { conditionAdd: "delayed", moraleMod: -6 }, tip: "A rest day costs time and supplies. Budget acclimatization days into the itinerary before the mountain — never as an afterthought.", learnMore: ["hz010", "s046"] },
+        },
+        "push-camp": {
+          success: { narrative: "Up you go, slow and steady, gear cached at 4,700 m — then back down to sleep at 4,200. Your partner's symptoms don't worsen. Climb high, sleep low: the oldest acclimatization trick in the book, executed cleanly.", effects: { conditionAdd: "cache_placed", xpBonus: 10 }, tip: "Climb high, sleep low is the classic pattern: stress the body at altitude by day, let it recover lower by night.", learnMore: ["hz010"] },
+          failure: { narrative: "Halfway to Camp 3 your partner's headache spikes and the nausea returns with interest. You abort, drag them back down to 4,200 m, and burn the evening's energy for nothing. The mountain just taught you the rule the hard way.", effects: { conditionAdd: "partner_worse", moraleMod: -8 }, tip: "Ascending with symptoms doesn't build toughness — it builds the conditions for HACE and HAPE. Symptoms mean stop.", learnMore: ["hz010"] },
+        },
+        "mask-climb": {
+          success: { narrative: "The ibuprofen dulls the headache for a few hours and you convince yourself it's working. By midnight the nausea is back, sleep never comes, and the headache returns roaring. You've bought comfort and paid for it with information.", effects: { conditionAdd: "masked_symptoms", moraleMod: -6 }, tip: "Analgesics hide the headache without fixing the oxygen problem — and a hidden headache hides the decision point. Acetazolamide aids acclimatization; painkillers only hide pain.", learnMore: ["hz010", "m006"] },
+          failure: { narrative: "The pills wear off at 2 a.m. Your partner is vomiting outside the tent, head splitting, and now you have no idea how bad it really is — you've been reading a medicated patient all evening. Morning brings the worst decision of the trip.", effects: { conditionAdd: "masked_symptoms", conditionAdd2: "partner_worse", moraleMod: -14 }, tip: "Masked symptoms are lied-about symptoms. Treat what you can measure, not what the pills are hiding.", learnMore: ["hz010"] },
+        },
+      },
+    },
+    {
+      id: "s2", title: "Stage 2 — 04:50, The Morning Test",
+      situation: "Dawn. Your partner crawls out of the tent and immediately stumbles. You ask them to walk a straight line, heel to toe — they can't. They answer your questions slowly, get the date wrong, and their speech is slurred. Every instinct says wait for full light and hope it passes. That instinct is the killer. This is no longer AMS.",
+      check: { stat: "knowledge", difficulty: 12, tag: "medical", label: "Recognize HACE" },
+      choices: [
+        { id: "descend-now", q: "sound", label: "Descend immediately, 800 m down", desc: "Roped together, partner carries nothing, straight down to the last camp where they were well. Descent is the only cure — everything else is a bridge to it.", statHint: "endurance", tag: "medical" },
+        { id: "stabilize-descend", q: "risky", label: "Gamow bag + dexamethasone, then descend", desc: "It's dark and they're too ataxic to walk safely. Dexamethasone to reduce the brain swelling, the portable hyperbaric bag to simulate lower altitude — stabilize, then descend at first light.", statHint: "knowledge", tag: "medical" },
+        { id: "summit-push", q: "fatal", label: "Push on toward the summit anyway", desc: "The weather is perfect and the summit is one push away. They can lean on you. Go.", statHint: "strength", tag: "medical" },
+      ],
+      outcomes: {
+        "descend-now": {
+          success: { narrative: "You rope up and go down — 800 metres, steady, patient, carrying their pack. Halfway down the slurred speech clears. By 3,400 m they know the date again. Descent did what no drug could: it cured them.", effects: { conditionAdd: "partner_stable", moraleMod: 12, xpBonus: 20 }, tip: "Descent is the definitive treatment for HACE — even 500–1,000 m can reverse it. The patient carries no load, and you never leave them alone on the way down.", learnMore: ["hz010"] },
+          failure: { narrative: "The descent is rougher than planned — your partner's legs keep giving out and you're effectively short-roping a dead weight down scree in the dark. You reach the lower camp spent and shaking, partner critical but alive. The price of doing the right thing late.", effects: { conditionAdd: "partner_critical", moraleMod: -12 }, tip: "Descend BEFORE the patient can't walk. An ataxic patient who becomes unable to walk turns a descent into a stretcher evacuation.", learnMore: ["hz010", "s046"] },
+        },
+        "stabilize-descend": {
+          success: { narrative: "The dexamethasone starts reducing the brain swelling; two hours sealed in the Gamow bag simulates a far lower altitude and your partner's thinking clears. At first light you walk them down 800 m under their own power. The drugs bought the night — the descent bought the cure.", effects: { conditionAdd: "dex_given", conditionAdd2: "gamow_used", moraleMod: 8, xpBonus: 15 }, tip: "Dexamethasone and the Gamow bag buy time — they never replace descent. Stabilize, then go down at the first safe moment.", learnMore: ["hz010", "s046"] },
+          failure: { narrative: "Your partner panics inside the sealed bag and tears at the zipper; the pump seal won't hold pressure. An hour lost to fiddling with gear is an hour the swelling had to grow — delay is its own decision, and it's the wrong one. You descend anyway, in the dark, with a deteriorating patient.", effects: { conditionAdd: "partner_critical", moraleMod: -14 }, tip: "Bridges fail, and every hour spent on a failed bridge is an hour of 'wait and see.' A Gamow bag is only useful if you can operate it fast — the descent plan must exist independently of the gadgets.", learnMore: ["hz010"] },
+        },
+        "summit-push": {
+          success: { narrative: "Two hundred metres up, your partner collapses at the edge of a drop — and by pure luck falls inward, not outward. You drag them back down to camp with your heart hammering through your ribs. It worked. You will never, ever do that again.", effects: { moraleMod: -10 }, tip: "You got lucky. An ataxic, confused climber on a ridge is one stumble from a fall — judgment is the first thing HACE takes and the last thing you can afford to lose.", learnMore: ["hz010"] },
+          failure: { narrative: "They insist they're fine — impaired judgment is a HACE symptom, not a character flaw. On the ridge they wander three steps off the line, the ataxia takes their feet, and they're gone over the edge before your rope goes taut. Ascending with HACE doesn't end in rescue. It ends here.", effects: { fatal: true }, tip: "This is the genuinely lethal combination: ataxia plus confusion plus continued ascent. Stumbling feet and broken judgment kill on ridges — the only cure is down.", learnMore: ["hz010"] },
+        },
+      },
+    },
+    {
+      id: "s3", title: "Stage 3 — The Descent",
+      situation: "You're on the way down with a weakened partner when the light starts to fail and the wind picks up. Worse: their breathing is now labored even at rest, and there's a wet, gurgling edge to each cough. The brain is recovering — the lungs are filling.",
+      check: { stat: "endurance", difficulty: 12, tag: "medical", label: "Get Down" },
+      randomEvents: [
+        { chance: 0.2, text: "The wind shifts and drives stinging ice pellets across the ridge — visibility drops to an arm's length for a quarter hour.", effect: { moraleMod: -8 } },
+      ],
+      choices: [
+        { id: "rope-descend", q: "sound", label: "Short-rope down, steady and assisted", desc: "Partner carries nothing. Slow controlled pace, rest stops with them upright and warm, breathing watched the whole way. 800 m to the lower camp.", statHint: "endurance", tag: "medical" },
+        { id: "night-push", q: "risky", label: "Push hard through the dark to the valley", desc: "Headlamps on, no stops, straight through to 2,800 m tonight. Speed ends the exposure — if nobody falls.", statHint: "endurance", tag: "utility" },
+        { id: "split-up", q: "poor", label: "Run ahead alone to get help", desc: "You're faster solo. Sprint to the lower camp, raise help, come back for them. Two hours, maybe three.", statHint: "strength", tag: "signal" },
+      ],
+      outcomes: {
+        "rope-descend": {
+          success: { narrative: "Steady wins. Roped together, pack on your back, you nurse them down 800 metres. As the altitude drops, the gurgling cough thins and the breathlessness at rest fades — HAPE, like HACE, answers to descent faster than to anything else. Lower camp by full dark.", effects: { conditionAdd: "partner_improving", moraleMod: 10, xpBonus: 20 }, tip: "Never leave a person with altitude sickness alone, and the patient never carries a load. Monitor continuously, assist over every tricky step.", learnMore: ["hz010", "s046"] },
+          failure: { narrative: "The weather closes in and pins you on the ridge — you dig in for an unplanned bivouac, partner wrapped in everything you both own, kept upright and warm through a brutal night. They hold stable. At dawn you finish the descent running on nothing.", effects: { conditionAdd: "delayed", conditionAdd2: "partner_stable", moraleMod: -10 }, tip: "When descent stalls, protect the patient against the cold and keep them upright — and keep a stove and shelter accessible, because the mountain decides the timetable.", learnMore: ["s046", "f037"] },
+        },
+        "night-push": {
+          success: { narrative: "Headlamps, locked knees, no stops — you drop 1,400 m in one brutal push and stumble into the valley at midnight. Your partner's lungs are clear by morning. Speed was the medicine, and the gamble paid.", effects: { conditionAdd: "partner_stable", xpBonus: 15 }, tip: "A fast descent is legitimate when the patient can still walk and the route is known — but one fall in the dark ends the expedition and maybe the patient.", learnMore: ["hz010"] },
+          failure: { narrative: "Halfway down, exhausted legs miss a step on the scree and your partner goes down hard — a gashed knee and a twisted ankle on top of everything else. Now you're half-carrying a sick, injured person in the dark. The shortcut became the long way.", effects: { conditionAdd: "partner_worse", conditionAdd2: "delayed", moraleMod: -12 }, tip: "Exhaustion plus darkness plus scree is how descents become rescues. Pace is a safety device, not a luxury.", learnMore: ["hz010"] },
+        },
+        "split-up": {
+          success: { narrative: "You make the lower camp in ninety minutes and return with two porters and hot tea. Your partner is worse — colder, more confused, and furious at being abandoned. They survive your help, barely.", effects: { conditionAdd: "partner_worse", moraleMod: -10 }, tip: "Never leave a person with altitude sickness alone. Confusion and impaired judgment make them a hazard to themselves the moment you're out of sight.", learnMore: ["hz010"] },
+          failure: { narrative: "You return three hours later to an empty bivouac spot. Your confused partner tried to follow you, wandered off the trail in the dark, and is now curled in a hollow 200 m below the path, hypothermic and barely responsive. The rescue you went to fetch is now for a second emergency you created.", effects: { conditionAdd: "partner_critical", moraleMod: -18 }, tip: "An altitude-sick brain makes bad decisions confidently. Leaving them alone doesn't get help faster — it manufactures a second casualty.", learnMore: ["hz010"] },
+        },
+      },
+    },
+    {
+      id: "s4", title: "Stage 4 — 3,300 m, Below the Line",
+      situation: "Morning at 3,300 m. Your partner is lucid, the cough is gone, breakfast stays down. The trailhead is two hours below; the summit is still up there, gleaming. One rest day and you could be back at high camp by tomorrow night.",
+      check: { stat: "composure", difficulty: 11, tag: "medical", label: "Aftermath" },
+      choices: [
+        { id: "evacuate", q: "sound", label: "All the way down, medical evaluation", desc: "Finish the descent to the trailhead and get them properly checked. The expedition is over; the mountain will be there next year.", statHint: "composure", tag: "medical" },
+        { id: "rest-watch", q: "risky", label: "Camp here, monitor overnight, then decide", desc: "One careful night at 3,300 m: watch the breathing, the headache, the thinking. Descend at the first sign of anything returning.", statHint: "perception", tag: "medical" },
+        { id: "reascent", q: "poor", label: "\"Feeling fine — head back up\"", desc: "They look great. Rest a day, re-climb to high camp, finish what you started.", statHint: "strength", tag: "utility" },
+      ],
+      outcomes: {
+        "evacuate": {
+          success: { narrative: "Two hours down, clinic by afternoon. The doctor confirms it: HACE, caught and reversed by descent, no lasting damage because you kept going down. Your partner buys you dinner and calls you insufferable for a month. Fair trade.", effects: { conditionAdd: "partner_recovered", moraleMod: 14, xpBonus: 20 }, tip: "After HACE or HAPE, the prudent course is no reascent on the same trip — even once symptoms resolve. The mountain keeps; people don't always.", learnMore: ["hz010"] },
+          failure: { narrative: "The clinic is a six-hour drive and the expedition budget dies on the road — permits, porters, the whole season. Your partner recovers completely. Expensive, unglamorous, and exactly right.", effects: { conditionAdd: "partner_recovered", moraleMod: -4 }, tip: "The price of a full evacuation is money and plans. The price of skipping it can be a person. Do the arithmetic once, then never again.", learnMore: ["hz010"] },
+        },
+        "rest-watch": {
+          success: { narrative: "An uneventful night: steady breathing, clear head, normal appetite. You descend to the trailhead in the morning with a rested patient and a clean conscience. Caution, verified.", effects: { conditionAdd: "partner_recovered", xpBonus: 10 }, tip: "Monitoring is an active verb: breathing, headache, coordination, thinking — checked on a schedule, with a descent trigger decided in advance.", learnMore: ["hz010", "s046"] },
+          failure: { narrative: "At 2 a.m. the headache creeps back and the thinking goes fuzzy at the edges. You were ready: packs packed, headlamps out, descending within the hour. The night watch earned its keep — barely.", effects: { conditionAdd: "delayed", moraleMod: -6 }, tip: "Symptoms returning at the same altitude mean the illness isn't done. The only direction that treats it is still down.", learnMore: ["hz010"] },
+        },
+        "reascent": {
+          success: { narrative: "You climb 300 m before the headache returns like a slammed door. You turn around — trip over, summit unclimbed, ego in tatters. The mountain gave you one warning you were smart enough to hear.", effects: { moraleMod: -8 }, tip: "No reascent before the patient feels completely well — and after HACE/HAPE, not on this trip at all. Feeling fine at 3,300 m is not the same as being fine at 4,200.", learnMore: ["hz010"] },
+          failure: { narrative: "At 3,900 m your partner is stumbling again, words slurring — the HACE is back, faster this time. The second descent is a stretcher built from trekking poles and rope, and this time the clinic keeps them for three days. Relapse doesn't negotiate either.", effects: { conditionAdd: "partner_critical", moraleMod: -16 }, tip: "Reascent after HACE risks rapid relapse — the brain remembers the swelling. One episode ends the trip; that's the rule that keeps people alive.", learnMore: ["hz010"] },
+        },
+      },
+    },
+  ],
+},
+{
+  id: "snakebite",
+  gear: "kit",
+  biomes: ["temperate_forest", "grassland", "highland", "desert"],
+  title: "Don't Chase the Snake",
+  icon: "🐍",
+  difficulty: 3,
+  phase: 0,
+  timeOfDay: "13:20",
+  environment: "Rocky ridgeline trail through oak-hickory forest. Your hiking partner steps over a log — and the log moves. Two fang marks well blood on her ankle.",
+  weather: "Blue sky, 25°C, light breeze. Warm rock, warm snakes — peak pit-viper weather.",
+  relatedDomain: "medical",
+  intro: "A pit-viper bite is a race, not a mystery: the venom spreads from minute one, and the only finish line is a hospital. Your first-aid kit has bandages, soap, and a marker. It does not have antivenom — there is no field substitute for it, in any pack, anywhere. What you do in the next hour decides the leg; what you don't do decides everything else.",
+  stages: [
+    {
+      id: "s1", title: "Stage 1 — 13:20, The Strike",
+      situation: "Thirty metres downhill, the snake coils back into the rocks: thick-bodied, triangular head, coppery hourglass bands — a copperhead. Her ankle is swelling already. Her pulse is hammering, which is the one thing you must fix first.",
+      check: { stat: "perception", difficulty: 11, tag: "medical", label: "Read the Bite" },
+      choices: [
+        { id: "protocol", q: "sound", label: "Still, level, strip, photograph, call 911", desc: "Sit her down, keep her calm. Ankle propped at heart level. Shoe, sock, watch off before swelling starts. Photo of the snake from five metres — never touch it. 911 on speaker.", statHint: "knowledge", tag: "medical" },
+        { id: "carry-out-now", q: "risky", label: "Splint it and walk her out now", desc: "Three kilometres to the trailhead. Lash the leg to a splint and move — every minute counts.", statHint: "endurance", tag: "medical" },
+        { id: "chase", q: "poor", label: "Catch the snake for identification", desc: "Pin it with a trekking pole, bag it, bring it to the ER. A real specimen means faster treatment.", statHint: "perception", tag: "utility" },
+      ],
+      outcomes: {
+        protocol: {
+          success: { narrative: "She sits. Ankle propped on her pack at heart level. You photograph the copperhead from the trail — hourglass bands, triangular head — without getting closer than five metres. 911 is on speaker before the shock wears off.", effects: { conditionAdd: "bite_stabilized", moraleMod: 10, xpBonus: 20 }, tip: "Still, calm, bitten limb at heart level, constricting items off before swelling. Photograph the snake from a safe distance — never handle it, not even dead; even a decapitated head can still bite.", learnMore: ["m042"] },
+          failure: { narrative: "You run the protocol right — but there's no signal in the hollow and the 911 call dies. Two minutes of panic before you remember the ridge above has bars. The first aid was correct anyway; the call just has to wait for signal.", effects: { conditionAdd: "delayed", moraleMod: -6 }, tip: "The protocol is right even when the call fails: still, level, stripped, photographed. Signal comes later — the first aid can't wait.", learnMore: ["m042"] },
+        },
+        "carry-out-now": {
+          success: { narrative: "Splinted, steady, she hops the first hundred metres while you carry both packs. You reach the hollow's edge in twenty minutes and the ankle looks no worse than at the strike.", effects: { conditionAdd: "moving_out", xpBonus: 10 }, tip: "Walking out is sometimes necessary — but every step pumps venom. Immobilize the limb and keep the pace slow; stillness is the default, movement is the compromise.", learnMore: ["m042"] },
+          failure: { narrative: "Ten minutes in she goes pale and sits down hard — dizziness, nausea. The walking leg has swollen to the knee. You've spread the venom faster and burned your calmest window.", effects: { conditionAdd: "venom_spread", conditionAdd2: "delayed", moraleMod: -12 }, tip: "Movement spreads venom through the muscle pump. If she must walk, it is slow, supported, limb immobilized — never hurried.", learnMore: ["m042"] },
+        },
+        chase: {
+          success: { narrative: "Your pole pins the snake mid-body — and it thrashes free, striking the aluminium, not your hand. You back off, heart hammering. You have no specimen, no bite, and one lesson bought cheap: luck, not skill.", effects: { moraleMod: -10 }, tip: "Second bites happen exactly this way. Identification comes from a photo and a description, never a specimen — a dead snake's head can still bite for over an hour.", learnMore: ["m042"] },
+          failure: { narrative: "The pole slips off its neck. The copperhead strikes your forearm — a full defensive bite this time. You're now treating two victims with one first-aid kit, three kilometres from the trailhead.", effects: { conditionAdd: "second_bite", conditionAdd2: "venom_spread", moraleMod: -20 }, tip: "Never pick up the snake or try to trap it — not even a dead one. Most second bites happen to people trying to catch or kill the first one.", learnMore: ["m042"] },
+        },
+      },
+    },
+    {
+      id: "s2", title: "Stage 2 — The Hollow, No Signal",
+      situation: "Two kilometres in, the trail dips into the hollow and your phone drops to zero bars. Her ankle is the size of a grapefruit. With your pen you circle the swelling's edge and write the time on her skin — the ER will dose antivenom off that timeline. The kit has soap, bandages, a marker. No antivenom exists in any pack on earth.",
+      check: { stat: "endurance", difficulty: 12, tag: "utility", label: "The Carry" },
+      randomEvents: [
+        { chance: 0.2, text: "Your phone flickers: one bar, then nothing. Hope is a bad plan — keep moving toward signal.", effect: { moraleMod: -8 } },
+      ],
+      choices: [
+        { id: "litter", q: "sound", label: "Improvise a litter, steady pace, call at first bar", desc: "Lash two trekking poles to her rain jacket. Keep the leg still and level. Mark the swelling edge hourly. Move toward signal — 911 and Poison Control at the first bar.", statHint: "knowledge", tag: "medical" },
+        { id: "piggyback", q: "risky", label: "Piggyback her out at speed", desc: "She's 60 kilos. Run the flats, jog the descents. Speed is the closest thing to antivenom.", statHint: "strength", tag: "utility" },
+        { id: "tourniquet", q: "poor", label: "Tie off the leg above the bite, ice it", desc: "A belt tight above the knee holds the venom in the foot. Cold from the stream slows everything down.", statHint: "knowledge", tag: "medical" },
+      ],
+      outcomes: {
+        litter: {
+          success: { narrative: "The litter works. Her leg stays level and still; you mark the swelling's new edge at 14:40 and it has climbed an inch. At the hollow's lip your phone finds two bars — 911, then Poison Control at 1-800-222-1222, both with the timed marks to report.", effects: { conditionAdd: "evac_on_track", conditionAdd2: "responders_called", moraleMod: 12, xpBonus: 20 }, tip: "Circle the swelling's leading edge and write the time on the skin. ER doctors use those marks to judge envenomation speed and dose antivenom.", learnMore: ["m042"] },
+          failure: { narrative: "The litter holds but the hollow is longer than the map said. An hour in, a pole lashing snaps on a scree slope — you re-tie it, lose thirty minutes, keep moving. Slow is still moving.", effects: { conditionAdd: "delayed", moraleMod: -6 }, tip: "Improvised carries fail at the lashings. Test them under load before you commit the victim's weight.", learnMore: ["m042"] },
+        },
+        piggyback: {
+          success: { narrative: "She locks her arms around your shoulders, you take the descents sideways, slow on the rocks. Forty minutes and you're at the hollow's lip with signal — winded, intact, ahead of the swelling.", effects: { conditionAdd: "evac_on_track", xpBonus: 10 }, tip: "A fast carry trades venom spread for time. It only pays when the victim stays calm, the leg stays still, and the terrain can't throw you both.", learnMore: ["m042"] },
+          failure: { narrative: "Halfway down the scree you catch a toe and go down hard. She lands on the bad leg — screams — and the ankle balloons visibly in minutes. Panic does the rest.", effects: { conditionAdd: "fall", conditionAdd2: "venom_spread", moraleMod: -16 }, tip: "A fall on an envenomated limb spikes local venom spread and pain. Slow and ugly beats fast and broken.", learnMore: ["m042"] },
+        },
+        tourniquet: {
+          success: { narrative: "You tie the belt — and she yanks it loose herself, swearing, thirty seconds later. 'Are you insane?' Damage: one bruised thigh and thirty seconds lost.", effects: { moraleMod: -8 }, tip: "A tourniquet concentrates venom in the limb and starves tissue of blood — it destroys the limb it claims to save. Never indicated for snakebite, ever.", learnMore: ["m042"] },
+          failure: { narrative: "The belt goes on tight above the knee and stays on. By the hollow's lip the foot below it is mottled and swollen hard against the leather, going numb. You've trapped the venom exactly where it does the most damage.", effects: { conditionAdd: "tourniquet_damage", conditionAdd2: "venom_spread", moraleMod: -16 }, tip: "Tourniquets cut off blood flow and concentrate venom — the tissue below dies twice over. If someone has applied one, note the time and tell the ER; only medical staff remove it.", learnMore: ["m042"] },
+        },
+      },
+    },
+    {
+      id: "s3", title: "Stage 3 — 15:30, The Turn",
+      situation: "The swelling has crossed your 14:40 mark and is climbing toward the knee. She's nauseous, pale, breathing fast, and starting to panic — convinced she's dying. You're one kilometre from the trailhead. This is the hour that decides the leg, and maybe more.",
+      check: { stat: "composure", difficulty: 12, tag: "medical", label: "Hold the Line" },
+      choices: [
+        { id: "reassess", q: "sound", label: "Stop, calm her, re-mark, call Poison Control", desc: "Sit her down, slow her breathing, mark the new swelling edge with the time. Call 1-800-222-1222 from the ridge — they coordinate directly with the ER on envenomations.", statHint: "composure", tag: "medical" },
+        { id: "run-ahead", q: "risky", label: "Leave her with your pack and run for the trailhead", desc: "One kilometre at a sprint. Back with help — or an ambulance — in twenty minutes.", statHint: "endurance", tag: "signal" },
+        { id: "folk-kitchen", q: "fatal", label: "The full backwoods fix: cut, suck, tourniquet, ice, whiskey, wait", desc: "Open the fang marks with your knife so they bleed, suck out the venom, tie the leg off, pack it with ice from the stream, give her whiskey for the pain — and wait at the shelter to see if it gets worse before calling anyone.", statHint: "knowledge", tag: "medical" },
+      ],
+      outcomes: {
+        reassess: {
+          success: { narrative: "She matches your breathing. New mark, new time: 15:35. Poison Control confirms you're doing it right and relays the swelling timeline to the incoming ambulance. The panic breaks — hers, and the venom's timetable both.", effects: { conditionAdd: "envenomation_tracked", moraleMod: 10, xpBonus: 20 }, tip: "US Poison Control: 1-800-222-1222 — free, 24/7, and they coordinate with the ER on envenomations. Call early, not when things turn.", learnMore: ["m042"] },
+          failure: { narrative: "She won't stop hyperventilating and the marks keep climbing. You hold the protocol anyway — still, level, marked, moving — because the procedure doesn't need her calm to be correct.", effects: { conditionAdd: "delayed", moraleMod: -8 }, tip: "Panic raises heart rate, and heart rate moves venom. Calming the victim is treatment, not comfort.", learnMore: ["m042"] },
+        },
+        "run-ahead": {
+          success: { narrative: "You mark the trail junctions with cairns, sprint the kilometre, and flag down a ranger truck at the trailhead. Twenty minutes later you're back with a stretcher and the swelling hasn't crossed the knee.", effects: { conditionAdd: "help_inbound", xpBonus: 10 }, tip: "Splitting up is a calculated risk: mark your route, leave water and the whistle with the victim, and only go if rescue is genuinely close.", learnMore: ["m042"] },
+          failure: { narrative: "You take a wrong fork in the burn scar and lose twenty minutes bushwhacking back. She spent them alone, swelling and vomiting, convinced you'd abandoned her.", effects: { conditionAdd: "left_alone", conditionAdd2: "delayed", moraleMod: -14 }, tip: "Never leave a deteriorating victim without a marked route back. A wrong turn turns a twenty-minute run into an hour of abandonment.", learnMore: ["m042"] },
+        },
+        "folk-kitchen": {
+          success: { narrative: "The knife opens the fang marks and the blood that comes out won't clot right. She spits the whiskey back up. By the time you finally call for help, the leg below your tourniquet is dying tissue — the surgeons take it below the knee that night. She lives. The leg doesn't.", effects: { conditionAdd: "limb_lost", conditionAdd2: "envenomated", moraleMod: -24 }, tip: "Every folk 'treatment' — cutting, suction, tourniquets, ice, alcohol, waiting — is explicitly condemned by the CDC. Each one makes envenomation worse in a different way.", learnMore: ["m042", "m003"] },
+          failure: { narrative: "Hours pass at the shelter. The tourniquet starves the leg for three hours while the venom works unopposed — no antivenom, no ER, because you chose to wait and see. By the time passing hikers flag down a ranger, systemic envenomation has crashed her blood pressure and clotting. She dies in the ambulance — of hours, not minutes.", effects: { fatal: true }, tip: "This is the cascade that kills: folk treatment destroys the limb while the delay lets systemic envenomation progress unchecked. Antivenom is hospital-only — and the evidence is consistent: the longer the delay, the worse the outcome. Treatment delayed beyond about six hours markedly raises the risk of severe systemic toxicity.", learnMore: ["m042", "m003"] },
+        },
+      },
+    },
+    {
+      id: "s4", title: "Stage 4 — The Trailhead Handoff",
+      situation: "The ambulance meets you at the trailhead lot at 16:10. Paramedics move fast — IV, vitals, radio ahead. Your phone has the snake photo, her skin has the swelling timeline, and a well-meaning bystander is telling the paramedic it 'looked like a dry bite, barely any swelling at first.'",
+      check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "The Handoff" },
+      choices: [
+        { id: "handoff", q: "sound", label: "Hand over photo, timeline, and a clean report", desc: "Time of bite, snake description and photo from safe distance, timed swelling marks, what you did — and what you didn't. Then step back and let the ER decide.", statHint: "knowledge", tag: "medical" },
+        { id: "drive", q: "risky", label: "Drive her to the ER yourself — faster", desc: "The hospital is twenty minutes by road. The ambulance is still loading. Your car is right there.", statHint: "endurance", tag: "utility" },
+        { id: "dry-bite", q: "poor", label: "Agree it's probably a dry bite — skip the ER", desc: "Two tiny punctures, and the swelling slowed. Save the ambulance bill; watch it at home.", statHint: "composure", tag: "medical" },
+      ],
+      outcomes: {
+        handoff: {
+          success: { narrative: "You read off the timeline — bite 13:20, marks at 14:10, 14:40, 15:35, photo of the copperhead. The ER doctor nods once: 'This is exactly what we need.' Antivenom starts within the hour, dosed against your marks.", effects: { conditionAdd: "hospital_handoff", moraleMod: 14, xpBonus: 20 }, tip: "Only the hospital decides dry bite versus envenomation. Your job is the timeline: when, what snake, how fast it spread, what you did.", learnMore: ["m042"] },
+          failure: { narrative: "Your photo is blurry and you blank on the 14:40 mark's exact time. The ER works it out anyway — copperhead, moderate envenomation — but the antivenom dosing starts on guesswork instead of data.", effects: { conditionAdd: "delayed", moraleMod: -4 }, tip: "Blurry photos and missing times cost precision. Photograph from a safe distance, and write every mark's time on the skin.", learnMore: ["m042"] },
+        },
+        drive: {
+          success: { narrative: "You drive smooth, hazards on, her leg propped level on the back seat. Twenty minutes, ER doors, triage in five. The ambulance would have taken forty.", effects: { conditionAdd: "hospital_handoff", xpBonus: 10 }, tip: "Driving the victim can work — but never drive yourself if you're the bitten one. Envenomation causes dizziness and fainting; the CDC says don't drive yourself to the hospital.", learnMore: ["m042"] },
+          failure: { narrative: "Ten minutes down the highway she goes grey and vomits across the back seat, then her breathing goes shallow. You're doing 110 with a crashing patient and no equipment. The ER is still twelve minutes away.", effects: { conditionAdd: "deteriorated_enroute", conditionAdd2: "delayed", moraleMod: -14 }, tip: "Deterioration en route is why ambulances exist: monitoring, oxygen, IV access. A car is a box with no tools.", learnMore: ["m042"] },
+        },
+        "dry-bite": {
+          success: { narrative: "You start to agree — and the paramedic cuts in: 'We're going in anyway.' At the ER the labs show real envenomation. The bystander's confidence was worth nothing.", effects: { moraleMod: -6 }, tip: "About one in four pit-viper bites is dry — but you cannot tell in the field. 'Wait and see' is how treatable envenomations become amputations.", learnMore: ["m042"] },
+          failure: { narrative: "You talk her out of the ambulance. By midnight the hand-sized swelling is leg-sized, and the clotting damage the ER would have caught at 16:30 is now a transfusion case. She keeps the leg. Barely.", effects: { conditionAdd: "envenomated", conditionAdd2: "delayed_care", moraleMod: -22 }, tip: "Field rule: every bite is an envenomation until the hospital proves otherwise. The hospital has labs, antivenom, and surgeons. Your car has a first-aid kit.", learnMore: ["m042"] },
+        },
+      },
+    },
+  ],
+},
+{
+  id: "ice-breakthrough",
+  gear: "pockets",
+  biomes: ["boreal", "arctic", "alpine"],
+  title: "One Minute",
+  icon: "🧊",
+  difficulty: 3,
+  phase: 0,
+  timeOfDay: "15:50",
+  environment: "A frozen lake in late December. You were cutting across the ice on a footpath shortcut back to the parking lot when the ice changed colour under your boot — a dark patch, thinner than the rest.",
+  weather: "Overcast, -12°C, wind 20 km/h out of the northwest. Light fading.",
+  relatedDomain: "hazards",
+  intro: "You stepped onto a dark patch of ice and the lake swallowed you to the chest. The water is near freezing, the wind is rising, and you walked out here with nothing but what's in your pockets. You have about one minute before the cold shock passes, ten before your muscles stop obeying you — and no margin for a second mistake.",
+  stages: [
+    {
+      id: "s1", title: "Stage 1 — 15:50, the Breakthrough",
+      situation: "The ice gives way under your front foot and you drop chest-deep into black water. The cold hits like a slap and your lungs try to gulp air that isn't there. Your friend is 40 metres behind you on the footpath, shouting your name.",
+      check: { stat: "composure", difficulty: 11, tag: "utility", label: "Ride the Cold Shock" },
+      choices: [
+        { id: "breathe", q: "sound", label: "Control your breathing, get your arms up", desc: "Hands flat on solid ice, elbows up. Fight the gasp reflex, ride out the first minute, don't thrash.", statHint: "composure", tag: "utility" },
+        { id: "heave", q: "risky", label: "Explosive pull-out, right now", desc: "Hurl yourself forward onto the ice in one surge before the cold steals your strength.", statHint: "strength", tag: "utility" },
+        { id: "thrash", q: "poor", label: "Scramble straight up at the broken edge", desc: "Claw at the ice right in front of you, kicking hard, trying to climb out where you fell in.", statHint: "strength", tag: "utility" },
+      ],
+      outcomes: {
+        breathe: {
+          success: { narrative: "You force slow breaths — in through the nose, out through the mouth — and slap both forearms flat onto solid ice. The gasp reflex passes in about a minute. You're cold and wet, but your airway is clear and your arms are already where they need to be for the pull-out.", effects: { conditionAdd: "breathing_controlled", moraleMod: 6, xpBonus: 20 }, tip: "The 1-10-1 rule: ~1 minute of cold shock (gasp reflex, hyperventilation), ~10 minutes of meaningful movement before cold incapacitation, ~1 hour before hypothermia causes unconsciousness. Spend the first minute on breathing, not climbing.", learnMore: ["hz004", "m018"] },
+          failure: { narrative: "You get your arms up but the gasping won't settle — every breath comes in ragged gulps and you swallow water on one of them. Coughing, half-choked, you still keep your forearms on the ice. Your breathing isn't under control, but your airway is out of the water, and that's the part that keeps you alive.", effects: { conditionAdd: "aspirated_water", moraleMod: -6 }, tip: "Cold shock passes in about a minute whether you fight it or ride it — but thrashing burns the 10-minute movement window. Arms up, head up, breathe.", learnMore: ["hz004"] },
+        },
+        heave: {
+          success: { narrative: "You explode forward and up in one surge — chest and belly slap onto solid ice before the cold has dulled your muscles. You're out, soaked, but out. It worked because you moved in the first minute, not the tenth.", effects: { conditionAdd: "out_of_water", xpBonus: 10, moraleMod: 4 }, tip: "If you're able to get out of the water immediately, do it — but the attempt goes forward onto solid ice, never straight up at the weak edge where you fell in.", learnMore: ["hz004"] },
+          failure: { narrative: "The surge gets your torso halfway up — then the broken edge crumbles under your weight and you slide back in, gasping. Now you're wetter, colder, and you've spent precious strength. Your fingers are already going numb.", effects: { conditionAdd: "strength_spent", conditionAdd2: "aspirated_water", moraleMod: -12 }, tip: "A broken edge costs you twice: the fall back in and the strength you burned. Get breathing under control first, then kick and pull from horizontal.", learnMore: ["hz004"] },
+        },
+        thrash: {
+          success: { narrative: "You thrash at the edge and it keeps breaking — but your friend reaches the footpath's end, lies flat, and extends a fallen branch for you to grab. You fail at the edge and get out on the branch. The climb didn't save you; staying near the surface for someone to reach did.", effects: { conditionAdd: "out_of_water", moraleMod: -8 }, tip: "Climbing straight up at the broken edge just breaks it again — the ice is weakest exactly where you fell in. Get horizontal, kick, pull forward. REACH or THROW to help someone; never walk out unsecured.", learnMore: ["hz004"] },
+          failure: { narrative: "You claw at the broken edge and it crumbles under your hands, again and again. Each collapse dumps you deeper, each gasp risks water in your lungs. Two minutes gone, strength gone, and you're still in the hole — colder, weaker, and closer to the point where your muscles stop taking orders.", effects: { conditionAdd: "strength_spent", conditionAdd2: "aspirated_water", moraleMod: -16 }, tip: "Resist the urge to climb out where you fell in. Reach forward onto the broken ice without pushing down, kick your legs, and push your torso up flat — vertical attempts just re-break the edge.", learnMore: ["hz004"] },
+        },
+      },
+    },
+    {
+      id: "s2", title: "Stage 2 — 15:58, Out and Clear",
+      situation: "You're face-down on solid ice, soaked to the bone, wind cutting across. Your phone lies on the ice a metre from the hole's edge — screen lit, still alive. Your friend is shouting from the footpath, too far to reach you.",
+      check: { stat: "strength", difficulty: 11, tag: "utility", label: "Get Horizontal" },
+      choices: [
+        { id: "roll", q: "sound", label: "Roll away, leave the phone", desc: "Kick your legs up behind you, pull your torso forward onto the ice, then roll away from the hole with your weight spread. The phone stays where it is.", statHint: "endurance", tag: "utility" },
+        { id: "reach", q: "risky", label: "Belly-crawl back for the phone", desc: "Stay flat, stay low, reach for the phone at the hole's edge — never stand, never walk.", statHint: "composure", tag: "utility" },
+        { id: "walkback", q: "fatal", label: "Walk back out for the phone", desc: "It's right there, a metre from the edge. Quick steps out and back. What could go wrong?", statHint: "strength", tag: "utility" },
+      ],
+      outcomes: {
+        roll: {
+          success: { narrative: "You get horizontal, kick hard, and haul your chest forward onto the ice. Then you roll — arms and legs spread — away from the hole and toward shore. No standing. By the time you're ten metres clear, the only thing lost is a phone.", effects: { conditionAdd: "clear_of_hole", moraleMod: 8, xpBonus: 20 }, tip: "Once out, crawl on your stomach or roll away from the hole with arms and legs spread to distribute your weight. Don't stand up near the hole — and head back the way you came, toward the ice you know held you.", learnMore: ["hz004"] },
+          failure: { narrative: "You try to rise to your knees twice and the ice complains both times before you commit to staying horizontal — kick, pull, flop forward like a seal. It works, but you're exhausted and your hands have stopped feeling the ice.", effects: { conditionAdd: "clear_of_hole", conditionAdd2: "hands_numb", moraleMod: -6 }, tip: "Horizontal first, kick second, pull third — in that order. Every attempt to stand or kneel near the hole concentrates your weight where the ice is weakest.", learnMore: ["hz004"] },
+        },
+        reach: {
+          success: { narrative: "Flat on your belly, you inch back toward the hole — weight spread, never rising — and your fingers close on the phone. One smooth backward crawl and you're rolling away again. Phone in hand, ice unbroken.", effects: { conditionAdd: "clear_of_hole", conditionAdd2: "phone_saved", moraleMod: 10, xpBonus: 10 }, tip: "REACH, don't GO: a flat crawl spreads your weight; standing concentrates it. If you can grab it lying down from solid ice, the ice never has to hold your full weight.", learnMore: ["hz004"] },
+          failure: { narrative: "You reach for the phone and the ice groans — a crack races out from under your forearm. You freeze, slide back flat, and retreat without it. The phone's screen goes dark. You live with that.", effects: { conditionAdd: "clear_of_hole", moraleMod: -10 }, tip: "Cracking ice is the ice telling you it's at its limit. Back off flat — slowly — the way you came. No object is worth a second breakthrough.", learnMore: ["hz004"] },
+        },
+        walkback: {
+          success: { narrative: "You get the phone and the ice holds — barely. You feel it flex under your second step back. You don't run; you lower yourself flat and crawl the rest of the way. You will never, ever do that again.", effects: { moraleMod: -6 }, tip: "You got lucky. Walking back out onto ice that just broke is how solo crossings become double immersions — and the second one, cold and impaired, leaves you no strength left to get out.", learnMore: ["hz004"] },
+          failure: { narrative: "Two steps out, the ice opens under you again — with no strength left to fight. The cold that took minutes to dull you now takes seconds. Your arms won't obey, the hole closes over black water, and there's nobody close enough to reach you.", effects: { fatal: true }, tip: "By the second breakthrough you're already deep into cold incapacitation — your muscles simply stop taking orders. Alone, back in the water, unable to climb out — that is drowning, and it is fast.", learnMore: ["hz004", "m018"] },
+        },
+      },
+    },
+    {
+      id: "s3", title: "Stage 3 — 16:25, Wet and Windy",
+      situation: "You're off the ice at the tree line, shaking hard. Every layer is soaked — jeans, sweater, jacket — and the wind is finding all of it. Your friend's car is 400 metres down the trail. Your hands are clumsy, your thinking is getting foggy. The shivering is the only thing still generating heat.",
+      check: { stat: "endurance", difficulty: 12, tag: "shelter", label: "Stop the Heat Loss" },
+      randomEvents: [
+        { chance: 0.2, text: "A gust hits and your soaked jacket starts stiffening on your shoulders.", effect: { moraleMod: -8 } },
+      ],
+      choices: [
+        { id: "strip", q: "sound", label: "Strip the wet layers, shelter in place", desc: "Get out of the soaked clothes now, wring them out, get behind the trees out of the wind, and call for help.", statHint: "knowledge", tag: "shelter" },
+        { id: "push", q: "risky", label: "Move hard for the car", desc: "Walk fast, swing your arms — generate heat with your own engine and cover 400 metres before the cold wins.", statHint: "endurance", tag: "utility" },
+        { id: "whiskey", q: "poor", label: "A pull of whiskey, keep walking", desc: "The hip flask is in your back pocket. Whiskey warms you up — everyone knows that. Keep the wet layers on, keep moving, you'll dry out as you go.", statHint: "composure", tag: "utility" },
+      ],
+      outcomes: {
+        strip: {
+          success: { narrative: "Wet clothes off, wrung hard, the driest layer back on. You wedge behind a spruce out of the wind, call your friend over, and start moving gently toward the car together. The shivering eases the moment the wind stops stealing heat.", effects: { conditionAdd: "wet_layers_off", conditionAdd2: "rewarming", moraleMod: 10, xpBonus: 20 }, tip: "Get out of wet clothes immediately — wet fabric keeps pulling heat out of you. Strip, wring, get out of the wind. Stopping heat loss comes before making heat.", learnMore: ["m018", "hz004"] },
+          failure: { narrative: "You strip and wring, but your numb fingers fumble the layers and the wind keeps finding your bare skin. You get half-sheltered behind the trees, shivering so hard your teeth ache — but the soaked sweater is off, and that's the part that mattered most.", effects: { conditionAdd: "wet_layers_off", moraleMod: -6 }, tip: "Fumbling with numb hands is cold incapacitation doing its work — the 10-minute clock. Strip early, while your fingers still take orders.", learnMore: ["m018"] },
+        },
+        push: {
+          success: { narrative: "You move — fast walk, big arm swings, no stopping. Your own muscles become the furnace, and the shivering never quits. Four hundred metres later you fall into the car with the heat on full. Exercise rewarmed you, and it worked because the shivering never stopped.", effects: { conditionAdd: "rewarming", xpBonus: 10, moraleMod: 6 }, tip: "If you're alert and still shivering hard, exercise speeds rewarming — your muscles are heat engines. But this only works while shivering persists; once it stops, exertion becomes dangerous.", learnMore: ["m018"] },
+          failure: { narrative: "Two hundred metres in, your legs go rubbery and the shivering stutters. The wet jeans are anchors, the wind is a thief, and the car might as well be a kilometre away. You stop, get behind a tree, and strip the worst of the wet layers instead — the walk can wait.", effects: { conditionAdd: "wet_layers_off", moraleMod: -10 }, tip: "Wet clothes plus wind plus exertion is a losing trade: movement burns the energy your shivering needs. If the shiver falters, stop moving and shelter — the car isn't worth the collapse.", learnMore: ["m018"] },
+        },
+        whiskey: {
+          success: { narrative: "The whiskey burns going down and for a minute you feel warm — that's the blood vessels in your skin opening, dumping core heat into the cold air. You catch yourself, cap the flask, and strip the wet sweater anyway. The warmth was a lie; you stop listening to it.", effects: { conditionAdd: "wet_layers_off", moraleMod: -8 }, tip: "Alcohol feels warm because it dilates blood vessels in the skin — which accelerates heat loss from the core and impairs the judgment you need most. Warm, sweet, non-alcoholic drinks only.", learnMore: ["m018"] },
+          failure: { narrative: "The whiskey feels like warmth and you keep the soaked clothes on because moving feels like enough. Twenty minutes later your thinking is soup, your shivering is fading, and your friend has to make the decisions you can't. The flask is empty. So is your margin.", effects: { conditionAdd: "confusion", conditionAdd2: "shivering_fading", moraleMod: -16 }, tip: "That 'warmth' is vasodilation dumping your core heat into the cold air — plus impaired judgment on top of a cooling brain. No alcohol, no caffeine, in any cold emergency.", learnMore: ["m018"] },
+        },
+      },
+    },
+    {
+      id: "s4", title: "Stage 4 — 17:10, The Afterdrop",
+      situation: "You're in the car, heat blasting, wrapped in your friend's spare blanket. The violent shivering has... stopped. You feel strangely warm, almost sleepy, and your thoughts are coming slow. Your friend says you don't look right.",
+      check: { stat: "knowledge", difficulty: 12, tag: "medical", label: "Recognize the Danger" },
+      choices: [
+        { id: "call", q: "sound", label: "Call emergency services, stay still and flat", desc: "Shivering stopping plus confusion means severe hypothermia. Stay lying down, stay awake, let the medics come — no driving, no sudden moves.", statHint: "knowledge", tag: "medical" },
+        { id: "drive", q: "risky", label: "Drive yourself to the hospital", desc: "It's 15 minutes to the ER. You're an adult, you can drive. The heat's on, you'll warm up on the way.", statHint: "composure", tag: "utility" },
+        { id: "sleep", q: "poor", label: "Just rest — close your eyes a bit", desc: "You're warm now, the shivering stopped, sleep sounds perfect. Just a few minutes.", statHint: "endurance", tag: "medical" },
+      ],
+      outcomes: {
+        call: {
+          success: { narrative: "You stay reclined, stay talking, and the dispatcher keeps you on the line until the ambulance arrives. At the hospital they rewarm you gradually — warm IVs, monitored heart. The doctor says the shivering stopping was the red line, and you read it right.", effects: { conditionAdd: "medical_care", moraleMod: 14, xpBonus: 20 }, tip: "Shivering stopping plus confusion and clumsiness means severe hypothermia — a medical emergency. Handle the person gently and keep them horizontal: a cold heart is arrhythmia-prone, and rough handling can trigger cardiac arrest.", learnMore: ["m018"] },
+          failure: { narrative: "Your phone died in the water — no call. So you stay put, stay reclined, keep talking to your friend, and have them drive you to the ER instead of driving yourself. Not the plan, but the right principles: still, flat, awake, monitored.", effects: { conditionAdd: "medical_care", moraleMod: -4 }, tip: "No phone is not an excuse to drive impaired by hypothermia. Flat, still, awake, and let someone else make the decisions — a confused brain makes fatal ones.", learnMore: ["m018"] },
+        },
+        drive: {
+          success: { narrative: "You make it — white-knuckled, slow, hazard lights on, your friend talking you through every turn. The ER takes you straight in. You got away with it, and the nurse tells you so: people die doing exactly this when the confusion is worse than they think.", effects: { conditionAdd: "medical_care", moraleMod: -6, xpBonus: 10 }, tip: "You got lucky. Hypothermic confusion impairs judgment and reaction time — driving yourself is a gamble where the failure mode is a crash on top of a medical emergency.", learnMore: ["m018"] },
+          failure: { narrative: "Three minutes out, your vision tunnels and your hands stop steering properly. You pull over — barely — too shaky to open the door. Your friend calls the ambulance from the passenger seat. The drive you insisted on nearly added a crash to the hypothermia.", effects: { conditionAdd: "confusion", moraleMod: -14 }, tip: "Severe hypothermia degrades coordination and consciousness unpredictably. If you can't trust your hands on a phone screen, you can't trust them on a steering wheel.", learnMore: ["m018"] },
+        },
+        sleep: {
+          success: { narrative: "Your eyes close — and your friend shakes you awake, hard. 'Stay with me.' Annoying. Also the reason you're still conscious when the medics arrive. You hate them a little and owe them everything.", effects: { conditionAdd: "medical_care", moraleMod: -6 }, tip: "In severe hypothermia, drowsiness isn't tiredness — it's consciousness failing. Stay awake, stay talking, stay monitored: the moment they stop responding is the moment the emergency gets worse, and nobody can act on what nobody sees.", learnMore: ["m018"] },
+          failure: { narrative: "You drift off warm and comfortable — which is exactly the danger: the drowsiness was severe hypothermia progressing, not tiredness. By the time the ambulance arrives your friend can't wake you properly. Unresponsive, breathing slow, core temperature still falling from the afterdrop — and nobody was watching it happen.", effects: { conditionAdd: "unresponsive", moraleMod: -18 }, tip: "After rescue, core temperature keeps dropping — cold blood from the limbs returns to the core (afterdrop). That's why rewarming is gradual, the trunk is warmed first, and the person is kept awake and monitored: drowsiness is the symptom progressing, not a sign they're recovering.", learnMore: ["m018"] },
+        },
+      },
+    },
+  ],
+}
 ];
 
 
