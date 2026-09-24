@@ -994,6 +994,30 @@ body::after {
   transition: opacity .6s ease;
 }
 #boot-overlay.boot-done { opacity: 0; pointer-events: none; }
+/* CRT power-on: a bright line snaps open into the full picture */
+@keyframes crt-power-on {
+  0%   { transform: scaleY(.004); filter: brightness(7); }
+  55%  { transform: scaleY(1.015); filter: brightness(2.4); }
+  78%  { transform: scaleY(.988);  filter: brightness(1.25); }
+  100% { transform: scaleY(1);     filter: brightness(1); }
+}
+#boot-overlay:not(.boot-done):not(.boot-off) {
+  animation: crt-power-on .85s cubic-bezier(.22,.8,.3,1) both;
+  transform-origin: 50% 50%;
+}
+/* CRT power-off: the picture collapses back into a line */
+@keyframes crt-power-off {
+  0%   { transform: scaleY(1);    filter: brightness(1); opacity: 1; }
+  55%  { transform: scaleY(.004); filter: brightness(6); opacity: 1; }
+  100% { transform: scaleY(.004); filter: brightness(6); opacity: 0; }
+}
+#boot-overlay.boot-off {
+  animation: crt-power-off .34s ease-in forwards;
+  transform-origin: 50% 50%;
+}
+@media (prefers-reduced-motion: reduce) {
+  #boot-overlay { animation: none !important; }
+}
 .boot-term {
   width: min(620px, 100%);
   font-family: var(--font-m);
@@ -17527,15 +17551,17 @@ function runBootSequence() {
   const promptEl = document.getElementById("boot-prompt");
   const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  const scenCount = (typeof SCENARIOS !== "undefined" && SCENARIOS.length) ? SCENARIOS.length : 64;
   const FULL = [
     ["head", "YDDNW FIELD OS v2.7.0 \u2014 \u201cmorning after\u201d build"],
     ["head", "(c) You Didn't Die Systems \u00b7 all rights reserved \u00b7 most of them"],
     ["blank"],
-    ["line", "mounting optimism", "NOT FOUND", "fail"],
-    ["line", "loading regrets_final_FINAL_v3.zip", "OK (3.2 GB)", "ok"],
+    ["line", "mounting /dev/optimism", "NOT FOUND", "fail"],
+    ["line", "encyclopedia", "605 articles \u00b7 32 domains", "ok"],
+    ["line", "simulator", scenCount + " scenarios loaded", "ok"],
+    ["line", "atlas", "200 regions mapped", "ok"],
     ["line", "calibrating will_to_live", "7%", "warn"],
     ["line", "brewing coffee", "FAILED (no water, no power, no beans)", "fail"],
-    ["line", "unpacking trauma", "OK (do not open)", "ok"],
     ["line", "locating clean water", "you'll learn how. that's the point.", "ok"],
     ["blank"],
     ["closer", "CONGRATULATIONS. SOMETHING WENT CATASTROPHICALLY WRONG."],
@@ -17585,9 +17611,9 @@ function runBootSequence() {
   const dismiss = () => {
     if (!overlay.parentNode) return;
     if (timer) clearTimeout(timer);
-    overlay.classList.add("boot-done");
+    overlay.classList.add(reduceMotion ? "boot-done" : "boot-off");
     document.body.style.overflow = "";
-    setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 700);
+    setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, reduceMotion ? 700 : 420);
   };
   const step = () => {
     if (finished) return;
