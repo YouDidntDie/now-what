@@ -2654,6 +2654,134 @@ body::after {
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
+   STORE — the encyclopedia treatment: one horizontal chip strip, a uniform
+   card grid, one detail page per item with cross-links.
+   Bible §3/§15: the Store is a major section — optional equipment that must
+   never gate knowledge. Honest by design: no star ratings, no review counts.
+   ════════════════════════════════════════════════════════════════════════════ */
+.store-page {
+  max-width: 1080px; margin: 0 auto; padding: 22px 20px 80px;
+}
+.store-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.store-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+.store-input {
+  padding: 8px 12px; min-width: 200px;
+  background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius);
+  color: var(--text); font-family: var(--font-m); font-size: 12px;
+  transition: border-color var(--speed);
+}
+.store-input:focus { outline: none; border-color: var(--amber); }
+.store-input::placeholder { color: var(--text-faint); }
+.store-intro {
+  font-size: 12px; color: var(--text-dim); line-height: 1.6;
+  margin: 0 0 14px; max-width: 640px;
+}
+
+/* Slim credits wallet (Sim Outfit only) */
+.store-credits-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 10px 14px; margin-bottom: 10px;
+}
+.store-credits-left { display: flex; align-items: baseline; gap: 10px; }
+.store-credits-label {
+  font-family: var(--font-m); font-size: 10px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--text-faint);
+}
+.store-credits-amount { font-family: var(--font-m); font-size: 18px; font-weight: 700; color: var(--phosphor); }
+.store-credits-hint { font-family: var(--font-m); font-size: 10px; color: var(--text-faint); }
+.store-owned-line {
+  font-family: var(--font-m); font-size: 11px; color: var(--text-dim);
+  margin: 0 0 14px;
+}
+
+/* One horizontal scroll strip — never a wrapping wall (same rule as domain chips) */
+.store-chips {
+  display: flex; flex-wrap: nowrap; overflow-x: auto;
+  gap: 6px; margin-bottom: 16px; padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.store-chips::-webkit-scrollbar { display: none; }
+.store-chips .chip { flex-shrink: 0; }
+
+/* Uniform card grid — the article-card treatment */
+.gear-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 11px;
+}
+.gear-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 15px; cursor: pointer;
+  transition: border-color 160ms, background 160ms, transform 160ms;
+}
+.gear-card:hover { border-color: var(--border2); background: var(--bg3); transform: translateY(-1px); }
+.gear-card-owned { border-color: var(--amber-dk); }
+.price-pill {
+  font-family: var(--font-m); font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: var(--radius); white-space: nowrap;
+  background: var(--amber-pale); color: var(--amber-lt); border: 1px solid var(--amber-dk);
+}
+.gear-owned-flag { font-family: var(--font-m); font-size: 10px; color: var(--amber-lt); }
+
+/* ── Gear detail page ─────────────────────────────────────────────────────── */
+.gear-page {
+  max-width: 700px; margin: 0 auto; padding: 26px 24px 80px;
+}
+.gear-head { margin-bottom: 24px; }
+.gear-head .card-domain { margin-bottom: 8px; }
+.gear-title {
+  font-family: var(--font-d); font-size: 32px; font-weight: 700;
+  color: var(--white); line-height: 1.1; margin-bottom: 10px;
+}
+.gear-meta {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-family: var(--font-m); font-size: 11px; color: var(--text-dim);
+  margin-bottom: 14px;
+}
+.gear-summary {
+  font-size: 15px; color: var(--text); line-height: 1.7;
+  border-left: 2px solid var(--amber-dk); padding-left: 14px; margin-bottom: 22px;
+}
+.gear-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px; margin-bottom: 22px;
+}
+.gear-stat {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 10px 12px;
+}
+.gear-stat-label {
+  font-family: var(--font-m); font-size: 9px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text-faint); margin-bottom: 4px;
+}
+.gear-stat-val { font-family: var(--font-m); font-size: 13px; font-weight: 600; color: var(--white); }
+.gear-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 26px; }
+.buy-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 20px; border-radius: var(--radius);
+  background: var(--phosphor); border: 1px solid var(--phosphor);
+  color: #000; font-family: var(--font-m); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: filter var(--speed);
+}
+.buy-btn:hover:not([disabled]) { filter: brightness(1.12); }
+.buy-btn[disabled] { opacity: .4; cursor: not-allowed; }
+.buy-btn-owned { background: transparent; color: var(--amber-lt); border: 1px solid var(--amber-dk); }
+.gear-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 20px; border-radius: var(--radius);
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--phosphor); font-family: var(--font-m); font-size: 13px;
+  text-decoration: none; cursor: pointer;
+  transition: border-color var(--speed);
+}
+.gear-cta:hover { border-color: var(--text-dim); }
+.gear-note { font-size: 11px; color: var(--text-faint); font-family: var(--font-m); margin-bottom: 26px; }
+
+/* ════════════════════════════════════════════════════════════════════════════
    LOADOUT STRIP — simulator menu entry point to the gear shop
    ════════════════════════════════════════════════════════════════════════════ */
 .loadout-strip {
@@ -3029,6 +3157,7 @@ const store = {
     searchQuery: "",
     difficultyFilter: "",
     storeCategory: "All",
+    storeQuery: "",
     storeMode: "sim",
   },
 };
@@ -15731,186 +15860,311 @@ const RW_CATALOG = [
   },
 ];
 
-// ── STORE (Console v2): restored as a primary tab, per the bible ─────────
+// ── STORE (Console v2): the encyclopedia treatment ─────────────────────────
 // Bible §3 / §15 — the Store is a major section: optional equipment, sim or
 // real, and it must never gate knowledge. Two views: SIM OUTFIT (credits
 // shop, feeds the simulator loop) and FIELD KIT (real-world gear, honest
-// recommendations, no fake ratings).
+// recommendations — no star ratings, no review counts).
+// Both views share the encyclopedia's visual language: one horizontal chip
+// strip, a uniform card grid, and one detail page per item with cross-links.
+// Gear detail pages are real history entries — the topbar back button and
+// the in-page back button both return to the grid.
+
 const STORE_TABS = [
   { id: "outfit",   label: "Sim Outfit", icon: "◈" },
   { id: "fieldkit", label: "Field Kit",  icon: "▣" },
 ];
 
+const STORE_CAT_ICONS = {
+  Fire: "🔥", Shelter: "⛺", Water: "💧", Medical: "🩹",
+  Navigation: "🧭", Signal: "📡", Tools: "🪓",
+};
+
 function renderStoreScreen(root, opts = {}) {
   const view = opts.view === "fieldkit" ? "fieldkit" : "outfit";
+  if (opts.gearId) {
+    renderGearDetail(root, view, opts.gearId);
+    return;
+  }
   const content = renderHubShell(root, STORE_TABS, view,
     (t) => goTo("store", { view: t, replace: true }));
-  if (view === "fieldkit") {
-    content.innerHTML = `<div class="store-page">${renderFieldKitHTML()}</div>`;
-  } else {
-    renderStoreOutfit(content);
-  }
+  renderStoreGrid(content, view);
 }
 
-function renderStoreOutfit(el) {
-  refreshChar();
-  const activeCat = store.ui.storeCategory || "All";
+// ── Grid view ──────────────────────────────────────────────────────────────
+function renderStoreGrid(el, view) {
+  const isSim = view !== "fieldkit";
+  if (isSim) refreshChar();
+  const credits = char.credits ?? 0;
   const owned = new Set(char.ownedGear || []);
+  const cats = isSim ? STORE_CATEGORIES
+                     : ["All", ...RW_CATALOG.map(s => s.section)];
+  let activeCat = store.ui.storeCategory || "All";
+  if (!cats.includes(activeCat)) { activeCat = "All"; store.ui.storeCategory = "All"; }
 
   el.innerHTML = `
     <div class="store-page">
-      <div class="store-credits-bar">
-        <div class="store-credits-left">
-          <span class="store-credits-label">Credits</span>
-          <span class="store-credits-amount" id="store-credits-display">${char.credits ?? 0}</span>
+      <div class="store-head">
+        <div>
+          <div class="screen-eyebrow">${isSim ? "Simulator Store" : "Real-World Store"}</div>
+          <h2 class="screen-title">${isSim ? "Sim Outfit" : "Field Kit"}</h2>
         </div>
-        <span class="store-credits-hint">+25–65 ◈ per run</span>
+        <div class="store-controls">
+          <input id="store-search" class="store-input" type="text"
+            placeholder="Search gear…" value="${store.ui.storeQuery || ""}" autocomplete="off">
+        </div>
       </div>
 
-      ${owned.size > 0 ? `
-        <div class="store-owned-banner">
-          <span class="store-owned-label">Your Gear</span>
-          <div class="store-owned-chips">
-            ${[...owned].map(id => ITEMS[id] ? `<span class="store-owned-chip">${ITEMS[id].icon} ${ITEMS[id].name}</span>` : "").join("")}
+      ${isSim ? `
+        <div class="store-credits-bar">
+          <div class="store-credits-left">
+            <span class="store-credits-label">Credits</span>
+            <span class="store-credits-amount">${credits}</span>
           </div>
-          <span class="store-owned-note">Available in every simulator run via Custom Kit</span>
-        </div>` : ""}
+          <span class="store-credits-hint">+25–65 ◈ per run</span>
+        </div>
+        ${owned.size ? `<div class="store-owned-line">✓ ${owned.size} item${owned.size === 1 ? "" : "s"} in your gear — available in every run via Custom Kit</div>` : ""}
+      ` : `
+        <p class="store-intro">Field-tested recommendations for actual purchase. No star ratings, no review counts — just the pick, an honest price, and a search link.</p>
+      `}
 
-      <div class="chip-row store-cat-tabs">
-        ${STORE_CATEGORIES.map(c => `<button class="chip ${c === activeCat ? "chip-on" : ""}" data-cat="${c}">${c}</button>`).join("")}
+      <div class="store-chips">
+        ${cats.map(c => {
+          const label = isSim && c !== "All" ? `${STORE_CAT_ICONS[c] || "◈"} ${c}` : c;
+          return `<button class="chip ${c === activeCat ? "chip-on" : ""}" data-cat="${c}">${label}</button>`;
+        }).join("")}
       </div>
 
-      <div id="store-item-grid" class="store-item-grid">${storeItemsHTML(activeCat)}</div>
+      <div class="gear-grid" id="gear-grid"></div>
     </div>`;
 
-  el.querySelectorAll(".store-cat-tabs .chip").forEach(btn =>
+  const paintGrid = () => {
+    const grid = el.querySelector("#gear-grid");
+    if (!grid) return;
+    const items = storeGridItems(view,
+      store.ui.storeCategory || "All",
+      (store.ui.storeQuery || "").trim().toLowerCase());
+    grid.innerHTML = items.length
+      ? items.map(e => gearCardHTML(e, owned)).join("")
+      : `<div class="enc-empty">No gear found</div>`;
+    grid.querySelectorAll(".gear-card").forEach(card =>
+      card.addEventListener("click", () =>
+        goTo("store", { view, gearId: card.dataset.gearId })));
+  };
+  paintGrid();
+
+  el.querySelector("#store-search")?.addEventListener("input", e => {
+    store.ui.storeQuery = e.target.value;
+    paintGrid();
+  });
+
+  el.querySelectorAll(".store-chips .chip").forEach(btn =>
     btn.addEventListener("click", () => {
       store.ui.storeCategory = btn.dataset.cat;
-      el.querySelector("#store-item-grid").innerHTML = storeItemsHTML(btn.dataset.cat);
-      el.querySelectorAll(".store-cat-tabs .chip").forEach(b => b.classList.toggle("chip-on", b === btn));
-      wireStoreBuyButtons(el);
-    })
-  );
-
-  wireStoreBuyButtons(el);
+      el.querySelectorAll(".store-chips .chip").forEach(b =>
+        b.classList.toggle("chip-on", b === btn));
+      paintGrid();
+    }));
 }
 
-function storeItemsHTML(activeCat) {
-  const owned   = new Set(char.ownedGear || []);
-  const credits = char.credits ?? 0;
-  const items   = Object.values(ITEMS)
+function storeGridItems(view, activeCat, q) {
+  const matchQ = (text) => !q || text.toLowerCase().includes(q);
+  if (view === "fieldkit") {
+    const out = [];
+    for (const s of RW_CATALOG) {
+      if (activeCat !== "All" && s.section !== activeCat) continue;
+      for (const item of s.items) {
+        if (matchQ(`${item.name} ${item.brand} ${item.desc} ${(item.tags || []).join(" ")}`))
+          out.push({ kind: "real", section: s, item });
+      }
+    }
+    return out;
+  }
+  return Object.values(ITEMS)
     .filter(item => activeCat === "All" || item.category === activeCat)
-    .sort((a, b) => a.price - b.price);
+    .filter(item => matchQ(`${item.name} ${item.desc} ${item.category} ${(item.tags || []).join(" ")}`))
+    .sort((a, b) => a.price - b.price)
+    .map(item => ({ kind: "sim", item }));
+}
 
-  if (!items.length) return `<div class="store-empty">No items in this category.</div>`;
+function gearCardHTML(entry, owned) {
+  const item = entry.item;
+  if (entry.kind === "real") {
+    return `
+      <div class="gear-card" data-gear-id="${item.id}">
+        <div class="card-domain">${entry.section.icon} ${entry.section.section}</div>
+        <div class="card-title">${item.name}</div>
+        <div class="card-summary">${item.desc}</div>
+        <div class="card-foot">
+          <span class="price-pill">${item.price} est.</span>
+          <span class="card-time">${item.brand}</span>
+        </div>
+      </div>`;
+  }
+  const isOwned = owned.has(item.id);
+  const usesLabel = item.uses >= 99 ? "∞ uses" : `${item.uses} use${item.uses === 1 ? "" : "s"}`;
+  return `
+    <div class="gear-card ${isOwned ? "gear-card-owned" : ""}" data-gear-id="${item.id}">
+      <div class="card-domain">${STORE_CAT_ICONS[item.category] || "◈"} ${item.category}</div>
+      <div class="card-title">${item.name}</div>
+      <div class="card-summary">${item.desc}</div>
+      <div class="card-foot">
+        ${isOwned ? `<span class="gear-owned-flag">✓ In your gear</span>`
+                  : `<span class="price-pill">◈${item.price}</span>`}
+        <span class="card-time">${usesLabel}</span>
+      </div>
+    </div>`;
+}
 
-  if (activeCat === "All") {
-    const byCat = {};
-    for (const item of items) (byCat[item.category] ??= []).push(item);
-    return STORE_CATEGORIES.filter(c => c !== "All" && byCat[c]).map(cat => `
-      <div class="store-cat-section">
-        <div class="store-cat-heading">${cat}</div>
-        <div class="store-cards-row">${byCat[cat].map(i => storeItemCardHTML(i, owned, credits)).join("")}</div>
-      </div>`).join("");
+// ── Gear detail page ───────────────────────────────────────────────────────
+function findGearEntry(view, gearId) {
+  if (view === "fieldkit") {
+    for (const s of RW_CATALOG) {
+      const item = s.items.find(i => i.id === gearId);
+      if (item) return { kind: "real", section: s, item };
+    }
+    return null;
+  }
+  const item = ITEMS[gearId];
+  return item ? { kind: "sim", item } : null;
+}
+
+function renderGearDetail(root, view, gearId) {
+  const entry = findGearEntry(view, gearId);
+  if (!entry) { goTo("store", { view, replace: true }); return; }
+  const item = entry.item;
+  refreshChar();
+  const credits = char.credits ?? 0;
+  const ownedIds = char.ownedGear || [];
+
+  const statShort = { knowledge: "KNO", endurance: "END", strength: "STR", perception: "PER", composure: "CMP" };
+  let head, stats, actions, further;
+
+  if (entry.kind === "sim") {
+    const isOwned = ownedIds.includes(item.id);
+    const canAfford = credits >= item.price;
+    const usesLabel = item.uses >= 99 ? "∞" : `${item.uses}`;
+    head = `
+      <div class="card-domain">${STORE_CAT_ICONS[item.category] || "◈"} ${item.category} · Simulator gear</div>
+      <h1 class="gear-title">${item.name}</h1>
+      <div class="gear-meta">
+        <span class="price-pill">◈${item.price}</span>
+        <span class="meta-dot">·</span><span>${usesLabel} uses</span>
+        <span class="meta-dot">·</span><span>+${item.bonus} ${statShort[item.bonusStat] || item.bonusStat}</span>
+      </div>`;
+    stats = `
+      <div class="gear-stat"><div class="gear-stat-label">Bonus</div><div class="gear-stat-val">+${item.bonus} ${statShort[item.bonusStat] || item.bonusStat}</div></div>
+      <div class="gear-stat"><div class="gear-stat-label">Uses</div><div class="gear-stat-val">${usesLabel}</div></div>
+      <div class="gear-stat"><div class="gear-stat-label">Applies to</div><div class="gear-stat-val">${(item.tags || []).join(", ")}</div></div>`;
+    actions = isOwned
+      ? `<div class="gear-actions"><button class="buy-btn buy-btn-owned" disabled>✓ In your gear</button></div>
+         <div class="gear-note">Available in every simulator run via Custom Kit.</div>`
+      : `<div class="gear-actions">
+           <button class="buy-btn" id="gear-buy" ${canAfford ? "" : "disabled"}>
+             ${canAfford ? `Purchase — ◈${item.price}` : `◈${item.price} · Need ${item.price - credits} more`}
+           </button>
+         </div>
+         <div class="gear-note">Earn +25–65 ◈ per simulator run.</div>`;
+
+    const pairs = Object.values(ITEMS)
+      .filter(o => o.category === item.category && o.id !== item.id)
+      .sort((a, b) => a.price - b.price).slice(0, 4);
+    const rwMatch = RW_CATALOG.flatMap(s => s.items).find(rw => rw.simLinked === item.id);
+    further = `
+      <div class="go-further">
+        <div class="go-further-title">Go further</div>
+        ${pairs.length ? `
+        <div class="go-further-group">
+          <div class="go-further-label">◈ Pairs well with</div>
+          <div class="go-further-links">
+            ${pairs.map(o => `<button class="go-further-link" data-gear="${o.id}">${o.icon} ${o.name} <span style="opacity:.6">◈${o.price}</span></button>`).join("")}
+          </div>
+        </div>` : ""}
+        ${rwMatch ? `
+        <div class="go-further-group">
+          <div class="go-further-label">▣ Real-world equivalent</div>
+          <div class="go-further-links">
+            <button class="go-further-link" data-rwgear="${rwMatch.id}">${rwMatch.icon} ${rwMatch.name} <span style="opacity:.6">${rwMatch.price}</span></button>
+          </div>
+        </div>` : ""}
+      </div>`;
+  } else {
+    const s = entry.section;
+    const simItem = item.simLinked ? ITEMS[item.simLinked] : null;
+    const simOwned = simItem && ownedIds.includes(simItem.id);
+    head = `
+      <div class="card-domain">${s.icon} ${s.section} · Real-world gear</div>
+      <h1 class="gear-title">${item.name}</h1>
+      <div class="gear-meta">
+        <span class="price-pill">${item.price} est. retail</span>
+        <span class="meta-dot">·</span><span>${item.brand}</span>
+        ${simOwned ? `<span class="meta-dot">·</span><span class="gear-owned-flag">✓ Sim owned</span>` : ""}
+      </div>`;
+    stats = `
+      <div class="gear-stat"><div class="gear-stat-label">Est. retail</div><div class="gear-stat-val">${item.price}</div></div>
+      <div class="gear-stat"><div class="gear-stat-label">Brand</div><div class="gear-stat-val">${item.brand}</div></div>
+      <div class="gear-stat"><div class="gear-stat-label">Tags</div><div class="gear-stat-val">${(item.tags || []).join(", ") || "—"}</div></div>`;
+    actions = `
+      <div class="gear-actions">
+        <a class="gear-cta" href="${item.link}" target="_blank" rel="noopener">Search Amazon ↗</a>
+      </div>
+      <div class="gear-note">Links search Amazon for the recommended product. We don't guarantee pricing or availability.</div>`;
+
+    const related = s.items.filter(o => o.id !== item.id).slice(0, 4);
+    further = `
+      <div class="go-further">
+        <div class="go-further-title">Go further</div>
+        ${simItem ? `
+        <div class="go-further-group">
+          <div class="go-further-label">◈ Simulator counterpart</div>
+          <div class="go-further-links">
+            <button class="go-further-link" data-gear="${simItem.id}">${simItem.icon} ${simItem.name} <span style="opacity:.6">◈${simItem.price}</span></button>
+          </div>
+        </div>` : ""}
+        ${related.length ? `
+        <div class="go-further-group">
+          <div class="go-further-label">▣ Related gear</div>
+          <div class="go-further-links">
+            ${related.map(o => `<button class="go-further-link" data-rwgear="${o.id}">${o.icon} ${o.name} <span style="opacity:.6">${o.price}</span></button>`).join("")}
+          </div>
+        </div>` : ""}
+      </div>`;
   }
 
-  return `<div class="store-cards-row">${items.map(i => storeItemCardHTML(i, owned, credits)).join("")}</div>`;
-}
-
-function storeItemCardHTML(item, owned, credits) {
-  const isOwned    = owned.has(item.id);
-  const canAfford  = credits >= item.price;
-  const statShort  = { knowledge: "KNO", endurance: "END", strength: "STR", perception: "PER", composure: "CMP" };
-  const bonusLabel = `+${item.bonus} ${statShort[item.bonusStat] || item.bonusStat}`;
-  const usesLabel  = item.uses >= 99 ? "∞ uses" : `${item.uses} use${item.uses !== 1 ? "s" : ""}`;
-  const rwMatch    = RW_CATALOG.flatMap(s => s.items).find(rw => rw.simLinked === item.id);
-
-  return `
-    <div class="store-card ${isOwned ? "store-card-owned" : ""}">
-      <div class="sc-icon-wrap">${item.icon}</div>
-      <div class="sc-name">${item.name}</div>
-      <div class="sc-cat">${item.category}</div>
-      <div class="sc-tags">
-        <span class="sc-tag sc-tag-bonus">${bonusLabel}</span>
-        <span class="sc-tag sc-tag-uses">${usesLabel}</span>
-      </div>
-      <div class="sc-desc">${item.desc}</div>
-      <div class="sc-applies">Checks: ${item.tags.join(", ")}</div>
-      ${isOwned
-        ? `<div class="sc-owned-state">✓ In your gear</div>`
-        : `<button class="sc-buy-btn" data-item-id="${item.id}" data-price="${item.price}" ${canAfford ? "" : "disabled"}>
-             ${canAfford ? `◈${item.price} — Purchase` : `◈${item.price} · Need ${item.price - credits} more`}
-           </button>`}
-      ${rwMatch ? `<a class="sc-rw-link" href="${rwMatch.link}" target="_blank" rel="noopener">🛒 Buy real · ${rwMatch.price}</a>` : ""}
+  root.innerHTML = `
+    <div class="gear-page">
+      <button class="back-btn" id="gear-back">← Back to Store</button>
+      <div class="gear-head">${head}</div>
+      <p class="gear-summary">${item.desc}</p>
+      <div class="gear-stats">${stats}</div>
+      ${actions}
+      ${further}
     </div>`;
-}
 
-function wireStoreBuyButtons(root) {
-  root.querySelectorAll(".sc-buy-btn[data-item-id]:not([disabled])").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const itemId = btn.dataset.itemId;
-      const price  = parseInt(btn.dataset.price, 10);
-      if ((char.credits ?? 0) < price) return;
-      if ((char.ownedGear || []).includes(itemId)) return;
-      char.credits   = (char.credits ?? 0) - price;
-      char.ownedGear = [...(char.ownedGear || []), itemId];
-      saveCharacter(char);
-      const newBadges = checkAndAwardBadges(char);
-      newBadges.forEach((b, i) => setTimeout(() => showBadgeToast(b), 400 + i * 1600));
-      renderStoreOutfit(btn.closest("#hub-content") || root);
-    });
+  root.querySelector("#gear-back")?.addEventListener("click", () => goBack());
+
+  root.querySelector("#gear-buy")?.addEventListener("click", () => {
+    if (buySimItem(item.id)) renderGearDetail(root, view, gearId);
   });
+
+  root.querySelectorAll("[data-gear]").forEach(btn =>
+    btn.addEventListener("click", () =>
+      goTo("store", { view: "outfit", gearId: btn.dataset.gear })));
+  root.querySelectorAll("[data-rwgear]").forEach(btn =>
+    btn.addEventListener("click", () =>
+      goTo("store", { view: "fieldkit", gearId: btn.dataset.rwgear })));
 }
 
-// ── Real-World Gear Store ─────────────────────────────────────────────────────
-// ── Field-Tested Kit (Console v2): the real-gear catalog, now a Store view ──
-// Honest by design: no star ratings, no review counts — just the recommendation,
-// an estimated price, and an Amazon search link.
-function renderFieldKitHTML() {
-  const ownedIds = (typeof char !== "undefined" && char.ownedGear) || [];
-  return `
-      <p class="rw-intro">Field-tested recommendations for actual purchase. Items marked <span class="store-sim-badge">◈ Sim Linked</span> have a counterpart in your simulator loadout.</p>
-      ${RW_CATALOG.map(section => `
-        <div class="rw-section">
-          <div class="rw-section-head">
-            <span class="rw-section-icon">${section.icon}</span>
-            <span class="rw-section-title">${section.section}</span>
-            <span class="rw-section-count">${section.items.length} items</span>
-          </div>
-          <div class="rw-grid">
-            ${section.items.map(item => rwCardHTML(item, ownedIds)).join("")}
-          </div>
-        </div>`).join("")}
-      <div class="rw-disclaimer">⚠ Links search Amazon for the recommended product. We don't guarantee pricing or availability.</div>`;
-}
-
-function rwCardHTML(item, ownedIds) {
-  const simItem  = item.simLinked ? ITEMS[item.simLinked] : null;
-  const simOwned = item.simLinked && ownedIds.includes(item.simLinked);
-
-  return `
-    <div class="rw-card">
-      <div class="rw-card-top">
-        <div class="rw-card-icon">${item.icon}</div>
-        <div class="rw-card-meta">
-          <div class="rw-card-name">${item.name}</div>
-          <div class="rw-card-brand">${item.brand}</div>
-        </div>
-      </div>
-      <div class="rw-card-desc">${item.desc}</div>
-      <div class="rw-card-chips">
-        ${item.tags.map(t => `<span class="rw-card-chip">${t}</span>`).join("")}
-        ${simItem ? `<span class="rw-card-chip rw-chip-sim">◈ ${simItem.icon} ${simItem.name}</span>` : ""}
-        ${simOwned ? `<span class="rw-card-chip rw-chip-owned">✓ Sim owned</span>` : ""}
-      </div>
-      <div class="rw-card-footer">
-        <div>
-          <div class="rw-card-price">${item.price}</div>
-          <div class="rw-card-price-sub">est. retail</div>
-        </div>
-        <a class="rw-card-cta" href="${item.link}" target="_blank" rel="noopener">Search Amazon ↗</a>
-      </div>
-    </div>`;
+function buySimItem(itemId) {
+  const item = ITEMS[itemId];
+  if (!item) return false;
+  if ((char.credits ?? 0) < item.price) return false;
+  if ((char.ownedGear || []).includes(itemId)) return false;
+  char.credits = (char.credits ?? 0) - item.price;
+  char.ownedGear = [...(char.ownedGear || []), itemId];
+  saveCharacter(char);
+  checkAndAwardBadges(char).forEach((b, i) => setTimeout(() => showBadgeToast(b), 400 + i * 1600));
+  return true;
 }
 
 // Legacy shims — the old standalone Store screen is now the Store tab
