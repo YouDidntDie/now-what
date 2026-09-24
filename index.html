@@ -1170,6 +1170,7 @@ body::after {
 /* ── Setup phase (location + loadout, merged) ─────────────────────────────── */
 .setup-section { margin-bottom: 26px; }
 .setup-loc-current { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--green-dk); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; color: var(--white); margin-bottom: 12px; }
+.setup-loc-default { border-color: var(--border); color: var(--text-dim); }
 .setup-loc-change { font-family: var(--font-m); font-size: 10px; color: var(--text-faint); margin-left: auto; }
 .kit-card-selected { border-color: var(--amber) !important; background: var(--bg3); box-shadow: 0 0 0 1px var(--amber-dk); }
 .kit-card-selected .kit-name::after { content: " ✓"; color: var(--amber); }
@@ -14051,7 +14052,7 @@ function setupRegionSectionHTML() {
   return `
     <div class="menu-section-label"><span class="card-label">➤ Location</span></div>
     <div class="region-picker-sub" style="margin-bottom:10px">${s.icon} <strong style="color:var(--white)">${s.title}</strong> — pick where this takes place, or skip.</div>
-    ${sel ? `<div class="setup-loc-current">✓ ${sel.continent.icon} ${sel.region.name} · ${sel.country.name}<span class="setup-loc-change">change below</span></div>` : ""}
+    ${sel ? `<div class="setup-loc-current">✓ ${sel.continent.icon} ${sel.region.name} · ${sel.country.name}<span class="setup-loc-change">change below</span></div>` : `<div class="setup-loc-current setup-loc-default">◌ Default environment<span class="setup-loc-change">pick a region below to change it</span></div>`}
     ${filterNote}
     <button class="rp-skip-btn" id="setup-skip">Skip — use default environment</button>
     <input class="rp-search" id="setup-search" type="text" placeholder="Search regions or countries…" value="${_rp.query.replace(/"/g, "&quot;")}">
