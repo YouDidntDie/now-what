@@ -1216,6 +1216,10 @@ body::after {
 .tier-solid { color: var(--green-lt); border-color: var(--green); }
 .tier-costly { color: var(--amber); border-color: var(--amber); }
 .tier-risky { color: var(--red-lt); border-color: var(--red); }
+.tier-ready { color: var(--green-lt); border-color: var(--green); }
+.tier-taxing { color: var(--amber); border-color: var(--amber); }
+.tier-desperate { color: var(--red-lt); border-color: var(--red); }
+.stat-mod { font-size: 11px; opacity: .75; }
 .roll-verdict { font-family: var(--font-m); font-size: 13px; font-weight: 600; letter-spacing: .06em; margin-top: 12px; padding: 8px 20px; border-radius: var(--radius); text-align: center; }
 .verdict-ok { color: var(--green-lt); background: var(--green-pale); border: 1px solid var(--green); }
 .verdict-costly { color: var(--amber); background: var(--bg2); border: 1px solid var(--amber); }
@@ -1234,6 +1238,14 @@ body::after {
 .random-event-box .card-label { margin-bottom: 5px; display: block; }
 .random-event-box p { font-size: 13px; color: var(--text); }
 .result-narrative { font-size: 14px; color: var(--text); line-height: 1.8; margin-bottom: 16px; }
+.result-verdict { font-size: 13px; font-weight: 600; letter-spacing: .04em; margin: 10px 0 14px; }
+.collapse-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 10px 12px; margin-top: 8px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-dim); font-size: 12px; font-family: var(--font-m); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+.collapse-toggle:hover { border-color: var(--amber); color: var(--text); }
+.collapse-toggle.open { color: var(--text); }
+.collapse-toggle .ct-arrow { font-size: 14px; }
+.collapse-body { display: none; padding: 12px 2px 4px; }
+.collapse-body.open { display: block; }
+.factors-static { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
 .result-tip { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--amber-dk); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; }
 .result-tip.rule-card { border-left-color: var(--green-dk); }
 .result-tip .rule-title { font-family: var(--font-m); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--green-lt); margin-bottom: 6px; display: block; }
@@ -1902,6 +1914,15 @@ body::after {
 .rp-empty-title { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
 .rp-empty-sub { font-size: 12px; color: var(--text-dim); line-height: 1.6; margin-bottom: 8px; }
 .rp-filter-note { font-size: 10px; color: var(--text-faint); margin-top: 6px; }
+.rp-search { display: block; width: 100%; box-sizing: border-box; padding: 11px 14px; margin-bottom: 12px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 13px; font-family: inherit; }
+.rp-search:focus { outline: none; border-color: var(--amber); }
+.rp-search::placeholder { color: var(--text-faint); }
+.rp-flat-item { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; background: var(--bg2); overflow: hidden; }
+.rp-flat-item.open { border-color: var(--amber-dk); }
+.rp-flat-detail { padding: 4px 14px 14px; border-top: 1px solid var(--border); }
+.rp-detail-label { font-family: var(--font-m); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 5px; }
+.rp-threat { font-size: 11px; color: var(--red-lt); margin-bottom: 2px; }
+.rp-water { font-size: 11px; color: var(--green-lt); margin-bottom: 2px; }
 
 /* Regional Intel block in Brief */
 .regional-intel { background: rgba(14,48,26,.25); border: 1px solid var(--green); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
@@ -2822,14 +2843,75 @@ function spendStatPoint(char, statId) {
 
 // ── Readiness assessment (replaces dice rolls) ───────────────────────────────
 // Luck is real, but it is not a die roll on your competence.
-//   readiness = competence (stat) + preparation (kit) + steady effort (constant)
+//   readiness = competence (stat) + preparation (gear) + steady effort (constant)
 //   demand    = situation difficulty, adjusted by conditions and environment
-//   margin >= 2 → "solid":  clean success — your preparation carries it
-//   margin >= 0 → "costly":  success, but the situation takes something out of you
-//   margin <  0 → "failed":  failure branch — you were not ready for this approach
+//
+// Doctrine first, preparation second. Every choice carries a doctrine quality
+// (choice.q): the decision itself, independent of your stats.
+//   sound: the right call.  Branch = success, always. Readiness sets the PRICE.
+//   risky: a genuine gamble. Readiness decides the branch (legacy behavior).
+//   poor:  the wrong call.  Branch = failure, always. Readiness limits damage.
+//   fatal: a lethal decision. Worst branch, whatever your stats.
+// Competence never makes a bad decision correct. Being unready never makes a
+// good decision wrong — it just makes it cost more. You can't always be ready
+// (if you crash, you won't have your kit), but you can always decide right.
 // The unforeseen (random events, friction on thin margins) adds COST, never a veto.
 // Death comes only from fatal situations, fatal decisions, or compounding states.
 const STEADY_EFFORT = 5;
+
+// Doctrine quality vocabulary. Untagged choices default to "risky".
+const CHOICE_Q = { SOUND: "sound", RISKY: "risky", POOR: "poor", FATAL: "fatal" };
+
+// Resolve a choice: doctrine picks the branch, readiness picks the price.
+// Returns { quality, branch, priceTier, frictionCount }.
+function resolveChoice(choice, assess) {
+  const q = choice.q || CHOICE_Q.RISKY;
+  const m = assess.margin;
+  if (q === CHOICE_Q.SOUND) {
+    const priceTier = m >= 2 ? "solid" : m >= 0 ? "costly" : "desperate";
+    return { quality: q, branch: "success", priceTier,
+             frictionCount: m >= 2 ? 0 : m >= 0 ? 1 : 2 };
+  }
+  if (q === CHOICE_Q.POOR) {
+    const mitigated = m >= 2;
+    return { quality: q, branch: "failure", priceTier: mitigated ? "mitigated" : "botched",
+             frictionCount: mitigated ? 0 : 1 };
+  }
+  if (q === CHOICE_Q.FATAL) {
+    return { quality: q, branch: "failure", priceTier: "fatal", frictionCount: 0 };
+  }
+  // risky — the gamble: margin decides the branch
+  return { quality: q, branch: assess.success ? "success" : "failure",
+           priceTier: assess.tier, frictionCount: assess.tier === "costly" ? 1 : 0 };
+}
+
+// Verdict + result badge for a resolved choice.
+function verdictFor(res) {
+  const q = res.quality, p = res.priceTier;
+  if (q === "sound") {
+    if (p === "solid")  return { text: "✓ SOUND CALL — clean execution.", cls: "verdict-ok",
+                                 badge: "✓ Sound — clean" };
+    if (p === "costly") return { text: "~ SOUND CALL — it works, but it costs you.", cls: "verdict-costly",
+                                 badge: "~ Sound — costly" };
+    return { text: "✓ SOUND CALL — hard-won. Right decision, heavy price.", cls: "verdict-costly",
+             badge: "✓ Sound — hard-won" };
+  }
+  if (q === "poor") {
+    return p === "mitigated"
+      ? { text: "✗ POOR CALL — wrong plan, but your competence limited the damage.", cls: "verdict-fail",
+          badge: "✗ Poor call — contained" }
+      : { text: "✗ POOR CALL — the plan itself was wrong.", cls: "verdict-fail",
+          badge: "✗ Poor call" };
+  }
+  if (q === "fatal") {
+    return { text: "✗ FATAL DECISION — no preparation saves this call.", cls: "verdict-fail",
+             badge: "✗ Fatal decision" };
+  }
+  // risky
+  if (p === "solid")  return { text: "✓ SOLID — your preparation carries it.", cls: "verdict-ok", badge: "✓ Solid" };
+  if (p === "costly") return { text: "~ COSTLY — it works, but it takes something out of you.", cls: "verdict-costly", badge: "~ Costly" };
+  return { text: "✗ NOT READY — beyond your current means.", cls: "verdict-fail", badge: "✗ Failed" };
+}
 
 function assessReadiness(statValue, demand, itemBonus = 0) {
   const readiness = statValue + itemBonus + STEADY_EFFORT;
@@ -2850,9 +2932,11 @@ const FRICTION_COSTS = [
   { effects: { moraleMod: -4, conditionAdd: "delayed" }, label: "Delays ripple outward. Nothing is free." },
 ];
 
-function xpForStage(tier, margin, stageIndex) {
-  let base = tier === "failed" ? 10 : 20;   // you learn from failure too
-  if (tier === "solid" && margin >= 4) base += 8;   // clean mastery
+function xpForStage(res, margin, stageIndex) {
+  let base = res.branch === "success"
+    ? (res.priceTier === "desperate" ? 25 : 20)  // hard-won right calls teach the most
+    : 10;                                        // you learn from failure too
+  if (res.priceTier === "solid" && margin >= 4) base += 8;   // clean mastery
   base += stageIndex * 4;
   return base;
 }
@@ -2887,6 +2971,11 @@ const ITEMS = {
   headlamp:          { id: "headlamp",             name: "Headlamp",          icon: "🔦", uses: 6,  bonus: 2, bonusStat: "perception",tags: ["utility","navigation"],desc: "+2 PER — night navigation",       price: 45,  category: "Tools" },
   whistle:           { id: "whistle",              name: "Signal Whistle",    icon: "📣", uses: 99, bonus: 2, bonusStat: "perception",tags: ["signal"],              desc: "+2 PER on signal checks",         price: 15,  category: "Signal" },
   road_flare:        { id: "road_flare",           name: "Road Flares (x2)",  icon: "🔴", uses: 2,  bonus: 3, bonusStat: "perception",tags: ["signal"],              desc: "+3 PER on signal checks",         price: 40,  category: "Signal" },
+  // Everyday carry — what you have when there's no time to pack (scenario gear: "pockets")
+  phone:            { id: "phone",            name: "Phone",            icon: "📱", uses: 2,  bonus: 1, bonusStat: "perception",tags: ["signal"],              desc: "+1 PER — dying battery",        price: 0,   category: "Carry" },
+  keys:             { id: "keys",             name: "Keys",             icon: "🔑", uses: 99, bonus: 0, bonusStat: "perception",tags: [],                        desc: "No bonus. They're keys.",       price: 0,   category: "Carry" },
+  wallet:           { id: "wallet",           name: "Wallet",           icon: "👛", uses: 99, bonus: 0, bonusStat: "perception",tags: [],                        desc: "ID, cards, cash. No bonus.",     price: 0,   category: "Carry" },
+  pocketknife:      { id: "pocketknife",      name: "Pocket Knife",     icon: "🔪", uses: 99, bonus: 1, bonusStat: "strength",  tags: ["utility"],               desc: "+1 STR — small blade",          price: 0,   category: "Carry" },
 };
 
 const KITS = {
@@ -2940,6 +3029,30 @@ function buildCustomInventory(itemIds) {
   return inv;
 }
 
+// Gear premise — you can't always be ready. If you crash, you won't have your kit.
+// scenario.gear: "kit" (default) | "pockets" | "nothing"
+const POCKET_GEAR_IDS = ["phone", "keys", "wallet", "pocketknife"];
+
+function buildPocketsInventory() {
+  const inv = {};
+  for (const id of POCKET_GEAR_IDS) {
+    const def = ITEMS[id];
+    if (def) inv[id] = { ...def, remaining: def.uses };
+  }
+  return inv;
+}
+
+function gearWord(gear) {
+  return gear === "pockets" ? "pockets" : gear === "nothing" ? "nothing" : "kit";
+}
+
+// Effective stat: character stat ± scenario condition modifier (e.g. injured in a crash)
+function effStat(statId) {
+  const base = (typeof char !== "undefined" && char.stats[statId]) || 3;
+  const mod = (RUN.scenario.statMods && RUN.scenario.statMods[statId]) || 0;
+  return { value: base + mod, mod };
+}
+
 // Find best available item for a tag; returns { item, bonus } or { item: null, bonus: 0 }
 function getBestItem(inventory, tag) {
   let best = null, bestBonus = 0;
@@ -2960,9 +3073,15 @@ function consumeItem(inventory, itemId) {
 // ═══ scenarios.js ═══
 // scenarios.js — multi-stage RPG scenario data
 //
+// Each scenario: { id, title, ..., stages[], gear, statMods, biomes, climates }
+// gear: "kit" (default — you pack before it starts) | "pockets" (only everyday
+//   carry — no time to pack) | "nothing" (clothes on your back, no tools)
+// statMods: { [statId]: delta } — scenario conditions (e.g. injured: { strength: -2 })
 // Each stage: { id, title, situation, check, choices[], outcomes{} randomEvents[] }
 // check: { stat, difficulty, tag, label }
-// choices: { id, label, desc, statHint, tag }
+// choices: { id, label, desc, statHint, tag, q }
+// q: doctrine quality — "sound" | "risky" (default) | "poor" | "fatal".
+//   Doctrine picks the outcome branch; readiness picks the price within it.
 // outcomes: { [choiceId]: { success: {narrative,effects,tip}, failure: {narrative,effects,tip} } }
 // effects: { moraleMod, conditionAdd, conditionRemove, xpBonus, fatal }
 // randomEvents: [{ chance, text, effect }]
@@ -8160,6 +8279,7 @@ const SCENARIOS = [
   },
   {
     id: "hurricane",
+    gear: "kit",
     biomes: ["coastal", "island"],
     title: "The Long Wind",
     icon: "🌀",
@@ -8179,9 +8299,9 @@ const SCENARIOS = [
           { chance: 0.2, text: "The forecast shifts 30km toward you. The cone tightens like a noose.", effect: { moraleMod: -8 } },
         ],
         choices: [
-          { id: "leave", label: "Leave now, inland to family", desc: "Beat the rush. Two hours inland to high ground, before the highways clog.", statHint: "knowledge", tag: "navigation" },
-          { id: "prepare", label: "Stay and harden the house", desc: "Board windows, stock water, charge everything. Ride it out above the surge line.", statHint: "endurance", tag: "shelter" },
-          { id: "wait", label: "Wait for the official order", desc: "Don't overreact. If they order evacuation, you'll go then.", statHint: "composure", tag: "utility" },
+          { id: "leave", q: "sound", label: "Leave now, inland to family", desc: "Beat the rush. Two hours inland to high ground, before the highways clog.", statHint: "knowledge", tag: "navigation" },
+          { id: "prepare", q: "risky", label: "Stay and harden the house", desc: "Board windows, stock water, charge everything. Ride it out above the surge line.", statHint: "endurance", tag: "shelter" },
+          { id: "wait", q: "poor", label: "Wait for the official order", desc: "Don't overreact. If they order evacuation, you'll go then.", statHint: "composure", tag: "utility" },
         ],
         outcomes: {
           leave: {
@@ -8203,9 +8323,9 @@ const SCENARIOS = [
         situation: "Landfall minus six hours. You're sheltering at your sister's — but your neighbour refused to leave and just called: water is in his street, rising fast, and he's thinking about the attic.",
         check: { stat: "composure", difficulty: 12, tag: "shelter", label: "Surge Advice" },
         choices: [
-          { id: "roof", label: "Tell him: up to the roof, not the attic", desc: "Attics trap people. The roof can be seen and reached. Bring an axe if he must go up.", statHint: "knowledge", tag: "shelter" },
-          { id: "attic", label: "Tell him: attic is fine, stay dry", desc: "Higher is drier. The attic keeps him out of the water.", statHint: "composure", tag: "shelter" },
-          { id: "wade", label: "Tell him: wade out to your car now", desc: "The water's only knee-deep. He can still walk out.", statHint: "endurance", tag: "water" },
+          { id: "roof", q: "sound", label: "Tell him: up to the roof, not the attic", desc: "Attics trap people. The roof can be seen and reached. Bring an axe if he must go up.", statHint: "knowledge", tag: "shelter" },
+          { id: "attic", q: "fatal", label: "Tell him: attic is fine, stay dry", desc: "Higher is drier. The attic keeps him out of the water.", statHint: "composure", tag: "shelter" },
+          { id: "wade", q: "poor", label: "Tell him: wade out to your car now", desc: "The water's only knee-deep. He can still walk out.", statHint: "endurance", tag: "water" },
         ],
         outcomes: {
           roof: {
@@ -8227,9 +8347,9 @@ const SCENARIOS = [
         situation: "The wind dies. Sun breaks through. Your sister opens the front door — the street is calm, debris everywhere, and neighbours are emerging to inspect damage.",
         check: { stat: "knowledge", difficulty: 11, tag: "utility", label: "Eye Discipline" },
         choices: [
-          { id: "inside", label: "Keep everyone inside until the all-clear", desc: "The calm is the eye. The back eyewall hits from the other side, just as hard.", statHint: "knowledge", tag: "utility" },
-          { id: "inspect", label: "Quick look at the damage, then back in", desc: "Five minutes to check the roof and the car. In and out.", statHint: "perception", tag: "utility" },
-          { id: "help", label: "Go help the neighbours clear debris", desc: "The street needs hands. The worst seems over.", statHint: "strength", tag: "utility" },
+          { id: "inside", q: "sound", label: "Keep everyone inside until the all-clear", desc: "The calm is the eye. The back eyewall hits from the other side, just as hard.", statHint: "knowledge", tag: "utility" },
+          { id: "inspect", q: "risky", label: "Quick look at the damage, then back in", desc: "Five minutes to check the roof and the car. In and out.", statHint: "perception", tag: "utility" },
+          { id: "help", q: "poor", label: "Go help the neighbours clear debris", desc: "The street needs hands. The worst seems over.", statHint: "strength", tag: "utility" },
         ],
         outcomes: {
           inside: {
@@ -8254,9 +8374,9 @@ const SCENARIOS = [
           { chance: 0.25, text: "A transformer up the street buzzes, pops, and goes dark. The lines in the water may still be live.", effect: { moraleMod: -8 } },
         ],
         choices: [
-          { id: "stop", label: "Stop him: floodwater is poison", desc: "Sewage, chemicals, hidden debris, live wires. Nothing in that house is worth the water.", statHint: "knowledge", tag: "water" },
-          { id: "gear", label: "Go in with him, properly equipped", desc: "Boots, gloves, a stick to probe ahead. Quick in-and-out for the essentials.", statHint: "endurance", tag: "utility" },
-          { id: "power", label: "Focus on power: get his generator running", desc: "The fridge is warming. A generator in the garage will save the food.", statHint: "knowledge", tag: "fire" },
+          { id: "stop", q: "sound", label: "Stop him: floodwater is poison", desc: "Sewage, chemicals, hidden debris, live wires. Nothing in that house is worth the water.", statHint: "knowledge", tag: "water" },
+          { id: "gear", q: "risky", label: "Go in with him, properly equipped", desc: "Boots, gloves, a stick to probe ahead. Quick in-and-out for the essentials.", statHint: "endurance", tag: "utility" },
+          { id: "power", q: "fatal", label: "Focus on power: get his generator running", desc: "The fridge is warming. A generator in the garage will save the food.", statHint: "knowledge", tag: "fire" },
         ],
         outcomes: {
           stop: {
@@ -8269,7 +8389,7 @@ const SCENARIOS = [
           },
           power: {
             success: { narrative: "You set the generator up and something in your training screams — you move it outside, 6m from the house, exhaust pointed downwind. That night it runs clean and the fridge survives.", effects: { conditionAdd: "powered", moraleMod: 8, xpBonus: 10 }, tip: "Generators kill with carbon monoxide: outside only, far from windows and doors, exhaust downwind. Never in a garage, even with the door open.", learnMore: ["ep004", "s032"] },
-            failure: { narrative: "The generator goes in the garage 'with the door open.' By midnight the CO alarm — thank god for the CO alarm — is screaming and everyone's stumbling out into the yard with headaches.", effects: { conditionAdd: "toxic", moraleMod: -18 }, tip: "An open garage door does NOT make a generator safe. CO is invisible and odourless — outside, 6+ metres from the house, always.", learnMore: ["ep004"] },
+            failure: { narrative: "The generator hums in the garage, door 'open enough.' By 2 AM everyone has a headache and nobody connects it to the humming. Carbon monoxide is invisible, odourless, and patient — it doesn't knock, it just turns the lights out. The house is silent by morning. All of it.", effects: { fatal: true }, tip: "A running generator belongs OUTSIDE, 6+ metres from the house, exhaust pointed away. An open garage door does NOT make it safe. Post-storm CO poisoning kills whole families every year.", learnMore: ["ep004"] },
           },
         },
       },
@@ -8278,6 +8398,7 @@ const SCENARIOS = [
 ,
   {
     id: "heatwave-blackout",
+    gear: "kit",
     biomes: ["urban"],
     title: "The Hot Grid",
     icon: "🌡️",
@@ -8294,9 +8415,9 @@ const SCENARIOS = [
         situation: "Inside it's 34°C and climbing. You're sweating through your shirt, headachy, a little nauseous. The fridge died yesterday. Your phone is at 18%.",
         check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Heat Triage" },
         choices: [
-          { id: "cool", label: "Cool the body, not the room", desc: "Wet towel on neck and armpits, feet in cool water, sip steadily. Lower your core temp directly.", statHint: "knowledge", tag: "medical" },
-          { id: "fan", label: "Fan on full, windows open", desc: "Move the air. A breeze feels like cooling.", statHint: "endurance", tag: "utility" },
-          { id: "shower", label: "Cold shower, then rest", desc: "One hard reset under cold water, then lie still and conserve.", statHint: "composure", tag: "water" },
+          { id: "cool", q: "sound", label: "Cool the body, not the room", desc: "Wet towel on neck and armpits, feet in cool water, sip steadily. Lower your core temp directly.", statHint: "knowledge", tag: "medical" },
+          { id: "fan", q: "poor", label: "Fan on full, windows open", desc: "Move the air. A breeze feels like cooling.", statHint: "endurance", tag: "utility" },
+          { id: "shower", q: "risky", label: "Cold shower, then rest", desc: "One hard reset under cold water, then lie still and conserve.", statHint: "composure", tag: "water" },
         ],
         outcomes: {
           cool: {
@@ -8321,9 +8442,9 @@ const SCENARIOS = [
           { chance: 0.2, text: "Her cat weaves between your ankles, meowing — its water bowl is empty and bone dry.", effect: { moraleMod: -6 } },
         ],
         choices: [
-          { id: "immerse", label: "Cool her aggressively, right now", desc: "Cold wet towels, fanning, ice from the dead freezer on neck and groin. Call emergency services. Don't wait.", statHint: "knowledge", tag: "medical" },
-          { id: "water", label: "Get water into her first", desc: "She's dehydrated. Fluids first, then cooling.", statHint: "composure", tag: "water" },
-          { id: "rest", label: "Help her lie down and rest", desc: "She's elderly and exhausted. Rest in a cool spot is the gentle option.", statHint: "composure", tag: "medical" },
+          { id: "immerse", q: "sound", label: "Cool her aggressively, right now", desc: "Cold wet towels, fanning, ice from the dead freezer on neck and groin. Call emergency services. Don't wait.", statHint: "knowledge", tag: "medical" },
+          { id: "water", q: "poor", label: "Get water into her first", desc: "She's dehydrated. Fluids first, then cooling.", statHint: "composure", tag: "water" },
+          { id: "rest", q: "fatal", label: "Help her lie down and rest", desc: "She's elderly and exhausted. Rest in a cool spot is the gentle option.", statHint: "composure", tag: "medical" },
         ],
         outcomes: {
           immerse: {
@@ -8336,7 +8457,7 @@ const SCENARIOS = [
           },
           rest: {
             success: { narrative: "She lies down in the coolest corner and you stay with her, wetting her skin, watching. It's heat exhaustion, not stroke — rest and cooling turn it around.", effects: { conditionAdd: "neighbor_helped", xpBonus: 10 }, tip: "Rest works for heat exhaustion (sweating, weak, nauseous, still thinking clearly). But confusion or slurred speech means stroke — dry skin or not — and stroke needs aggression, not rest.", learnMore: ["m019"] },
-            failure: { narrative: "You let her rest. An hour later she's unconscious, burning up, not sweating at all. Rest was the wrong treatment for the wrong diagnosis.", effects: { conditionAdd: "deteriorated", conditionAdd2: "guilt_heavy", moraleMod: -22 }, tip: "The fork in the road: confusion, slurring, or any altered mental state means STROKE — cool aggressively and call now, whether the skin is dry or sweating. Sweating rules out nothing.", learnMore: ["m019", "m032"] },
+            failure: { narrative: "You let her rest. An hour later she's unconscious, burning up, skin dry as paper. The paramedics fight up three flights of dead stairs, but heat stroke doesn't negotiate — by the time they reach her, her organs have been cooking for over an hour. Rest was the wrong treatment for the wrong diagnosis, and now the apartment is quiet.", effects: { conditionAdd: "guilt_heavy", moraleMod: -30 }, tip: "The fork in the road: confusion, slurring, or any altered mental state means STROKE — cool aggressively and call now, whether the skin is dry or sweating. Sweating rules out nothing. Waiting kills.", learnMore: ["m019", "m032"] },
           },
         },
       },
@@ -8345,9 +8466,9 @@ const SCENARIOS = [
         situation: "Day three. The taps still run but the pressure is dropping and nobody knows for how long. You have 6 litres stored. Mrs. Abernathy needs watching. It's 40°C again.",
         check: { stat: "endurance", difficulty: 11, tag: "water", label: "Rationing" },
         choices: [
-          { id: "ration", label: "Strict rationing + electrolytes", desc: "Measured sips through the day, pinch of salt and sugar in each litre. Nothing wasted.", statHint: "knowledge", tag: "water" },
-          { id: "drink", label: "Drink freely while water flows", desc: "The taps work now. Hydrate hard today, worry about tomorrow tomorrow.", statHint: "endurance", tag: "water" },
-          { id: "share", label: "Split everything with the neighbours", desc: "Pool all water on the floor. Nobody goes thirsty on your watch.", statHint: "composure", tag: "water" },
+          { id: "ration", q: "sound", label: "Strict rationing + electrolytes", desc: "Measured sips through the day, pinch of salt and sugar in each litre. Nothing wasted.", statHint: "knowledge", tag: "water" },
+          { id: "drink", q: "poor", label: "Drink freely while water flows", desc: "The taps work now. Hydrate hard today, worry about tomorrow tomorrow.", statHint: "endurance", tag: "water" },
+          { id: "share", q: "poor", label: "Split everything with the neighbours", desc: "Pool all water on the floor. Nobody goes thirsty on your watch.", statHint: "composure", tag: "water" },
         ],
         outcomes: {
           ration: {
@@ -8369,9 +8490,9 @@ const SCENARIOS = [
         situation: "29°C at midnight. The apartment won't cool. The fridge has been dead for two days and something in there smells wrong. You need sleep — tomorrow will be just as hot.",
         check: { stat: "knowledge", difficulty: 11, tag: "shelter", label: "Hot Nights" },
         choices: [
-          { id: "basement", label: "Sleep in the basement / lowest floor", desc: "Heat rises. The ground floor or basement is 5–8 degrees cooler. Take a mat down.", statHint: "knowledge", tag: "shelter" },
-          { id: "roof", label: "Sleep on the roof under the sky", desc: "Open air, maybe a breeze. Cooler than the brick box.", statHint: "endurance", tag: "shelter" },
-          { id: "fridge", label: "Triage the fridge, then sleep", desc: "Sort what's safe, cook what's borderline, toss the rest. Protect the food supply first.", statHint: "knowledge", tag: "utility" },
+          { id: "basement", q: "sound", label: "Sleep in the basement / lowest floor", desc: "Heat rises. The ground floor or basement is 5–8 degrees cooler. Take a mat down.", statHint: "knowledge", tag: "shelter" },
+          { id: "roof", q: "risky", label: "Sleep on the roof under the sky", desc: "Open air, maybe a breeze. Cooler than the brick box.", statHint: "endurance", tag: "shelter" },
+          { id: "fridge", q: "poor", label: "Triage the fridge, then sleep", desc: "Sort what's safe, cook what's borderline, toss the rest. Protect the food supply first.", statHint: "knowledge", tag: "utility" },
         ],
         outcomes: {
           basement: {
@@ -8393,6 +8514,7 @@ const SCENARIOS = [
 ,
   {
     id: "structure-fire",
+    gear: "pockets",
     biomes: ["urban"],
     title: "Get Low, Get Out",
     icon: "🧯",
@@ -8409,9 +8531,9 @@ const SCENARIOS = [
         situation: "Alarm screaming. The hallway smells of burning plastic. Your cat is under the bed. Your door is closed; the hall beyond it is an unknown.",
         check: { stat: "perception", difficulty: 11, tag: "utility", label: "Read the Fire" },
         choices: [
-          { id: "door", label: "Check the door before opening", desc: "Back of the hand on the door, low and high. Look under it. Read the hallway before you enter it.", statHint: "perception", tag: "utility" },
-          { id: "out", label: "Grab the cat and go, now", desc: "Speed is life. Out the door and down the stairs before it gets worse.", statHint: "endurance", tag: "utility" },
-          { id: "balcony", label: "Out to the balcony to look", desc: "See what's burning before deciding. Information first.", statHint: "perception", tag: "signal" },
+          { id: "door", q: "sound", label: "Check the door before opening", desc: "Back of the hand on the door, low and high. Look under it. Read the hallway before you enter it.", statHint: "perception", tag: "utility" },
+          { id: "out", q: "risky", label: "Grab the cat and go, now", desc: "Speed is life. Out the door and down the stairs before it gets worse.", statHint: "endurance", tag: "utility" },
+          { id: "balcony", q: "poor", label: "Out to the balcony to look", desc: "See what's burning before deciding. Information first.", statHint: "perception", tag: "signal" },
         ],
         outcomes: {
           door: {
@@ -8433,9 +8555,9 @@ const SCENARIOS = [
         situation: "The hallway is filling from above. The stairwell door is 10 metres away. Below: four floors to the street. Above: the fire. The elevator dings.",
         check: { stat: "composure", difficulty: 12, tag: "shelter", label: "Descend" },
         choices: [
-          { id: "stairs", label: "Stairs down, staying low", desc: "Below the smoke layer, hand on the rail, steady pace. Close every door behind you.", statHint: "composure", tag: "shelter" },
-          { id: "elevator", label: "Take the elevator — it's faster", desc: "Four floors in ten seconds. The doors just opened.", statHint: "endurance", tag: "utility" },
-          { id: "up", label: "Up to the roof instead", desc: "Above the fire, fresh air, visible to rescuers. The roof is the classic escape.", statHint: "strength", tag: "shelter" },
+          { id: "stairs", q: "sound", label: "Stairs down, staying low", desc: "Below the smoke layer, hand on the rail, steady pace. Close every door behind you.", statHint: "composure", tag: "shelter" },
+          { id: "elevator", q: "fatal", label: "Take the elevator — it's faster", desc: "Four floors in ten seconds. The doors just opened.", statHint: "endurance", tag: "utility" },
+          { id: "up", q: "poor", label: "Up to the roof instead", desc: "Above the fire, fresh air, visible to rescuers. The roof is the classic escape.", statHint: "strength", tag: "shelter" },
         ],
         outcomes: {
           stairs: {
@@ -8444,7 +8566,7 @@ const SCENARIOS = [
           },
           elevator: {
             success: { narrative: "The car comes, the doors close, you descend — and step out into the lobby as the power flickers. You made it. You will never do that again.", effects: { moraleMod: -4 }, tip: "You got lucky. Elevators in fires fail: power cuts trap you, shafts fill with smoke, doors open onto the fire floor. Never again.", learnMore: ["f010"] },
-            failure: { narrative: "Between the third and second floor, the lights die. The car stops. You're in a steel box in a burning building with no way out, and the smoke is coming through the vents.", effects: { conditionAdd: "trapped", conditionAdd2: "smoke_inhalation", moraleMod: -22 }, tip: "This is why: power fails, cars stall between floors, shafts act as chimneys. Elevators are never an evacuation route in fire.", learnMore: ["f010", "ep005"] },
+            failure: { narrative: "Between the third and second floor the lights die and the car stops. A steel box in a burning building. The shaft acts as a chimney — smoke pours through the vents, hot and black, and the doors never open again.", effects: { fatal: true }, tip: "This is why: power fails, cars stall between floors, shafts act as chimneys. Elevators are never an evacuation route in fire.", learnMore: ["f010", "ep005"] },
           },
           up: {
             success: { narrative: "The roof door is unlocked — some are, some aren't. Fresh air, city lights, and you flag the first ladder truck with your phone light. The roof was the right call because the stairs below were already lost.", effects: { conditionAdd: "evacuated_clean", moraleMod: 10, xpBonus: 10 }, tip: "Roof refuge works only if the stairs down are already impassable AND the roof is accessible. It's a last resort, not a plan A.", learnMore: ["f010"] },
@@ -8460,9 +8582,9 @@ const SCENARIOS = [
           { chance: 0.25, text: "A window blows out on the second floor and a tongue of flame licks up the facade.", effect: { moraleMod: -10 } },
         ],
         choices: [
-          { id: "guide", label: "Talk the kid through sealing the room", desc: "Shout instructions: close the door, block it with wet towels, get low, signal at the window. Buy two minutes.", statHint: "knowledge", tag: "fire" },
-          { id: "backin", label: "Go back in for the kid", desc: "Two minutes is too long. You know the stairs. Go.", statHint: "strength", tag: "fire" },
-          { id: "ladder", label: "Find a ladder — trucks, balconies, anything", desc: "Third floor is reachable. Extension ladder from the maintenance shed, or climb the balconies.", statHint: "perception", tag: "utility" },
+          { id: "guide", q: "sound", label: "Talk the kid through sealing the room", desc: "Shout instructions: close the door, block it with wet towels, get low, signal at the window. Buy two minutes.", statHint: "knowledge", tag: "fire" },
+          { id: "backin", q: "fatal", label: "Go back in for the kid", desc: "Two minutes is too long. You know the stairs. Go.", statHint: "strength", tag: "fire" },
+          { id: "ladder", q: "risky", label: "Find a ladder — trucks, balconies, anything", desc: "Third floor is reachable. Extension ladder from the maintenance shed, or climb the balconies.", statHint: "perception", tag: "utility" },
         ],
         outcomes: {
           guide: {
@@ -8471,7 +8593,7 @@ const SCENARIOS = [
           },
           backin: {
             success: { narrative: "Wet shirt over your face, low along the wall — you know this stairwell. You reach the kid's door, seal it behind you both, and ride out the two minutes until the ladder arrives. Heroic. Stupid. It worked.", effects: { conditionAdd: "smoke_inhalation", moraleMod: 12, xpBonus: 10 }, tip: "Re-entry kills more would-be rescuers than fire kills victims. If you go, it's low, fast, wet cover, and only when you know the layout blind.", learnMore: ["f010"] },
-            failure: { narrative: "The stairwell you knew is gone — visibility zero, heat like an oven door. You collapse on the second-floor landing. Now there are two victims, and the crew has to choose.", effects: { conditionAdd: "smoke_inhalation", conditionAdd2: "burns_suffered", moraleMod: -25, fatal: false }, tip: "Firefighters have a saying: don't make two victims. Untrained re-entry into a working fire is how rescuers die.", learnMore: ["f010", "m005"] },
+            failure: { narrative: "The stairwell you knew is gone — visibility zero, heat like an open oven door. Your lungs fill on the second-floor landing and your legs stop taking orders. Now there are two victims, and the crew arriving outside has to choose which one to carry out first.", effects: { fatal: true }, tip: "Firefighters have a saying: don't make two victims. Untrained re-entry into a working fire is how rescuers die — the kid needed instructions through the door, not a second body in the stairwell.", learnMore: ["f010", "m005"] },
           },
           ladder: {
             success: { narrative: "The maintenance shed has a 7m extension ladder. You and the father foot it while a neighbour climbs — steady, rungs, window. The kid comes down into waiting arms as the trucks roll in.", effects: { conditionAdd: "kid_saved", moraleMod: 14, xpBonus: 20 }, tip: "Third floor ≈ 7–9m. An extension ladder, footed by two people, is a real rescue tool — if you can get it up in under two minutes.", learnMore: ["f010", "ep005"] },
@@ -8484,9 +8606,9 @@ const SCENARIOS = [
         situation: "You're across the street with the other residents. The building burns. Your neighbour is coughing hard, grey-faced. Someone's teenager is crying about the cat still inside. Sirens everywhere.",
         check: { stat: "composure", difficulty: 11, tag: "medical", label: "Aftermath" },
         choices: [
-          { id: "airway", label: "Sit the cougher down, watch his breathing", desc: "Smoke inhalation can worsen over hours. Keep him still, upright, monitored until medics triage him.", statHint: "knowledge", tag: "medical" },
-          { id: "cat", label: "Go back for the teenager's cat", desc: "It's just inside the lobby. Thirty seconds, in and out.", statHint: "strength", tag: "utility" },
-          { id: "account", label: "Run the headcount for firefighters", desc: "Who's out, who's missing, which flats. Give the crew the information they need.", statHint: "perception", tag: "signal" },
+          { id: "airway", q: "sound", label: "Sit the cougher down, watch his breathing", desc: "Smoke inhalation can worsen over hours. Keep him still, upright, monitored until medics triage him.", statHint: "knowledge", tag: "medical" },
+          { id: "cat", q: "poor", label: "Go back for the teenager's cat", desc: "It's just inside the lobby. Thirty seconds, in and out.", statHint: "strength", tag: "utility" },
+          { id: "account", q: "sound", label: "Run the headcount for firefighters", desc: "Who's out, who's missing, which flats. Give the crew the information they need.", statHint: "perception", tag: "signal" },
         ],
         outcomes: {
           airway: {
@@ -9831,6 +9953,8 @@ const RUN = {
   stageIndex:   0,
   chosenChoice: null,
   lastAssess:   null,
+  lastResolve:  null,
+  lastFactors:  null,
   lastOutcome:  null,
   conditions:   [],
   inventory:    {},
@@ -9852,7 +9976,7 @@ let pendingLevelUp = false;
 function resetRun() {
   Object.assign(RUN, {
     phase:"menu", scenario:null, stageIndex:0, chosenChoice:null,
-    lastAssess:null, lastOutcome:null, conditions:[], inventory:{},
+    lastAssess:null, lastOutcome:null, lastResolve:null, lastFactors:null, conditions:[], inventory:{},
     xpEarned:0, stageLog:[], randomEvent:null, survived:false,
     systems:initCoreSystems(), env:{}, tickEvents:[],
     atlasRegion: null,
@@ -10047,7 +10171,6 @@ function renderSimulator(root, onOpenArticle) {
     case "kit":     renderKit(root);                    break;
     case "brief":   renderBrief(root);                  break;
     case "stage":   renderStage(root);                  break;
-    case "resolution": renderResolution(root);            break;
     case "result":  renderStageResult(root, openArticle); break;
     case "debrief": renderDebrief(root, openArticle); break;
     case "levelup": renderLevelUp(root);                break;
@@ -10201,190 +10324,118 @@ function rpContinentCount(c, s) {
 }
 function rpUseDefault(root) { RUN.atlasRegion = null; RUN.phase = "kit"; renderSimulator(root); }
 
+// Flat list of every scenario-compatible region across all continents.
+function rpFlatRegions(s) {
+  const out = [];
+  for (const c of (atlasState.continents || [])) {
+    for (const co of (c.countries || [])) {
+      for (const r of (co.regions || [])) {
+        if (rpRegionOK(r, s)) out.push({ c, co, r });
+      }
+    }
+  }
+  return out;
+}
+
+// ── Region picker: ONE flat searchable screen (no drill-down) ─────────────────
+// Every compatible region in one list. Tap to expand, set, done.
 function renderRegionPicker(root) {
-  // Ensure Atlas data is loaded
   if (!atlasState.loaded) {
     loadAtlas().then(() => renderRegionPicker(root));
     root.innerHTML = `<div class="region-picker"><div class="region-picker-header"><div class="region-picker-title">Loading Atlas…</div></div></div>`;
     return;
   }
 
-  _rp.step = _rp.step || "continent";
   const s = RUN.scenario;
+  _rp.query    = _rp.query || "";
+  _rp.expanded = _rp.expanded || null;
 
-  let inner = "";
+  const all = rpFlatRegions(s);
+  const q = _rp.query.trim().toLowerCase();
+  const list = q
+    ? all.filter(({ c, co, r }) => (r.name + " " + co.name + " " + c.name).toLowerCase().includes(q))
+    : all;
 
-  // ── Breadcrumb ──────────────────────────────────────────────────────────────
-  const crumbs = [`<span class="rp-crumb" data-crumb="continent">Continents</span>`];
-  if (_rp.continent) crumbs.push(`<span class="rp-crumb-sep">›</span><span class="rp-crumb" data-crumb="country">${_rp.continent.icon} ${_rp.continent.name}</span>`);
-  if (_rp.country)   crumbs.push(`<span class="rp-crumb-sep">›</span><span class="rp-crumb" data-crumb="region">${_rp.country.name}</span>`);
-  const breadcrumb = `<div class="rp-breadcrumb">${crumbs.join("")}</div>`;
-
-  // ── Step: continent ─────────────────────────────────────────────────────────
-  // Only continents holding at least one scenario-compatible region are shown.
-  if (_rp.step === "continent") {
-    const compat = atlasState.continents
-      .map(c => ({ c, n: rpContinentCount(c, s) }))
-      .filter(x => x.n > 0);
-    if (!compat.length) {
-      inner = `
-      <div class="rp-empty">
-        <div class="rp-empty-title">No mapped regions fit this scenario</div>
-        <div class="rp-empty-sub">${s.icon} <strong style="color:var(--white)">${s.title}</strong> doesn't take place in any mapped land region — the default environment will be used instead.</div>
-        <button class="rp-confirm-btn" id="rp-nodefault">Continue with default environment →</button>
-      </div>`;
-    } else {
-      inner = `
-      <div class="rp-grid">
-        ${compat.map(({ c, n }) => `
-          <button class="rp-card" data-cid="${c.id}">
-            <div class="rp-card-icon">${c.icon}</div>
-            <div class="rp-card-name">${c.name}</div>
-            <div class="rp-card-sub">${n} fitting region${n === 1 ? "" : "s"}</div>
-          </button>`).join("")}
-      </div>`;
-    }
-  }
-
-  // ── Step: country ───────────────────────────────────────────────────────────
-  // Only countries holding at least one scenario-compatible region are shown.
-  else if (_rp.step === "country") {
-    const compatCo = (_rp.continent.countries || []).filter(co => rpCountryOK(co, s));
-    inner = `
-      <div class="rp-list">
-        ${compatCo.map(co => {
-          const n = (co.regions || []).filter(r => rpRegionOK(r, s)).length;
-          return `
-          <button class="rp-list-item" data-coid="${co.id}">
-            <div class="rp-list-item-body">
-              <div class="rp-list-item-name">${co.name}</div>
-              <div class="rp-list-item-meta">${co.climate || ""}${co.climate ? " · " : ""}${n} fitting region${n === 1 ? "" : "s"}</div>
-            </div>
-            <span class="rp-list-arrow">›</span>
-          </button>`; }).join("")}
-      </div>`;
-  }
-
-  // ── Step: region ─────────────────────────────────────────────────────────────
-  // Only scenario-compatible regions are shown.
-  else if (_rp.step === "region") {
-    inner = `
-      <div class="rp-list">
-        ${( _rp.country.regions || []).filter(r => rpRegionOK(r, s)).map(r => `
-          <button class="rp-list-item" data-rid="${r.id}">
-            <div class="rp-list-item-body">
-              <div class="rp-list-item-name">${r.name}</div>
-              <div class="rp-list-item-meta">${(r.terrain || "").slice(0, 60)}${r.terrain && r.terrain.length > 60 ? "…" : ""}</div>
-            </div>
-            <span class="rp-list-arrow">›</span>
-          </button>`).join("")}
-      </div>`;
-  }
-
-  // ── Step: confirm ────────────────────────────────────────────────────────────
-  else if (_rp.step === "confirm") {
-    const r = _rp.region;
-    const threats = [
-      ...((r.threats?.weather || []).slice(0, 2)),
-      ...((r.threats?.wildlife || []).slice(0, 1)),
-    ];
-    const water = (r.water?.sources || []).slice(0, 2);
-    inner = `
-      <div class="rp-selected-card">
-        <div class="rp-selected-header">
-          <div class="rp-selected-icon">${_rp.continent.icon}</div>
-          <div>
-            <div class="rp-selected-title">${r.name}</div>
-            <div class="rp-selected-sub">${_rp.country.name} · ${_rp.continent.name}</div>
-          </div>
-        </div>
-        <div style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:8px">${r.terrain || ""}</div>
-        ${threats.length ? `<div style="font-family:var(--font-m);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:5px">Key threats</div>
-        ${threats.map(t => `<div style="font-size:11px;color:var(--red-lt);margin-bottom:2px">⚠ ${t}</div>`).join("")}` : ""}
-        ${water.length ? `<div style="font-family:var(--font-m);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);margin:8px 0 5px">Water</div>
-        ${water.map(w => `<div style="font-size:11px;color:var(--green-lt);margin-bottom:2px">✓ ${w}</div>`).join("")}` : ""}
-        <button class="rp-confirm-btn" id="rp-confirm">Set as scenario location →</button>
-      </div>`;
-  }
+  const filterNote = (s.biomes && s.biomes.length && rpAtlasTagged())
+    ? `<div class="rp-filter-note">Showing only regions that fit this scenario: ${s.biomes.map(b => b.replace(/_/g, " ")).join(" · ")}${s.climates && s.climates.length ? " · " + s.climates.join(" / ") + " climates" : ""}.</div>`
+    : "";
 
   root.innerHTML = `
     <div class="region-picker">
-      <button class="back-btn" id="rp-back">← ${_rp.step === "continent" ? "Scenarios" : "Back"}</button>
+      <button class="back-btn" id="rp-back">← Scenarios</button>
       <div class="region-picker-header">
         <div class="region-picker-title">📍 Set Location</div>
-        <div class="region-picker-sub">${s.icon} <strong style="color:var(--white)">${s.title}</strong> — choose where this scenario takes place. Region data will appear as field intelligence during your run.<br>Optional — skip to use the default environment.${(s.biomes && s.biomes.length && rpAtlasTagged()) ? `<div class="rp-filter-note">Showing only regions that fit this scenario: ${s.biomes.map(b => b.replace(/_/g, " ")).join(" · ")}${s.climates && s.climates.length ? " · " + s.climates.join(" / ") + " climates" : ""}.</div>` : ""}</div>
+        <div class="region-picker-sub">${s.icon} <strong style="color:var(--white)">${s.title}</strong> — pick where this takes place, or skip.</div>
+        ${filterNote}
       </div>
-      ${_rp.step !== "continent" ? breadcrumb : ""}
       <button class="rp-skip-btn" id="rp-skip">Skip — use default environment</button>
-      ${inner}
+      <input class="rp-search" id="rp-search" type="text" placeholder="Search regions or countries…" value="${_rp.query.replace(/"/g, "&quot;")}">
+      ${!all.length ? `
+        <div class="rp-empty">
+          <div class="rp-empty-title">No mapped regions fit this scenario</div>
+          <div class="rp-empty-sub">${s.icon} <strong style="color:var(--white)">${s.title}</strong> doesn't take place in any mapped land region — the default environment will be used instead.</div>
+          <button class="rp-confirm-btn" id="rp-nodefault">Continue with default environment →</button>
+        </div>` : !list.length ? `
+        <div class="rp-empty"><div class="rp-empty-sub">No regions match "${ _rp.query.replace(/</g, "&lt;") }".</div></div>` : `
+        <div class="rp-list">
+          ${list.map(({ c, co, r }) => {
+            const open = _rp.expanded === r.id;
+            const threats = [...((r.threats?.weather || []).slice(0, 2)), ...((r.threats?.wildlife || []).slice(0, 1))];
+            const water = (r.water?.sources || []).slice(0, 2);
+            return `
+            <div class="rp-flat-item ${open ? "open" : ""}">
+              <button class="rp-list-item" data-rid="${r.id}" style="width:100%">
+                <div class="rp-list-item-body">
+                  <div class="rp-list-item-name">${c.icon} ${r.name}</div>
+                  <div class="rp-list-item-meta">${co.name} · ${c.name}</div>
+                </div>
+                <span class="rp-list-arrow">${open ? "▾" : "▸"}</span>
+              </button>
+              ${open ? `
+                <div class="rp-flat-detail">
+                  <div style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:8px">${r.terrain || ""}</div>
+                  ${threats.length ? `<div class="rp-detail-label">Key threats</div>${threats.map(t => `<div class="rp-threat">⚠ ${t}</div>`).join("")}` : ""}
+                  ${water.length ? `<div class="rp-detail-label" style="margin-top:8px">Water</div>${water.map(w => `<div class="rp-water">✓ ${w}</div>`).join("")}` : ""}
+                  <button class="rp-confirm-btn" data-confirm="${r.id}">Set as scenario location →</button>
+                </div>` : ""}
+            </div>`;
+          }).join("")}
+        </div>`}
     </div>`;
 
-  // ── Back ──────────────────────────────────────────────────────────────────
-  root.querySelector("#rp-back").addEventListener("click", () => {
-    if (_rp.step === "continent") { RUN.phase = "menu"; renderSimulator(root); }
-    else if (_rp.step === "country") { _rp.step = "continent"; _rp.continent = null; renderRegionPicker(root); }
-    else if (_rp.step === "region")  { _rp.step = "country";   _rp.country   = null; renderRegionPicker(root); }
-    else if (_rp.step === "confirm") { _rp.step = "region";    _rp.region    = null; renderRegionPicker(root); }
-  });
-
-  // ── Skip / no fitting region ──────────────────────────────────────────────
+  root.querySelector("#rp-back").addEventListener("click", () => { RUN.phase = "menu"; renderSimulator(root); });
   root.querySelector("#rp-skip").addEventListener("click", () => rpUseDefault(root));
   const noFitBtn = root.querySelector("#rp-nodefault");
   if (noFitBtn) noFitBtn.addEventListener("click", () => rpUseDefault(root));
 
-  // ── Breadcrumb nav ─────────────────────────────────────────────────────────
-  root.querySelectorAll(".rp-crumb").forEach(el => {
-    el.addEventListener("click", () => {
-      const target = el.dataset.crumb;
-      if (target === "continent") { _rp.step = "continent"; _rp.continent = null; _rp.country = null; _rp.region = null; renderRegionPicker(root); }
-      if (target === "country")   { _rp.step = "country";   _rp.country   = null; _rp.region  = null; renderRegionPicker(root); }
-      if (target === "region")    { _rp.step = "region";    _rp.region    = null; renderRegionPicker(root); }
-    });
-  });
+  const search = root.querySelector("#rp-search");
+  search.addEventListener("input", () => { _rp.query = search.value; _rp.expanded = null; renderRegionPicker(root); });
+  // Keep focus in the search box while typing (re-render steals it)
+  search.focus();
+  search.setSelectionRange(search.value.length, search.value.length);
 
-  // ── Continent select ───────────────────────────────────────────────────────
-  root.querySelectorAll(".rp-card[data-cid]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      _rp.continent = atlasState.continents.find(c => c.id === btn.dataset.cid);
-      _rp.step = "country";
-      renderRegionPicker(root);
-    });
-  });
-
-  // ── Country select ─────────────────────────────────────────────────────────
-  root.querySelectorAll(".rp-list-item[data-coid]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      _rp.country = (_rp.continent.countries || []).find(c => c.id === btn.dataset.coid);
-      _rp.step = "region";
-      renderRegionPicker(root);
-    });
-  });
-
-  // ── Region select ──────────────────────────────────────────────────────────
   root.querySelectorAll(".rp-list-item[data-rid]").forEach(btn => {
     btn.addEventListener("click", () => {
-      _rp.region = (_rp.country.regions || []).find(r => r.id === btn.dataset.rid);
-      _rp.step = "confirm";
+      _rp.expanded = _rp.expanded === btn.dataset.rid ? null : btn.dataset.rid;
       renderRegionPicker(root);
     });
   });
 
-  // ── Confirm ───────────────────────────────────────────────────────────────
-  const confirmBtn = root.querySelector("#rp-confirm");
-  if (confirmBtn) {
-    confirmBtn.addEventListener("click", () => {
+  root.querySelectorAll("[data-confirm]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const found = all.find(({ r }) => r.id === btn.dataset.confirm);
+      if (!found) return;
       RUN.atlasRegion = {
-        continent: { id: _rp.continent.id, name: _rp.continent.name, icon: _rp.continent.icon },
-        country:   { id: _rp.country.id,   name: _rp.country.name },
-        region:    _rp.region,
+        continent: { id: found.c.id, name: found.c.name, icon: found.c.icon },
+        country:   { id: found.co.id,  name: found.co.name },
+        region:    found.r,
       };
-      applyAtlasRegionToEnv(_rp.region);
-      // Reset picker state for next use
-      _rp.step = "continent"; _rp.continent = null; _rp.country = null; _rp.region = null;
+      applyAtlasRegionToEnv(found.r);
+      _rp.query = ""; _rp.expanded = null;
       RUN.phase = "kit";
       renderSimulator(root);
     });
-  }
+  });
 }
 
 // ── Apply Atlas region data to RUN.env ─────────────────────────────────────────
@@ -10511,6 +10562,11 @@ function buildRegionalIntelBlock(atlasRegion) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function renderKit(root) {
+  // Gear premise: you can't always be ready. Crash scenarios skip the kit.
+  const gear = RUN.scenario.gear || "kit";
+  if (gear === "pockets") return renderPockets(root);
+  if (gear === "nothing") return renderNoGear(root);
+
   const available  = Object.values(KITS).filter(k => char.unlockedKits.includes(k.id));
   const locked     = Object.values(KITS).filter(k => !char.unlockedKits.includes(k.id));
   const ownedItems = (char.ownedGear || []).filter(id => ITEMS[id]);
@@ -10654,15 +10710,63 @@ function renderKit(root) {
   }
 }
 
+// ── Pockets / Nothing — you can't always be ready ────────────────────────────
+// If you crash, you won't have your kit. These screens replace kit selection
+// when the scenario's gear premise is "pockets" or "nothing".
+function renderPockets(root) {
+  const items = POCKET_GEAR_IDS.map(id => ITEMS[id]).filter(Boolean);
+  root.innerHTML = `
+    <div class="sim-page">
+      <button class="back-btn" id="btn-back">← Scenarios</button>
+      <div class="sim-eyebrow">${RUN.scenario.icon} ${RUN.scenario.title}</div>
+      <h2 class="sim-title">Empty Your Pockets</h2>
+      <p class="stage-situation">No time to pack. No kit. Whatever was on you when it started — that's your gear.</p>
+      <div class="kit-grid">
+        <div class="kit-card" style="cursor:default">
+          <div class="kit-name">👖 Everyday Carry</div>
+          <div class="kit-desc">This is all you have. Make it count.</div>
+          <div class="kit-items-list">
+            ${items.map(it => `<span class="kit-item-tag">${it.icon} ${it.name}</span>`).join("")}
+          </div>
+        </div>
+      </div>
+      <button class="btn-solid" id="btn-pockets-go" style="width:100%;margin-top:16px;padding:13px">Start With What's In Your Pockets →</button>
+    </div>`;
+  root.querySelector("#btn-back").addEventListener("click", () => { resetRun(); renderSimulator(root); });
+  root.querySelector("#btn-pockets-go").addEventListener("click", () => {
+    RUN.inventory = buildPocketsInventory();
+    RUN.phase = "brief";
+    renderSimulator(root);
+  });
+}
+
+function renderNoGear(root) {
+  root.innerHTML = `
+    <div class="sim-page">
+      <button class="back-btn" id="btn-back">← Scenarios</button>
+      <div class="sim-eyebrow">${RUN.scenario.icon} ${RUN.scenario.title}</div>
+      <h2 class="sim-title">Nothing</h2>
+      <p class="stage-situation">You have nothing but the clothes on your back. No tools, no supplies. Just you — and the decisions you're about to make.</p>
+      <button class="btn-solid" id="btn-nogear-go" style="width:100%;margin-top:16px;padding:13px">Start With Nothing →</button>
+    </div>`;
+  root.querySelector("#btn-back").addEventListener("click", () => { resetRun(); renderSimulator(root); });
+  root.querySelector("#btn-nogear-go").addEventListener("click", () => {
+    RUN.inventory = {};
+    RUN.phase = "brief";
+    renderSimulator(root);
+  });
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // BRIEF
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function renderBrief(root) {
   const s = RUN.scenario;
+  const backLabel = (s.gear && s.gear !== "kit") ? "← Gear" : "← Kit";
   root.innerHTML = `
     <div class="sim-page">
-      <button class="back-btn" id="btn-back">← Kit</button>
+      <button class="back-btn" id="btn-back">${backLabel}</button>
       <div class="sim-eyebrow">Scenario Brief</div>
       <h2 class="sim-title">${s.icon} ${s.title}</h2>
 
@@ -10730,6 +10834,7 @@ function renderStage(root) {
   const stageNum = RUN.stageIndex + 1;
   const total    = RUN.scenario.stages.length;
   const sys      = RUN.systems;
+  const gearW    = gearWord(RUN.scenario.gear || "kit");
 
   const hudBars = HUD_SYSTEMS.map(key => {
     const def  = CORE_SYSTEM_DEFS[key];
@@ -10780,7 +10885,7 @@ function renderStage(root) {
       <div class="check-block">
         <span class="card-label">${stage.check.label}</span>
         <span class="check-formula">
-          ${STAT_DEFS.find(s=>s.id===stage.check.stat)?.label} + kit + effort
+          ${STAT_DEFS.find(s=>s.id===stage.check.stat)?.label} + ${gearW} + effort
           vs <strong>${adjDiff}</strong> demand
           ${pen > 0 ? `<span class="pen-note">(+${pen} penalty)</span>` : ""}
           ${bon > 0 ? `<span class="bon-note">(−${bon} bonus)</span>` : ""}
@@ -10793,21 +10898,23 @@ function renderStage(root) {
       <div class="choices-list">
         ${stage.choices.map(ch => {
           const statId  = ch.statHint || stage.check.stat;
-          const statVal = char.stats[statId] || 3;
+          const { value: statVal, mod: statMod } = effStat(statId);
           const statDef = STAT_DEFS.find(s=>s.id===statId);
           const { item, bonus } = getBestItem(RUN.inventory, ch.tag || stage.check.tag);
           const readiness = statVal + bonus + STEADY_EFFORT;
           const margin = readiness - adjDiff;
-          const tierInfo = margin >= 2 ? ["SOLID", "tier-solid"]
-                       : margin >= 0 ? ["COSTLY", "tier-costly"]
-                       : ["RISKY", "tier-risky"];
+          // Price forecast only — never reveals whether the call itself is sound.
+          // READY: you can afford this. TAXING: it will cost you. DESPERATE: heavy price.
+          const tierInfo = margin >= 2 ? ["READY", "tier-ready"]
+                       : margin >= 0 ? ["TAXING", "tier-taxing"]
+                       : ["DESPERATE", "tier-desperate"];
           return `
             <button class="choice-btn" data-id="${ch.id}">
               <div class="choice-content">
                 <div class="choice-label">${ch.label}</div>
                 <div class="choice-desc">${ch.desc}</div>
                 <div class="choice-meta">
-                  <span class="choice-stat">${statDef?.icon} ${statDef?.label} ${statVal}</span>
+                  <span class="choice-stat">${statDef?.icon} ${statDef?.label} ${statVal}${statMod ? ` <span class="stat-mod">(${statMod > 0 ? "+" : ""}${statMod})</span>` : ""}</span>
                   ${item ? `<span class="choice-item">${item.icon} +${bonus}</span>` : ""}
                   <span class="choice-tier ${tierInfo[1]}">${tierInfo[0]}</span>
                 </div>
@@ -10827,9 +10934,8 @@ function renderStage(root) {
 
   root.querySelectorAll(".choice-btn").forEach(btn =>
     btn.addEventListener("click", () => {
-      RUN.chosenChoice = stage.choices.find(c => c.id === btn.dataset.id);
-      RUN.phase = "resolution";
-      renderSimulator(root);
+      const choice = stage.choices.find(c => c.id === btn.dataset.id);
+      resolveStageChoice(root, choice);
     })
   );
 
@@ -10845,11 +10951,13 @@ function renderStage(root) {
 // Factors are revealed one by one, then the verdict. The situation unfolds;
 // nothing is rolled. Thin margins cost you; they never veto a sound plan.
 
-function renderResolution(root) {
+// ── Synchronous stage resolution (no forced animation) ────────────────────────
+// Tap a choice → everything computes instantly → result screen.
+// Doctrine picks the branch, readiness picks the price.
+function resolveStageChoice(root, choice) {
   const stage   = RUN.scenario.stages[RUN.stageIndex];
-  const choice  = RUN.chosenChoice;
   const statId  = choice.statHint || stage.check.stat;
-  const statVal = char.stats[statId] || 3;
+  const { value: statVal, mod: statMod } = effStat(statId);
   const statDef = STAT_DEFS.find(s => s.id === statId);
   const { item, bonus } = getBestItem(RUN.inventory, choice.tag || stage.check.tag);
   const pen     = condPenalty();
@@ -10857,139 +10965,168 @@ function renderResolution(root) {
   const envMod  = envDiffMod(stage.check.tag);
   const adjDiff = Math.max(4, stage.check.difficulty + pen - bon + envMod);
 
-  const rows = [{ k: statDef?.label || "Stat", v: `+${statVal}` }];
-  if (item) rows.push({ k: `${item.icon} ${item.name}`, v: `+${bonus}` });
-  rows.push({ k: "Steady effort", v: `+${STEADY_EFFORT}` });
-  if (pen > 0)    rows.push({ k: "Conditions working against you", v: `demand +${pen}`, neg: true });
-  if (bon > 0)    rows.push({ k: "Conditions in your favour",      v: `demand −${bon}`, pos: true });
-  if (envMod > 0) rows.push({ k: "Environment", v: `demand +${envMod}`, neg: true });
-  if (envMod < 0) rows.push({ k: "Environment", v: `demand ${envMod}`,  pos: true });
+  const factors = [{ k: statDef?.label || "Stat", v: `+${statVal}` }];
+  if (item) factors.push({ k: `${item.icon} ${item.name}`, v: `+${bonus}` });
+  factors.push({ k: "Steady effort", v: `+${STEADY_EFFORT}` });
+  if (statMod) factors.push({ k: "Scenario condition", v: `${statMod > 0 ? "+" : ""}${statMod}`, neg: statMod < 0, pos: statMod > 0 });
+  if (pen > 0)    factors.push({ k: "Conditions working against you", v: `demand +${pen}`, neg: true });
+  if (bon > 0)    factors.push({ k: "Conditions in your favour",      v: `demand \u2212${bon}`, pos: true });
+  if (envMod > 0) factors.push({ k: "Environment", v: `demand +${envMod}`, neg: true });
+  if (envMod < 0) factors.push({ k: "Environment", v: `demand ${envMod}`,  pos: true });
 
-  root.innerHTML = `
-    <div class="sim-page resolution-page">
-      <div class="rolling-action">${choice.label}</div>
-      <div class="rolling-check">${stage.check.label}</div>
-      <div class="factors" id="factors"></div>
-      <div class="factors-total" id="factors-total"></div>
-      <div class="roll-verdict" id="roll-verdict"></div>
-    </div>`;
+  if (item) RUN.inventory = consumeItem(RUN.inventory, item.id);
 
-  const factorsEl = root.querySelector("#factors");
-  const totalEl   = root.querySelector("#factors-total");
-  const verdict   = root.querySelector("#roll-verdict");
-  let i = 0;
+  const assess = assessReadiness(statVal, adjDiff, bonus);
+  RUN.lastAssess  = assess;
+  const res = resolveChoice(choice, assess);
+  RUN.lastResolve = res;
+  RUN.lastFactors = factors;
 
-  const iv = setInterval(() => {
-    if (i < rows.length) {
-      const r = rows[i++];
-      factorsEl.insertAdjacentHTML("beforeend",
-        `<div class="factor-row"><span>${r.k}</span><span class="factor-val${r.neg ? " f-neg" : r.pos ? " f-pos" : ""}">${r.v}</span></div>`);
-      return;
-    }
-    clearInterval(iv);
+  // Per-stage random events — the world's luck, never a veto on your competence
+  RUN.randomEvent = null;
+  for (const ev of (stage.randomEvents || [])) {
+    if (Math.random() < ev.chance) { RUN.randomEvent = ev; applyEffects(ev.effect); break; }
+  }
 
-    if (item) RUN.inventory = consumeItem(RUN.inventory, item.id);
+  // Stage outcome — doctrine chose the branch above
+  const outcomeMap = stage.outcomes[choice.id];
+  const outcome    = res.branch === "success" ? outcomeMap?.success : outcomeMap?.failure;
+  RUN.lastOutcome  = outcome;
+  applyEffects(outcome?.effects);
 
-    const assess = assessReadiness(statVal, adjDiff, bonus);
-    RUN.lastAssess = assess;
-    totalEl.innerHTML = `<div class="factor-row factor-total"><span>Readiness vs demand</span><span class="factor-val">${assess.readiness} vs ${assess.demand}</span></div>`;
+  // Friction: the price of the call. Bounded, never a veto on a sound plan.
+  const frictionLabels = [];
+  for (let f = 0; f < res.frictionCount; f++) {
+    const fr = FRICTION_COSTS[Math.floor(Math.random() * FRICTION_COSTS.length)];
+    applyEffects(fr.effects);
+    frictionLabels.push(fr.label);
+  }
 
-    verdict.textContent =
-      assess.tier === "solid"  ? "✓ SOLID — your preparation carries it." :
-      assess.tier === "costly" ? "~ COSTLY — it works, but it takes something out of you." :
-                                 "✗ NOT READY — beyond your current means.";
-    verdict.className = "roll-verdict " + (
-      assess.tier === "solid" ? "verdict-ok" : assess.tier === "costly" ? "verdict-costly" : "verdict-fail");
+  const xp = xpForStage(res, assess.margin, RUN.stageIndex);
+  RUN.xpEarned += xp;
 
-    setTimeout(() => {
-      // Per-stage random events — the world's luck, never a veto on your competence
-      RUN.randomEvent = null;
-      for (const ev of (stage.randomEvents || [])) {
-        if (Math.random() < ev.chance) { RUN.randomEvent = ev; applyEffects(ev.effect); break; }
-      }
+  // Steps 4–11 — full simulation tick
+  runSimulationTick();
 
-      // Stage outcome
-      const outcomeMap = stage.outcomes[choice.id];
-      const outcome    = assess.success ? outcomeMap?.success : outcomeMap?.failure;
-      RUN.lastOutcome  = outcome;
-      applyEffects(outcome?.effects);
+  RUN.stageLog.push({
+    stageTitle: stage.title, choiceLabel: choice.label,
+    assess, resolve: res, success: res.branch === "success", xp,
+    frictionLabel: frictionLabels[0] || null, frictionLabels,
+    fatal: outcome?.effects?.fatal === true,
+    tickEvents: RUN.tickEvents.map(e => e.label || e.id),
+    learnMore: outcome?.learnMore || [],
+  });
 
-      // Friction on thin margins: a cost, never a veto
-      let frictionLabel = null;
-      if (assess.tier === "costly") {
-        const fr = FRICTION_COSTS[Math.floor(Math.random() * FRICTION_COSTS.length)];
-        applyEffects(fr.effects);
-        frictionLabel = fr.label;
-      }
-
-      const xp = xpForStage(assess.tier, assess.margin, RUN.stageIndex);
-      RUN.xpEarned += xp;
-
-      // Steps 4–11 — full simulation tick
-      runSimulationTick();
-
-      RUN.stageLog.push({
-        stageTitle: stage.title, choiceLabel: choice.label,
-        assess, success: assess.success, xp, frictionLabel,
-        fatal: outcome?.effects?.fatal === true,
-        tickEvents: RUN.tickEvents.map(e => e.label || e.id),
-        learnMore: outcome?.learnMore || [],
-      });
-
-      if (outcome?.effects?.fatal || isLethal(RUN.systems)) {
-        finaliseRun(false);
-        RUN.phase = "debrief";
-      } else {
-        RUN.phase = "result";
-      }
-      renderSimulator(root);
-    }, 900);
-  }, 220);
+  if (outcome?.effects?.fatal || isLethal(RUN.systems)) {
+    finaliseRun(false);
+    RUN.phase = "debrief";
+  } else {
+    RUN.phase = "result";
+  }
+  renderSimulator(root);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // STAGE RESULT
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function renderStageResult(root, onOpenArticle) {
   const assess   = RUN.lastAssess;
+  const res      = RUN.lastResolve || { quality: "risky", branch: assess?.success ? "success" : "failure", priceTier: assess?.tier };
   const outcome  = RUN.lastOutcome;
+  const factors  = RUN.lastFactors || [];
   const friction = RUN.stageLog.length ? RUN.stageLog[RUN.stageLog.length - 1].frictionLabel : null;
-  const tierBadge = assess.tier === "solid" ? "✓ Solid" : assess.tier === "costly" ? "~ Costly" : "✗ Failed";
+  const vd       = verdictFor(res);
+  const won      = res.branch === "success";
   const stage    = RUN.scenario.stages[RUN.stageIndex];
   const isLast   = RUN.stageIndex >= RUN.scenario.stages.length - 1;
   const stageNum = RUN.stageIndex + 1;
   const sys      = RUN.systems;
 
-  const tickHTML = RUN.tickEvents.length ? `
-    <div class="tick-events-box">
-      <span class="card-label">Dynamic Events</span>
-      ${RUN.tickEvents.map(ev => `
-        <div class="tick-event-row">
-          <span class="te-label">${ev.label || ev.id}</span>
-          ${ev.tip ? `<p class="te-tip">${ev.tip.slice(0,90)}${ev.tip.length > 90 ? "…" : ""}</p>` : ""}
-          ${ev._cascadesFired?.length ? `
-            <div class="te-cascades">
-              ${ev._cascadesFired.map(c => `<span class="te-cascade">↳ ${c.label || c.id}</span>`).join("")}
-            </div>` : ""}
-        </div>`).join("")}
-    </div>` : "";
+  const rule = getMatchedRule(stage.check.tag, RUN.scenario.relatedDomain);
+
+  const whyInner = `
+    ${factors.length ? `
+      <div class="factors-static">
+        ${factors.map(r => `<div class="factor-row"><span>${r.k}</span><span class="factor-val${r.neg ? " f-neg" : r.pos ? " f-pos" : ""}">${r.v}</span></div>`).join("")}
+        <div class="factor-row factor-total"><span>Readiness vs demand</span><span class="factor-val">${assess.readiness} vs ${assess.demand}</span></div>
+      </div>` : ""}
+    ${rule ? `
+      <div class="result-tip" style="border-left-color:var(--green-dk);margin-top:10px">
+        <span class="card-label" style="color:var(--green-lt)">⬡ You Didn't Die — ${rule.title}</span>
+        <p>${rule.rule}</p>
+      </div>` : ""}
+    ${friction ? `
+      <div class="result-tip" style="border-left-color:var(--amber);margin-top:10px">
+        <span class="card-label">Cost</span>
+        <p>${friction}</p>
+      </div>` : ""}`;
+
+  const situationInner = `
+    ${RUN.randomEvent ? `
+      <div class="random-event-box" style="margin:0 0 10px">
+        <span class="card-label">Situation Event</span>
+        <p>${RUN.randomEvent.text}</p>
+      </div>` : ""}
+    ${RUN.tickEvents.length ? `
+      <div class="tick-events-box" style="margin:0">
+        <span class="card-label">Dynamic Events</span>
+        ${RUN.tickEvents.map(ev => `
+          <div class="tick-event-row">
+            <span class="te-label">${ev.label || ev.id}</span>
+            ${ev.tip ? `<p class="te-tip">${ev.tip.slice(0,90)}${ev.tip.length > 90 ? "…" : ""}</p>` : ""}
+          </div>`).join("")}
+      </div>` : ""}`;
+
+  const learnInner = `
+    <div class="result-tip" style="border-left-color:var(--amber);margin:0">
+      <span class="card-label">📖 Learn More — Encyclopedia</span>
+      ${(outcome.learnMore || []).map(id => {
+        const a = store.articlesById[id];
+        if (!a) return "";
+        return `
+          <button class="reading-link" data-id="${a.id}">
+            <span>${a.domainIcon || "📖"}</span>
+            <div>
+              <div class="rl-title">${a.title}</div>
+              <div class="rl-meta">Level ${a.difficulty} · ${a.readTime} min</div>
+            </div>
+            <span>→</span>
+          </button>`;
+      }).join("")}
+    </div>`;
+
+  const statusInner = `
+    <div class="systems-readout" style="margin:0 0 10px">
+      <span class="card-label">Systems Status</span>
+      <div class="sys-readout-grid">
+        ${HUD_SYSTEMS.map(key => {
+          const def  = CORE_SYSTEM_DEFS[key];
+          const val  = sys[key] ?? def.default;
+          const warn = key === "health" ? val < 30 : key === "morale" ? val < 30
+                     : key === "thirst" ? val > 65 : key === "fatigue" ? val > 65
+                     : key === "stress"  ? val > 70
+                     : key === "temperature" ? (val < 35 || val > 39.5) : false;
+          return `
+            <div class="sys-readout-item ${warn ? "sys-warn" : ""}">
+              <span>${def.icon} ${def.label}</span>
+              <span>${Number.isInteger(val) ? val : val.toFixed(1)}${def.unit}</span>
+            </div>`;
+        }).join("")}
+      </div>
+    </div>
+    ${RUN.conditions.length ? `
+      <div class="result-conditions" style="margin:0">
+        ${RUN.conditions.map(c => `<span class="cond-tag">${c.replace(/_/g," ")}</span>`).join("")}
+      </div>` : ""}`;
 
   root.innerHTML = `
     <div class="sim-page">
-      <div class="result-stage-banner ${assess.success ? "rsb-ok" : "rsb-fail"}">
-        <span class="rsb-badge">${tierBadge}</span>
+      <div class="result-stage-banner ${won ? "rsb-ok" : "rsb-fail"}">
+        <span class="rsb-badge">${vd.badge}</span>
         <span class="rsb-stage">Stage ${stageNum} of ${RUN.scenario.stages.length}</span>
         <span class="rsb-roll">${assess.readiness} vs ${assess.demand} readiness</span>
       </div>
-
-      ${RUN.randomEvent ? `
-        <div class="random-event-box">
-          <span class="card-label">Situation Event</span>
-          <p>${RUN.randomEvent.text}</p>
-        </div>` : ""}
-
-      ${tickHTML}
+      <div class="result-verdict ${vd.cls}">${vd.text}</div>
 
       <div class="result-narrative">${outcome?.narrative || ""}</div>
 
@@ -10999,76 +11136,33 @@ function renderStageResult(root, onOpenArticle) {
           <p>${outcome.tip}</p>
         </div>` : ""}
 
-      ${(() => {
-        const rule = getMatchedRule(stage.check.tag, RUN.scenario.relatedDomain);
-        if (!rule) return "";
-        return `
-          <div class="result-tip" style="border-left-color:var(--green-dk)">
-            <span class="card-label" style="color:var(--green-lt)">⬡ You Didn't Die — ${rule.title}</span>
-            <p>${rule.rule}</p>
-          </div>`;
-      })()}
+      <button class="collapse-toggle" data-collapse="why"><span>Why this happened</span><span class="ct-arrow">▸</span></button>
+      <div class="collapse-body" id="collapse-why">${whyInner}</div>
+
+      ${(RUN.randomEvent || RUN.tickEvents.length) ? `
+        <button class="collapse-toggle" data-collapse="situation"><span>Situation</span><span class="ct-arrow">▸</span></button>
+        <div class="collapse-body" id="collapse-situation">${situationInner}</div>` : ""}
 
       ${(outcome?.learnMore || []).length ? `
-        <div class="result-tip" style="border-left-color:var(--amber)">
-          <span class="card-label">📖 Learn More — Encyclopedia</span>
-          ${(outcome.learnMore || []).map(id => {
-            const a = store.articlesById[id];
-            if (!a) return "";
-            return `
-              <button class="reading-link" data-id="${a.id}">
-                <span>${a.domainIcon || "📖"}</span>
-                <div>
-                  <div class="rl-title">${a.title}</div>
-                  <div class="rl-meta">Level ${a.difficulty} · ${a.readTime} min</div>
-                </div>
-                <span>→</span>
-              </button>`;
-          }).join("")}
-        </div>` : ""}
+        <button class="collapse-toggle" data-collapse="learn"><span>Learn more</span><span class="ct-arrow">▸</span></button>
+        <div class="collapse-body" id="collapse-learn">${learnInner}</div>` : ""}
 
-      ${friction ? `
-        <div class="result-tip" style="border-left-color:var(--amber)">
-          <span class="card-label">Cost</span>
-          <p>${friction}</p>
-        </div>` : ""}
-
-      <div class="result-row-stats">
-        <div class="rstat"><div class="rstat-val">${assess.stat}</div><div class="rstat-label">Stat</div></div>
-        ${assess.bonus ? `<div class="rstat"><div class="rstat-val">+${assess.bonus}</div><div class="rstat-label">Kit</div></div>` : ""}
-        <div class="rstat"><div class="rstat-val">+${assess.effort}</div><div class="rstat-label">Effort</div></div>
-        <div class="rstat"><div class="rstat-val ${assess.success ? "rs-ok" : "rs-fail"}">${assess.readiness}</div><div class="rstat-label">Ready</div></div>
-        <div class="rstat"><div class="rstat-val text-dim">${assess.demand}</div><div class="rstat-label">Demand</div></div>
-      </div>
-
-      <div class="systems-readout">
-        <span class="card-label">Systems Status</span>
-        <div class="sys-readout-grid">
-          ${HUD_SYSTEMS.map(key => {
-            const def  = CORE_SYSTEM_DEFS[key];
-            const val  = sys[key] ?? def.default;
-            const warn = key === "health" ? val < 30 : key === "morale" ? val < 30
-                       : key === "thirst" ? val > 65 : key === "fatigue" ? val > 65
-                       : key === "stress"  ? val > 70
-                       : key === "temperature" ? (val < 35 || val > 39.5) : false;
-            return `
-              <div class="sys-readout-item ${warn ? "sys-warn" : ""}">
-                <span>${def.icon} ${def.label}</span>
-                <span>${Number.isInteger(val) ? val : val.toFixed(1)}${def.unit}</span>
-              </div>`;
-          }).join("")}
-        </div>
-      </div>
-
-      ${RUN.conditions.length ? `
-        <div class="result-conditions">
-          ${RUN.conditions.map(c => `<span class="cond-tag">${c.replace(/_/g," ")}</span>`).join("")}
-        </div>` : ""}
+      <button class="collapse-toggle" data-collapse="status"><span>Status</span><span class="ct-arrow">▸</span></button>
+      <div class="collapse-body" id="collapse-status">${statusInner}</div>
 
       <button class="btn-solid" id="btn-next" style="margin-top:24px;width:100%;padding:14px">
         ${isLast ? "Complete Scenario →" : "Next Stage →"}
       </button>
     </div>`;
+
+  root.querySelectorAll(".collapse-toggle").forEach(btn =>
+    btn.addEventListener("click", () => {
+      const body = root.querySelector("#collapse-" + btn.dataset.collapse);
+      const open = body.classList.toggle("open");
+      btn.querySelector(".ct-arrow").textContent = open ? "▾" : "▸";
+      btn.classList.toggle("open", open);
+    })
+  );
 
   root.querySelectorAll(".reading-link").forEach(btn =>
     btn.addEventListener("click", () => onOpenArticle && onOpenArticle(btn.dataset.id))
@@ -11086,7 +11180,6 @@ function renderStageResult(root, onOpenArticle) {
   });
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // DEBRIEF — Step 10: output summary statistics
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -11199,7 +11292,7 @@ function renderDebrief(root, onOpenArticle) {
                 </div>` : ""}
             </div>
             <div class="log-right">
-              <span class="log-roll">${entry.assess.readiness} vs ${entry.assess.demand} · ${entry.assess.tier.toUpperCase()}</span>
+              <span class="log-roll">${entry.assess.readiness} vs ${entry.assess.demand} · ${(entry.resolve ? entry.resolve.quality + " · " + entry.resolve.priceTier : entry.assess.tier).toUpperCase()}</span>
               <span class="log-xp">+${entry.xp} xp</span>
             </div>
           </div>`).join("")}
