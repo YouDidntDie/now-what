@@ -458,6 +458,7 @@ body::after {
   position: fixed;
   top: var(--topbar-h); left: 0; right: 0; bottom: 0;
   overflow-y: auto;
+  overscroll-behavior-y: contain;
   background: var(--bg);
 }
 
@@ -1939,6 +1940,15 @@ body::after {
 .rp-detail-label { font-family: var(--font-m); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 5px; }
 .rp-threat { font-size: 11px; color: var(--red-lt); margin-bottom: 2px; }
 .rp-water { font-size: 11px; color: var(--green-lt); margin-bottom: 2px; }
+.rp-continent { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; background: var(--bg2); overflow: hidden; }
+.rp-continent > summary { cursor: pointer; padding: 12px 14px; font-family: var(--font-m); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-dim); list-style: none; display: flex; align-items: center; gap: 10px; }
+.rp-continent > summary::-webkit-details-marker { display: none; }
+.rp-continent > summary::before { content: "▸"; color: var(--amber); }
+.rp-continent[open] > summary::before { content: "▾"; }
+.rp-continent > summary:hover { color: var(--text); }
+.rp-continent-name { flex: 1; }
+.rp-continent-count { font-size: 9px; color: var(--text-faint); letter-spacing: .08em; }
+.rp-continent-body { padding: 10px 10px 2px; border-top: 1px solid var(--border); }
 
 /* Regional Intel block in Brief */
 .regional-intel { background: rgba(14,48,26,.25); border: 1px solid var(--green); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
@@ -12782,7 +12792,7 @@ function resetRun() {
     atlasRegion: null, stageResolved:false,
   });
   _setupSel = null;
-  _rp.query = ""; _rp.expanded = null;
+  _rp.query = ""; _rp.expanded = null; _rp.openContinents = new Set();
 }
 
 // ── Condition helpers ──────────────────────────────────────────────────────────
@@ -13075,6 +13085,7 @@ function renderMenu(root) {
       }
       RUN.phase = "setup";
       renderSimulator(root);
+      root.scrollTop = 0; // fresh navigation: start at the top
     })
   );
 }
@@ -13120,28 +13131,13 @@ function setupRegionSectionHTML() {
     <div id="setup-region-list"></div>`;
 }
 
-function setupRegionListHTML() {
-  const s = RUN.scenario;
-  const all = rpFlatRegions(s);
-  const q = _rp.query.trim().toLowerCase();
-  const list = q
-    ? all.filter(({ c, co, r }) => (r.name + " " + co.name + " " + c.name).toLowerCase().includes(q))
-    : all;
-
-  if (!all.length) return `
-    <div class="rp-empty">
-      <div class="rp-empty-title">No mapped regions fit this scenario</div>
-      <div class="rp-empty-sub">${s.icon} <strong style="color:var(--white)">${s.title}</strong> doesn't take place in any mapped land region — the default environment will be used instead.</div>
-    </div>`;
-  if (!list.length) return `
-    <div class="rp-empty"><div class="rp-empty-sub">No regions match "${_rp.query.replace(/</g, "&lt;")}".</div></div>`;
+// One region row (expandable): markup identical whether rendered flat (search)
+// or grouped under a continent <details>.
+function rpRegionItemHTML(c, co, r) {
+  const open = _rp.expanded === r.id;
+  const threats = [...((r.threats?.weather || []).slice(0, 2)), ...((r.threats?.wildlife || []).slice(0, 1))];
+  const water = (r.water?.sources || []).slice(0, 2);
   return `
-    <div class="rp-list">
-      ${list.map(({ c, co, r }) => {
-        const open = _rp.expanded === r.id;
-        const threats = [...((r.threats?.weather || []).slice(0, 2)), ...((r.threats?.wildlife || []).slice(0, 1))];
-        const water = (r.water?.sources || []).slice(0, 2);
-        return `
         <div class="rp-flat-item ${open ? "open" : ""}">
           <button class="rp-list-item" data-rid="${r.id}" style="width:100%">
             <div class="rp-list-item-body">
@@ -13158,22 +13154,73 @@ function setupRegionListHTML() {
               <button class="rp-confirm-btn" data-confirm="${r.id}">Set as scenario location →</button>
             </div>` : ""}
         </div>`;
-      }).join("")}
+}
+
+function setupRegionListHTML() {
+  const s = RUN.scenario;
+  const all = rpFlatRegions(s);
+  const q = _rp.query.trim().toLowerCase();
+
+  if (!all.length) return `
+    <div class="rp-empty">
+      <div class="rp-empty-title">No mapped regions fit this scenario</div>
+      <div class="rp-empty-sub">${s.icon} <strong style="color:var(--white)">${s.title}</strong> doesn't take place in any mapped land region — the default environment will be used instead.</div>
     </div>`;
+
+  // Search active: flat filtered list across all continents (unchanged behavior).
+  if (q) {
+    const list = all.filter(({ c, co, r }) => (r.name + " " + co.name + " " + c.name).toLowerCase().includes(q));
+    if (!list.length) return `
+    <div class="rp-empty"><div class="rp-empty-sub">No regions match "${_rp.query.replace(/</g, "&lt;")}".</div></div>`;
+    return `
+    <div class="rp-list">
+      ${list.map(({ c, co, r }) => rpRegionItemHTML(c, co, r)).join("")}
+    </div>`;
+  }
+
+  // No query: group matching regions by continent, each in a collapsible.
+  // All collapsed by default except the continent holding the selected region.
+  const groups = [];
+  const byId = new Map();
+  for (const { c, co, r } of all) {
+    let g = byId.get(c.id);
+    if (!g) { g = { c, items: [] }; byId.set(c.id, g); groups.push(g); }
+    g.items.push({ c, co, r });
+  }
+  const selContinentId = RUN.atlasRegion?.continent?.id || null;
+  return groups.map(({ c, items }) => {
+    const open = _rp.openContinents.has(c.id) || c.id === selContinentId;
+    return `
+    <details class="rp-continent" data-continent="${c.id}"${open ? " open" : ""}>
+      <summary class="rp-continent-summary">
+        <span class="rp-continent-name">${c.icon} ${c.name}</span>
+        <span class="rp-continent-count">${items.length} region${items.length === 1 ? "" : "s"}</span>
+      </summary>
+      <div class="rp-continent-body">
+        <div class="rp-list">
+          ${items.map(({ c, co, r }) => rpRegionItemHTML(c, co, r)).join("")}
+        </div>
+      </div>
+    </details>`;
+  }).join("");
 }
 
 function refreshSetupRegionSection(root) {
   const sec = root.querySelector("#setup-region-section");
   if (!sec) return;
+  const st = root.scrollTop; // in-place re-render: keep the user's scroll position
   sec.innerHTML = setupRegionSectionHTML();
   wireSetupRegion(root);
+  root.scrollTop = st;
 }
 
 function refreshSetupRegionList(root) {
   const el = root.querySelector("#setup-region-list");
   if (!el) return;
+  const st = root.scrollTop; // in-place re-render: keep the user's scroll position
   el.innerHTML = setupRegionListHTML();
   wireSetupRegionList(root);
+  root.scrollTop = st;
 }
 
 function wireSetupRegion(root) {
@@ -13199,6 +13246,14 @@ function wireSetupRegion(root) {
 }
 
 function wireSetupRegionList(root) {
+  // Continent collapsibles: sync open state to _rp.openContinents, no re-render.
+  root.querySelectorAll("#setup-region-list details.rp-continent").forEach(d => {
+    d.addEventListener("toggle", () => {
+      const id = d.dataset.continent;
+      if (d.open) _rp.openContinents.add(id);
+      else _rp.openContinents.delete(id);
+    });
+  });
   root.querySelectorAll("#setup-region-list .rp-list-item[data-rid]").forEach(btn => {
     btn.addEventListener("click", () => {
       _rp.expanded = _rp.expanded === btn.dataset.rid ? null : btn.dataset.rid;
@@ -13226,7 +13281,7 @@ function wireSetupRegionList(root) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Internal picker state (resets each time we enter picker)
-const _rp = { step: "continent", continent: null, country: null };
+const _rp = { step: "continent", continent: null, country: null, openContinents: new Set() };
 
 
 // ── Setup-phase selection state ──────────────────────────────────────────────
@@ -13411,7 +13466,7 @@ function buildRegionalIntelBlock(atlasRegion) {
 
 function renderSetup(root) {
   const s = RUN.scenario;
-  if (!s) { RUN.phase = "menu"; renderSimulator(root); return; }
+  if (!s) { RUN.phase = "menu"; renderSimulator(root); root.scrollTop = 0; return; }
   if (!atlasState.loaded) {
     loadAtlas().then(() => renderSetup(root));
     root.innerHTML = `<div class="sim-page"><div class="region-picker"><div class="region-picker-header"><div class="region-picker-title">Loading Atlas…</div></div></div></div>`;
@@ -13420,6 +13475,7 @@ function renderSetup(root) {
   if (!_setupSel) setupSelDefaults();
   _rp.query    = _rp.query || "";
   _rp.expanded = _rp.expanded || null;
+  _rp.openContinents = _rp.openContinents || new Set();
 
   root.innerHTML = `
     <div class="sim-page">
@@ -13439,7 +13495,7 @@ function renderSetup(root) {
       <button class="btn-solid" id="setup-continue" style="width:100%;padding:14px">Continue →</button>
     </div>`;
 
-  root.querySelector("#setup-back").addEventListener("click", () => { resetRun(); renderSimulator(root); });
+  root.querySelector("#setup-back").addEventListener("click", () => { resetRun(); renderSimulator(root); root.scrollTop = 0; });
   wireSetupRegion(root);
   wireSetupLoadout(root);
   root.querySelector("#setup-continue").addEventListener("click", () => setupContinue(root));
@@ -13550,8 +13606,10 @@ function setupCustomBuilderHTML() {
 function refreshSetupLoadout(root) {
   const body = root.querySelector("#setup-loadout-body");
   if (!body) return;
+  const st = root.scrollTop; // in-place re-render: keep the user's scroll position
   body.innerHTML = setupLoadoutHTML();
   wireSetupLoadout(root);
+  root.scrollTop = st;
 }
 
 function wireSetupLoadout(root) {
@@ -13625,6 +13683,7 @@ function setupContinue(root) {
   RUN.stageResolved = false;
   RUN.phase         = "run";
   renderSimulator(root);
+  root.scrollTop = 0; // fresh navigation: start at the top
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -13803,6 +13862,7 @@ function wireStageScreen(root) {
     resetRun();
     RUN.phase = "menu";
     renderSimulator(root);
+    root.scrollTop = 0; // fresh navigation: start at the top
   });
 
 }
@@ -13880,7 +13940,9 @@ function resolveStageChoice(root, choice) {
   } else {
     RUN.stageResolved = true;
   }
+  const st = root.scrollTop; // choice → inline result is in-place: keep scroll
   renderSimulator(root);
+  root.scrollTop = RUN.phase === "debrief" ? 0 : st; // fatal outcome → fresh screen, start at top
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -14036,6 +14098,7 @@ function wireResultScreen(root, onOpenArticle) {
       RUN.phase = "debrief";
     }
     renderSimulator(root);
+    root.scrollTop = 0; // fresh navigation: start at the top
   });
 
 }
@@ -14046,7 +14109,7 @@ function wireResultScreen(root, onOpenArticle) {
 
 function renderRun(root, onOpenArticle) {
   const stage = RUN.scenario.stages[RUN.stageIndex];
-  if (!stage) { finaliseRun(true); RUN.phase = "debrief"; renderSimulator(root); return; }
+  if (!stage) { finaliseRun(true); RUN.phase = "debrief"; renderSimulator(root); root.scrollTop = 0; return; }
 
   const canChangeSetup = !RUN.stageResolved && RUN.stageIndex === 0 && RUN.stageLog.length === 0;
 
@@ -14070,6 +14133,7 @@ function renderRun(root, onOpenArticle) {
     // No resetRun: keeps scenario, region and loadout picks — setup rehydrates.
     RUN.phase = "setup";
     renderSimulator(root);
+    root.scrollTop = 0; // fresh navigation: start at the top
   });
 }
 
@@ -14237,8 +14301,9 @@ function renderDebrief(root, onOpenArticle) {
     if (!RUN.env.wind_speed) RUN.env.wind_speed = 15;
     RUN.phase    = "setup";
     renderSimulator(root, onOpenArticle);
+    root.scrollTop = 0; // fresh navigation: start at the top
   });
-  root.querySelector("#btn-menu").addEventListener("click", () => { resetRun(); renderSimulator(root, onOpenArticle); });
+  root.querySelector("#btn-menu").addEventListener("click", () => { resetRun(); renderSimulator(root, onOpenArticle); root.scrollTop = 0; });
 
   // Fire badge toasts with staggered delay
   const newBadges = RUN._newBadges || [];
@@ -14282,13 +14347,13 @@ function renderLevelUp(root) {
       renderLevelUp(root);
     })
   );
-  root.querySelector("#btn-done").addEventListener("click", () => { RUN.phase = "menu"; renderSimulator(root); });
+  root.querySelector("#btn-done").addEventListener("click", () => { RUN.phase = "menu"; renderSimulator(root); root.scrollTop = 0; });
 }
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 function getChar()         { return char; }
 function refreshChar()     { char = loadCharacter(); }
-function openLevelUp(root) { RUN.phase = "levelup"; renderSimulator(root); }
+function openLevelUp(root) { RUN.phase = "levelup"; renderSimulator(root); root.scrollTop = 0; }
 
 
 // ═══ store-screen.js ═══
