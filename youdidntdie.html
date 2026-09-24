@@ -4065,7 +4065,7 @@ const SCENARIOS = [
     biomes: ["urban"],
     title: "Urban Collapse",
     icon: "✚",
-    difficulty: 3,
+    difficulty: 2,
     timeOfDay: "07:20",
     environment: "Mid-rise residential block, city centre. Partial structural collapse following seismic event. Dust, debris, ruptured gas and water lines.",
     weather: "Morning, 18°C. Dense dust reducing visibility to 15m. Aftershock risk.",
@@ -4075,7 +4075,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Immediate Hazard Assessment",
         situation: "Gas smell, dust, unstable debris above. You hear someone calling from the floor above the collapse. What is your first action?",
-        check: { stat: "perception", difficulty: 11, tag: "utility", label: "Hazard Scan" },
+        check: { stat: "perception", difficulty: 10, tag: "utility", label: "Hazard Scan" },
         randomEvents: [
           { chance: 0.2, text: "A section of ceiling drops 10m away. Aftershock warning.", effect: { conditionAdd: "aftershock_risk", moraleMod: -12 } },
           { chance: 0.2, text: "Dust clears briefly — you see an emergency exit sign, still lit.", effect: { conditionAdd: "exit_visible", moraleMod: 8 } },
@@ -4103,7 +4103,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Water & Sanitation",
         situation: "You're out of the building. A crowd of 30 survivors in the street. Municipal water is off. It's been 4 hours. How do you address water needs?",
-        check: { stat: "knowledge", difficulty: 11, tag: "water", label: "Urban Water Management" },
+        check: { stat: "knowledge", difficulty: 10, tag: "water", label: "Urban Water Management" },
         randomEvents: [
           { chance: 0.25, text: "A water main is flowing from a ruptured pipe nearby — uncontrolled but flowing.", effect: { conditionAdd: "water_source_found", moraleMod: 12 } },
           { chance: 0.2,  text: "Someone in the group has a water filter straw — one person's supply.", effect: { conditionAdd: "filter_available" } },
@@ -4131,7 +4131,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Communicating Your Position",
         situation: "24 hours in. No official rescue contact yet. The group is becoming anxious. You need to signal your location and get information out.",
-        check: { stat: "composure", difficulty: 10, tag: "signal", label: "Group Coordination" },
+        check: { stat: "composure", difficulty: 9, tag: "signal", label: "Group Coordination" },
         randomEvents: [
           { chance: 0.3, text: "Helicopter passes 500m to the south, moving slowly.", effect: { conditionAdd: "aircraft_nearby", moraleMod: 15 } },
           { chance: 0.2, text: "Someone has a working radio — no local station transmitting, but national emergency frequencies are active.", effect: { conditionAdd: "radio_available" } },
@@ -4265,7 +4265,7 @@ const SCENARIOS = [
     biomes: ["desert", "wetland", "grassland", "savanna", "temperate_forest", "highland", "urban", "coastal"],
     title: "Flash Flood",
     icon: "➤",
-    difficulty: 3,
+    difficulty: 2,
     timeOfDay: "15:50",
     environment: "Desert canyon system, American Southwest. Narrow canyon 8m wide, walls 30m vertical. Slot canyon, no outlet visible for 2km.",
     weather: "Clear overhead. 34°C. Thunderstorm 60km north — invisible from canyon floor.",
@@ -4275,7 +4275,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — 60 Seconds",
         situation: "Flash flood advancing. Canyon walls 30m high, vertical. What is your immediate action?",
-        check: { stat: "composure", difficulty: 13, tag: "utility", label: "Flash Flood Response" },
+        check: { stat: "composure", difficulty: 12, tag: "utility", label: "Flash Flood Response" },
         randomEvents: [
           { chance: 0.3, text: "A narrow ledge 8m up the east wall — accessible by a crack system.", effect: { conditionAdd: "ledge_visible", moraleMod: 10 } },
           { chance: 0.2,  text: "Pack is heavy — every second you carry it costs.", effect: { conditionAdd: "pack_weight" } },
@@ -4303,7 +4303,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — After the Flood",
         situation: "Flood has passed. Canyon floor now has 40cm of fast-moving water with debris. Canyon walls are slick. You need to navigate out — 2km to the canyon mouth.",
-        check: { stat: "perception", difficulty: 11, tag: "navigation", label: "Post-Flood Navigation" },
+        check: { stat: "perception", difficulty: 10, tag: "navigation", label: "Post-Flood Navigation" },
         randomEvents: [
           { chance: 0.25, text: "Mud has coated the canyon walls to a consistent line — the high water mark.", effect: { conditionAdd: "flood_line_visible" } },
           { chance: 0.2,  text: "A section of canyon floor has new quicksand conditions from the saturation.", effect: { conditionAdd: "quicksand_risk", moraleMod: -10 } },
@@ -4331,7 +4331,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Heat and Dehydration",
         situation: "Canyon mouth reached. Desert extends 8km to the nearest road. You've lost your water bottle in the flood. Temperature rising. 16:30, peak heat.",
-        check: { stat: "knowledge", difficulty: 12, tag: "water", label: "Desert Water Management" },
+        check: { stat: "knowledge", difficulty: 11, tag: "water", label: "Desert Water Management" },
         randomEvents: [
           { chance: 0.3, text: "A dark seep line stains the north canyon wall — damp rock that might yield a trickle.", effect: { conditionAdd: "seep_visible", moraleMod: 8 } },
           { chance: 0.2, text: "A dry riverbed branches north — post-flood, there may be pooled water in the bends.", effect: { conditionAdd: "riverbed_pooling" } },
@@ -4466,7 +4466,7 @@ const SCENARIOS = [
     climates: ["polar", "cold"],
     title: "Stranded Vehicle",
     icon: "⌂",
-    difficulty: 2,
+    difficulty: 1,
     timeOfDay: "19:45",
     environment: "Remote rural road, northern Canada. Boreal forest both sides. Nearest town 60km. Vehicle stuck in snowdrift after leaving the main road.",
     weather: "−18°C and falling. Light snow, wind 20 km/h. Sunset 2 hours ago. No phone signal.",
@@ -4476,7 +4476,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Vehicle as Shelter",
         situation: "−18°C. Should you stay with the vehicle or move? And how do you keep two people alive through a −18°C night inside a stalled vehicle?",
-        check: { stat: "knowledge", difficulty: 10, tag: "shelter", label: "Vehicle Survival" },
+        check: { stat: "knowledge", difficulty: 8, tag: "shelter", label: "Vehicle Survival" },
         randomEvents: [
           { chance: 0.3, text: "You find a full emergency kit in the trunk: candles, thermal blankets, high-energy bars, a small shovel.", effect: { conditionAdd: "emergency_kit_found", moraleMod: 15 } },
           { chance: 0.2, text: "Snow is still falling. The exhaust pipe may drift over in an hour.", effect: { conditionAdd: "exhaust_risk", moraleMod: -10 } },
@@ -4504,7 +4504,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Carbon Monoxide Awareness",
         situation: "Your second group member wants to run the engine for warmth. The exhaust pipe is partially drifted over. How do you handle this?",
-        check: { stat: "knowledge", difficulty: 9, tag: "utility", label: "CO Risk Management" },
+        check: { stat: "knowledge", difficulty: 7, tag: "utility", label: "CO Risk Management" },
         randomEvents: [
           { chance: 0.25, text: "You find a small CO alarm keychain in the emergency kit.", effect: { conditionAdd: "co_alarm_found", moraleMod: 15 } },
           { chance: 0.2,  text: "Snow continues. Drift around the vehicle is now door-height.", effect: { conditionAdd: "drift_increasing" } },
@@ -4532,7 +4532,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Signal for the Morning Shift",
         situation: "03:30. Survived the night. Logging trucks start at 06:00. You need to make your vehicle visible before dawn to avoid being passed on the road.",
-        check: { stat: "perception", difficulty: 9, tag: "signal", label: "Vehicle Visibility" },
+        check: { stat: "perception", difficulty: 7, tag: "signal", label: "Vehicle Visibility" },
         randomEvents: [
           { chance: 0.3, text: "Snowfall has stopped. Stars visible. Temperature now −23°C.", effect: { conditionAdd: "clear_sky", moraleMod: 5 } },
           { chance: 0.2, text: "You find a road flare in the emergency kit.", effect: { conditionAdd: "flare_found", moraleMod: 15 } },
@@ -4569,7 +4569,7 @@ const SCENARIOS = [
     biomes: ["highland", "alpine", "grassland"],
     title: "Week Two — Highland Camp",
     icon: "≈",
-    difficulty: 2,
+    difficulty: 1,
     phase: 1,
     timeOfDay: "07:00",
     environment: "Established camp in highland forest. Basic lean-to shelter, nearby stream, adequate firewood. Third day without rain.",
@@ -4580,7 +4580,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Water Infrastructure",
         situation: "Boiling every litre is expensive in fuel and time. You have materials to build a gravity filter. The stream runs clear but you don't know what's upstream.",
-        check: { stat: "knowledge", difficulty: 10, tag: "water", label: "Filter Construction" },
+        check: { stat: "knowledge", difficulty: 8, tag: "water", label: "Filter Construction" },
         randomEvents: [
           { chance: 0.2, text: "You find a carcass 200m upstream — confirms you need to filter.", effect: { moraleMod: -5 } },
           { chance: 0.15, text: "Rain has collected in a natural bowl nearby — clean water ready to store.", effect: { conditionAdd: "found_water", moraleMod: 8 } },
@@ -4608,7 +4608,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Hygiene Protocol",
         situation: "Six days in, your hands are constantly dirty. You've been handling wood, soil, water, and food without consistent handwashing. Your left thumb has a small cut from yesterday that looks slightly red.",
-        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Hygiene Assessment" },
+        check: { stat: "knowledge", difficulty: 9, tag: "medical", label: "Hygiene Assessment" },
         randomEvents: [
           { chance: 0.25, text: "Morning light reveals ant trails running through your food stores — contamination risk.", effect: { moraleMod: -10 } },
           { chance: 0.2, text: "You find a large pile of dry ash from previous fires — ready handwashing resource.", effect: { conditionAdd: "wound_dressed", moraleMod: 8 } },
@@ -4636,7 +4636,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Shelter Upgrade",
         situation: "Your lean-to is functional but heat retention is poor. Nights drop to 1°C. You're sleeping in most of your clothing. Twelve days in — this is home now, not an emergency bivouac.",
-        check: { stat: "strength", difficulty: 12, tag: "shelter", label: "Construction Assessment" },
+        check: { stat: "strength", difficulty: 10, tag: "shelter", label: "Construction Assessment" },
         randomEvents: [
           { chance: 0.2, text: "You find a natural rock overhang nearby — thermal mass and wind break combined.", effect: { conditionAdd: "spotted_overhang", moraleMod: 10 } },
           { chance: 0.15, text: "The lean-to's main ridgepole has a stress crack — it needs reinforcement soon.", effect: { conditionAdd: "poor_shelter", moraleMod: -10 } },
@@ -9414,7 +9414,7 @@ const SCENARIOS = [
   biomes: ["coastal", "island", "ocean"],
   title: "The Grip of the Rip",
   icon: "△",
-  difficulty: 2,
+  difficulty: 1,
   phase: 0,
   timeOfDay: "16:40",
   environment: "An unpatrolled stretch of ocean beach, late afternoon. Two-metre swell, steady onshore wind, no lifeguard tower in sight — just a faded warning sign at the dune path you walked past without reading.",
@@ -9425,7 +9425,7 @@ const SCENARIOS = [
     {
       id: "s1", title: "Stage 1 — 16:40, The Pull",
       situation: "You were floating in chest-deep water when the bottom fell away beneath you. Now the beach is getting smaller, the waves are breaking on both sides of you but not where you are, and the water around you is moving steadily out to sea.",
-      check: { stat: "composure", difficulty: 10, tag: "psychology", label: "Read the Water" },
+      check: { stat: "composure", difficulty: 8, tag: "psychology", label: "Read the Water" },
       choices: [
         { id: "stayCalm", q: "sound", label: "Stay calm, roll onto your back, read the water", desc: "Don't fight. Let the current carry you while you breathe, get your bearings, and note where the waves are breaking — that's your exit map.", statHint: "composure", tag: "psychology" },
         { id: "parallelEarly", q: "risky", label: "Slip sideways, parallel to shore, right now", desc: "You're fresh and the current is narrow here. Turn ninety degrees and swim steadily sideways, out of the channel.", statHint: "endurance", tag: "water" },
@@ -9449,7 +9449,7 @@ const SCENARIOS = [
     {
       id: "s2", title: "Stage 2 — 16:47, The Escape",
       situation: "You're 80 metres out, riding the current past the breakers. The beach is a long way off now. Your arms are tired but working, your breathing is under control, and the water around you is starting to slow — you're nearing the end of the rip's run.",
-      check: { stat: "endurance", difficulty: 12, tag: "water", label: "Break the Grip" },
+      check: { stat: "endurance", difficulty: 10, tag: "water", label: "Break the Grip" },
       randomEvents: [
         { chance: 0.2, text: "A larger set rolls through — white water foams up on both sides of the channel.", effect: { moraleMod: -8 } },
       ],
@@ -9476,7 +9476,7 @@ const SCENARIOS = [
     {
       id: "s3", title: "Stage 3 — 16:55, Beyond the Breakers",
       situation: "The current has carried you past the surf — the beach is a thin line now, the water calmer but deep. Your arms are heavy. You're alone out here: no lifeguard, no buddy, and the sun is starting to drop.",
-      check: { stat: "endurance", difficulty: 12, tag: "water", label: "Hold On" },
+      check: { stat: "endurance", difficulty: 10, tag: "water", label: "Hold On" },
       choices: [
         { id: "floatSignal", q: "sound", label: "Float on your back, raise an arm, shout", desc: "Conserve everything. The rip weakens out here — float, breathe, and make yourself seen and heard.", statHint: "composure", tag: "signal" },
         { id: "finalPush", q: "risky", label: "One last hard push parallel, then rest", desc: "You've got one surge left in your arms. Spend it on a sideways escape now, before you're too tired to swim at all.", statHint: "endurance", tag: "water" },
@@ -9500,7 +9500,7 @@ const SCENARIOS = [
     {
       id: "s4", title: "Stage 4 — 17:05, The White Water",
       situation: "You're back inside the breakers — or you never fully left them. Waves are rolling you shoreward in bursts, the bottom is close enough to touch, and dry sand is twenty metres away. The surf zone is the last boss: white water can knock you flat and drag you back out.",
-      check: { stat: "knowledge", difficulty: 11, tag: "water", label: "Work the Surf" },
+      check: { stat: "knowledge", difficulty: 9, tag: "water", label: "Work the Surf" },
       choices: [
         { id: "rideTheWhite", q: "sound", label: "Ride the waves in, feet first", desc: "Wait for a wave, let it push you, keep your feet up and pointed shoreward. Work with the white water, not against it.", statHint: "knowledge", tag: "water" },
         { id: "standAndSprint", q: "risky", label: "Stand when you touch bottom, sprint between sets", desc: "Feet on sand — get up and move fast in the lull between waves. Don't linger in the impact zone.", statHint: "composure", tag: "water" },
