@@ -712,20 +712,16 @@ body::after {
   background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius);
   color: var(--text-dim); font-family: var(--font-m); font-size: 11px; cursor: pointer;
 }
-.enc-select option { background: var(--bg2); }
-
-.domain-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 22px; }
-/* Mobile: 32 domain chips become a horizontal scroll strip instead of a
-   wrapping wall — guarantees no mid-text clipping at narrow widths. */
-@media (max-width: 560px) {
-  .domain-chips {
-    flex-wrap: nowrap; overflow-x: auto; margin-bottom: 16px;
-    padding-bottom: 6px; -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .domain-chips::-webkit-scrollbar { display: none; }
-  .domain-chips .chip { flex-shrink: 0; }
+/* 32 domain chips stay on ONE horizontal scroll strip at every viewport —
+   never a wrapping wall that pushes the articles off-screen. */
+.domain-chips {
+  display: flex; flex-wrap: nowrap; overflow-x: auto;
+  gap: 6px; margin-bottom: 16px; padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
 }
+.domain-chips::-webkit-scrollbar { display: none; }
+.domain-chips .chip { flex-shrink: 0; }
+.enc-select option { background: var(--bg2); }
 
 .article-grid {
   display: grid;
@@ -2720,15 +2716,15 @@ body::after {
       </div>
 
       <div class="drawer-item" data-nav="library">
-        <span class="di">📖</span> Library
+        <span class="di">▤</span> Library
       </div>
 
       <div class="drawer-item" data-nav="simulator">
-        <span class="di">▶</span> Simulate
+        <span class="di">⚄</span> Simulate
       </div>
 
       <div class="drawer-item" data-nav="profile">
-        <span class="di">👤</span> Profile
+        <span class="di">◉</span> Profile
       </div>
 
       <div class="drawer-section">Console</div>
@@ -2968,13 +2964,13 @@ body::after {
       <span class="tabbar-icon">◈</span><span class="tabbar-label">Learn</span>
     </button>
     <button class="tabbar-tab" data-screen="library">
-      <span class="tabbar-icon">📖</span><span class="tabbar-label">Library</span>
+      <span class="tabbar-icon">▤</span><span class="tabbar-label">Library</span>
     </button>
     <button class="tabbar-tab" data-screen="simulator">
-      <span class="tabbar-icon">▶</span><span class="tabbar-label">Simulate</span>
+      <span class="tabbar-icon">⚄</span><span class="tabbar-label">Simulate</span>
     </button>
     <button class="tabbar-tab" data-screen="profile">
-      <span class="tabbar-icon">👤</span><span class="tabbar-label">Profile</span>
+      <span class="tabbar-icon">◉</span><span class="tabbar-label">Profile</span>
     </button>
   </nav>
 
@@ -15426,7 +15422,7 @@ function renderProfile(root, opts = {}) {
       <div class="profile-section">
         <div class="profile-section-head" data-sec="fieldkit">
           <div class="profile-section-left">
-            <span class="profile-section-title"><span class="pst-icon">🎒</span> Field-Tested Kit</span>
+            <span class="profile-section-title"><span class="pst-icon">▣</span> Field-Tested Kit</span>
             <span class="profile-section-badge">real gear</span>
           </div>
           <span class="profile-section-chevron">▾</span>
@@ -15446,10 +15442,11 @@ function renderProfile(root, opts = {}) {
     </div>`;
 
   // ── Collapsible sections ─────────────────────────────────────────────────
+  // "fieldkit" starts collapsed: real-world gear stays optional, one tap away.
   const COLLAPSED_KEY = "fp_profile_collapsed";
   let collapsedSecs;
-  try { collapsedSecs = new Set(JSON.parse(localStorage.getItem(COLLAPSED_KEY) || "[]")); }
-  catch(e) { collapsedSecs = new Set(); }
+  try { collapsedSecs = new Set(JSON.parse(localStorage.getItem(COLLAPSED_KEY) || '["fieldkit"]')); }
+  catch(e) { collapsedSecs = new Set(["fieldkit"]); }
 
   if (opts.section) collapsedSecs.delete(opts.section);
   root.querySelectorAll(".profile-section-head[data-sec]").forEach(head => {
