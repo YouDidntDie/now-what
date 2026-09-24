@@ -3693,7 +3693,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Immediate Triage",
         situation: "Peak heat. Panic costs water. You need to make your first move correctly. Rescue comes when someone knows you're overdue — your trip plan is the rescue clock.",
-        check: { stat: "composure", difficulty: 10, tag: "utility", label: "Immediate Triage" },
+        check: { stat: "composure", difficulty: 9, tag: "utility", label: "Immediate Triage" },
         randomEvents: [
           { chance: 0.2, text: "You check the boot — emergency kit with 2L extra water. Overlooked earlier.", effect: { conditionAdd: "found_water", moraleMod: 15 } },
           { chance: 0.2, text: "A dust devil crosses 50m ahead. The heat is visible.", effect: { moraleMod: -5 } },
@@ -3721,7 +3721,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Water Rationing",
         situation: "You have 4 litres. In this heat your water needs climb with temperature, work, clothing and acclimatization — plan for far more than you think, and remember rescue comes when someone knows you're overdue.",
-        check: { stat: "knowledge", difficulty: 11, tag: "water", label: "Water Rationing Plan" },
+        check: { stat: "knowledge", difficulty: 10, tag: "water", label: "Water Rationing Plan" },
         randomEvents: [
           { chance: 0.25, text: "A 2L bottle of engine coolant in the boot. Poison — ethylene glycol. Never drink it, and don't try to 'purify' it into water.", effect: { conditionAdd: "found_coolant" } },
           { chance: 0.2,  text: "Temperature spikes to 45°C for two hours at midday.", effect: { conditionAdd: "extreme_heat" } },
@@ -3749,7 +3749,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Desert Night",
         situation: "Sun has set. Temperature dropping fast — 10°C by midnight. Vehicle provides thermal mass but you need to manage the swing.",
-        check: { stat: "endurance", difficulty: 11, tag: "warmth", label: "Overnight Thermal Management" },
+        check: { stat: "endurance", difficulty: 10, tag: "warmth", label: "Overnight Thermal Management" },
         randomEvents: [
           { chance: 0.3, text: "Distant lights on the horizon — vehicle on the main road. 20km.", effect: { moraleMod: 12 } },
           { chance: 0.2, text: "Temperature drops faster than expected — 7°C by 22:00.", effect: { conditionAdd: "cold_stressed" } },
@@ -3777,7 +3777,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Day Two, Critical Window",
         situation: "Day two. 09:00. Heat climbing. Water at 1.5L. It won't last forever. One decision point remains.",
-        check: { stat: "composure", difficulty: 12, tag: "signal", label: "Final Rescue Decision" },
+        check: { stat: "composure", difficulty: 11, tag: "signal", label: "Final Rescue Decision" },
         randomEvents: [
           { chance: 0.3, text: "Low-altitude aircraft — searching pattern. Possible SAR.", effect: { conditionAdd: "aircraft_near", moraleMod: 20 } },
           { chance: 0.2, text: "Your last road flare. One shot.", effect: { conditionAdd: "last_flare" } },
@@ -3820,7 +3820,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Assess Options",
         situation: "The ford is clearly unsafe. You need to quickly evaluate: wait, find another crossing, or attempt it prepared.",
-        check: { stat: "perception", difficulty: 10, tag: "navigation", label: "Situation Assessment" },
+        check: { stat: "perception", difficulty: 9, tag: "navigation", label: "Situation Assessment" },
         randomEvents: [
           { chance: 0.25, text: "A tree trunk rushes past in the current. The river is carrying debris.", effect: { moraleMod: -10 } },
           { chance: 0.2,  text: "You spot a cable crossing 300m upstream — maintenance access.", effect: { conditionAdd: "found_cable", moraleMod: 12 } },
@@ -3848,7 +3848,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — The Crossing Itself",
         situation: "Crossing point chosen. Now the execution. Cold, fast, unforgiving.",
-        check: { stat: "strength", difficulty: 12, tag: "utility", label: "Physical Crossing" },
+        check: { stat: "strength", difficulty: 11, tag: "utility", label: "Physical Crossing" },
         randomEvents: [
           { chance: 0.3,  text: "A submerged rock rolls under your foot mid-crossing.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "Current surges briefly — upstream obstruction cleared. Doubles for 30 seconds.", effect: { conditionAdd: "current_surge" } },
@@ -3876,7 +3876,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Wet and Moving",
         situation: "Across but soaked. 18°C air, temperature dropping toward evening. 8km of trail remaining. Wet clothes in falling temperatures can become hypothermia quickly.",
-        check: { stat: "knowledge", difficulty: 11, tag: "shelter", label: "Wet Conditions Management" },
+        check: { stat: "knowledge", difficulty: 10, tag: "shelter", label: "Wet Conditions Management" },
         randomEvents: [
           { chance: 0.3,  text: "Wind picks up. Wet clothes feel icy within minutes.", effect: { conditionAdd: "cold_stressed", moraleMod: -10 } },
           { chance: 0.2,  text: "Sun breaks through briefly. A 15-minute drying window.", effect: { moraleMod: 12 } },
@@ -3904,7 +3904,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Navigation in Fading Light",
         situation: "Trail markers washed out in sections. 18:45. Forty minutes of usable light. 4km to the trailhead.",
-        check: { stat: "perception", difficulty: 12, tag: "navigation", label: "Low-Light Navigation" },
+        check: { stat: "perception", difficulty: 11, tag: "navigation", label: "Low-Light Navigation" },
         randomEvents: [
           { chance: 0.25, text: "A junction marker is missing — two paths, equally worn.", effect: { moraleMod: -15 } },
           { chance: 0.2,  text: "Vehicle lights visible through a gap in the trees — below, on the road.", effect: { conditionAdd: "trailhead_visible", moraleMod: 15 } },
@@ -3947,7 +3947,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Wound Management",
         situation: "Bleeding is steady. You have a knife, a shirt, and a full water bottle. How do you manage the wound right now?",
-        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Wound Management" },
+        check: { stat: "knowledge", difficulty: 10, tag: "medical", label: "Wound Management" },
         randomEvents: [
           { chance: 0.2, text: "Adrenaline is masking the pain. You're moving better than you should be.", effect: { moraleMod: 5 } },
           { chance: 0.2, text: "The cut is deeper than first thought — you can see tissue.", effect: { conditionAdd: "wound_deep", moraleMod: -15 } },
@@ -3975,7 +3975,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Signal or Move?",
         situation: "Wound managed. 30% battery, no bars. Climb for signal or start moving toward camp. Rain is picking up.",
-        check: { stat: "composure", difficulty: 10, tag: "utility", label: "Decision Under Pressure" },
+        check: { stat: "composure", difficulty: 9, tag: "utility", label: "Decision Under Pressure" },
         randomEvents: [
           { chance: 0.25, text: "Rain intensifies. Ground turns to mud underfoot.", effect: { conditionAdd: "wet_ground", moraleMod: -10 } },
           { chance: 0.2,  text: "Ridgeline 300m uphill — elevation for a possible signal bar.", effect: { conditionAdd: "ridgeline_visible" } },
@@ -4003,7 +4003,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Wound Reassessment",
         situation: "Six hours since injury. Wound dressed but dressing is soaked through. Infection is a real risk in wet forest conditions.",
-        check: { stat: "knowledge", difficulty: 12, tag: "medical", label: "Wound Reassessment" },
+        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Wound Reassessment" },
         randomEvents: [
           { chance: 0.25, text: "Redness visible at wound edges — early infection sign.", effect: { conditionAdd: "infection_risk", moraleMod: -10 } },
           { chance: 0.2,  text: "Rain stops briefly. A short window to dry the dressing.", effect: { moraleMod: 10 } },
@@ -4031,7 +4031,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Rescue Coordination",
         situation: "Ten hours in. Search party active — you heard a whistle pattern an hour ago. Close but haven't found you. Communication is everything now.",
-        check: { stat: "perception", difficulty: 11, tag: "signal", label: "SAR Communication" },
+        check: { stat: "perception", difficulty: 10, tag: "signal", label: "SAR Communication" },
         randomEvents: [
           { chance: 0.3, text: "Two voices — 200m northwest, closing.", effect: { conditionAdd: "sar_near", moraleMod: 25 } },
           { chance: 0.2, text: "Your phone rings — one bar, 8% battery.", effect: { conditionAdd: "signal_bar" } },
@@ -4175,7 +4175,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Immediate Priority: Cold Water",
         situation: "You've been in 12°C water for 8 minutes. You're shivering hard. Your core temperature is dropping. What first?",
-        check: { stat: "knowledge", difficulty: 11, tag: "shelter", label: "Hypothermia Management" },
+        check: { stat: "knowledge", difficulty: 10, tag: "shelter", label: "Hypothermia Management" },
         randomEvents: [
           { chance: 0.25, text: "Your dry bag is floating 20m offshore — wetsuit, spare fleece inside.", effect: { conditionAdd: "drybag_visible", moraleMod: 10 } },
           { chance: 0.2,  text: "The shivering is involuntary and violent — your coordination is compromised.", effect: { conditionAdd: "shivering_severe", moraleMod: -15 } },
@@ -4203,7 +4203,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Tide Rising",
         situation: "Platform submerges in 60 minutes. You need to find high ground or a route off this beach.",
-        check: { stat: "perception", difficulty: 12, tag: "navigation", label: "Coastal Navigation" },
+        check: { stat: "perception", difficulty: 11, tag: "navigation", label: "Coastal Navigation" },
         randomEvents: [
           { chance: 0.3, text: "The fog briefly lifts — you see a boulder gully leading up the cliff face, 100m north.", effect: { conditionAdd: "gully_visible", moraleMod: 12 } },
           { chance: 0.2, text: "Kelp and debris line marks the previous high tide — 3m above you.", effect: { conditionAdd: "tide_line_visible" } },
@@ -4231,7 +4231,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Overnight on the Cliff",
         situation: "You're on a safe shelf 18m above sea level but no one knows where you are. Night is 3 hours away. Fog persists. You need a shelter and a signal strategy.",
-        check: { stat: "knowledge", difficulty: 11, tag: "shelter", label: "Coastal Bivouac" },
+        check: { stat: "knowledge", difficulty: 10, tag: "shelter", label: "Coastal Bivouac" },
         randomEvents: [
           { chance: 0.25, text: "Driftwood line 10m uphill — dry in the middle where the wood has been sheltered.", effect: { conditionAdd: "fire_material", moraleMod: 10 } },
           { chance: 0.2,  text: "Wind shifts — now offshore. Temperature is dropping faster than expected.", effect: { conditionAdd: "wind_shift", moraleMod: -12 } },
@@ -4375,7 +4375,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Fever Assessment",
         situation: "Day 3 symptoms: fever, chills, joint pain, no rash. Consciousness intact. What is your immediate medical priority?",
-        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Field Medical Assessment" },
+        check: { stat: "knowledge", difficulty: 10, tag: "medical", label: "Field Medical Assessment" },
         randomEvents: [
           { chance: 0.25, text: "You find a rapid malaria test in the first aid kit — result positive.", effect: { conditionAdd: "malaria_confirmed", moraleMod: -10 } },
           { chance: 0.2,  text: "The patient's resting pulse is 110bpm — elevated, suggesting significant fever load.", effect: { conditionAdd: "tachycardic" } },
@@ -4403,7 +4403,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Evacuation Decision",
         situation: "Day 4. Patient is stable but not improving. You need to decide: send for help, stay and manage, or attempt to move the patient yourself.",
-        check: { stat: "composure", difficulty: 10, tag: "utility", label: "Evacuation Planning" },
+        check: { stat: "composure", difficulty: 9, tag: "utility", label: "Evacuation Planning" },
         randomEvents: [
           { chance: 0.25, text: "A local villager on a motorbike appears on the trail — short window to communicate.", effect: { conditionAdd: "local_contact", moraleMod: 20 } },
           { chance: 0.2,  text: "Patient's temperature spikes again to 40.1°C — possible deterioration.", effect: { conditionAdd: "fever_spike", moraleMod: -15 } },
@@ -4431,7 +4431,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Camp Sanitation",
         situation: "Your second group member is now showing early fever symptoms. Contamination likely from shared camp site. Prevent spreading and protect yourself.",
-        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Field Sanitation" },
+        check: { stat: "knowledge", difficulty: 10, tag: "medical", label: "Field Sanitation" },
         randomEvents: [
           { chance: 0.3, text: "You find a mosquito breeding pool 10m from your sleeping area.", effect: { conditionAdd: "mosquito_breeding", moraleMod: -15 } },
           { chance: 0.2, text: "Your mosquito net has a small tear — you've been exposed every night.", effect: { conditionAdd: "net_compromised" } },
@@ -4476,7 +4476,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Vehicle as Shelter",
         situation: "−18°C. Should you stay with the vehicle or move? And how do you keep two people alive through a −18°C night inside a stalled vehicle?",
-        check: { stat: "knowledge", difficulty: 11, tag: "shelter", label: "Vehicle Survival" },
+        check: { stat: "knowledge", difficulty: 10, tag: "shelter", label: "Vehicle Survival" },
         randomEvents: [
           { chance: 0.3, text: "You find a full emergency kit in the trunk: candles, thermal blankets, high-energy bars, a small shovel.", effect: { conditionAdd: "emergency_kit_found", moraleMod: 15 } },
           { chance: 0.2, text: "Snow is still falling. The exhaust pipe may drift over in an hour.", effect: { conditionAdd: "exhaust_risk", moraleMod: -10 } },
@@ -4504,7 +4504,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Carbon Monoxide Awareness",
         situation: "Your second group member wants to run the engine for warmth. The exhaust pipe is partially drifted over. How do you handle this?",
-        check: { stat: "knowledge", difficulty: 10, tag: "utility", label: "CO Risk Management" },
+        check: { stat: "knowledge", difficulty: 9, tag: "utility", label: "CO Risk Management" },
         randomEvents: [
           { chance: 0.25, text: "You find a small CO alarm keychain in the emergency kit.", effect: { conditionAdd: "co_alarm_found", moraleMod: 15 } },
           { chance: 0.2,  text: "Snow continues. Drift around the vehicle is now door-height.", effect: { conditionAdd: "drift_increasing" } },
@@ -4532,7 +4532,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Signal for the Morning Shift",
         situation: "03:30. Survived the night. Logging trucks start at 06:00. You need to make your vehicle visible before dawn to avoid being passed on the road.",
-        check: { stat: "perception", difficulty: 10, tag: "signal", label: "Vehicle Visibility" },
+        check: { stat: "perception", difficulty: 9, tag: "signal", label: "Vehicle Visibility" },
         randomEvents: [
           { chance: 0.3, text: "Snowfall has stopped. Stars visible. Temperature now −23°C.", effect: { conditionAdd: "clear_sky", moraleMod: 5 } },
           { chance: 0.2, text: "You find a road flare in the emergency kit.", effect: { conditionAdd: "flare_found", moraleMod: 15 } },
@@ -4580,7 +4580,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Water Infrastructure",
         situation: "Boiling every litre is expensive in fuel and time. You have materials to build a gravity filter. The stream runs clear but you don't know what's upstream.",
-        check: { stat: "knowledge", difficulty: 11, tag: "water", label: "Filter Construction" },
+        check: { stat: "knowledge", difficulty: 10, tag: "water", label: "Filter Construction" },
         randomEvents: [
           { chance: 0.2, text: "You find a carcass 200m upstream — confirms you need to filter.", effect: { moraleMod: -5 } },
           { chance: 0.15, text: "Rain has collected in a natural bowl nearby — clean water ready to store.", effect: { conditionAdd: "found_water", moraleMod: 8 } },
@@ -4608,7 +4608,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Hygiene Protocol",
         situation: "Six days in, your hands are constantly dirty. You've been handling wood, soil, water, and food without consistent handwashing. Your left thumb has a small cut from yesterday that looks slightly red.",
-        check: { stat: "knowledge", difficulty: 12, tag: "medical", label: "Hygiene Assessment" },
+        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Hygiene Assessment" },
         randomEvents: [
           { chance: 0.25, text: "Morning light reveals ant trails running through your food stores — contamination risk.", effect: { moraleMod: -10 } },
           { chance: 0.2, text: "You find a large pile of dry ash from previous fires — ready handwashing resource.", effect: { conditionAdd: "wound_dressed", moraleMod: 8 } },
@@ -4636,7 +4636,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Shelter Upgrade",
         situation: "Your lean-to is functional but heat retention is poor. Nights drop to 1°C. You're sleeping in most of your clothing. Twelve days in — this is home now, not an emergency bivouac.",
-        check: { stat: "strength", difficulty: 13, tag: "shelter", label: "Construction Assessment" },
+        check: { stat: "strength", difficulty: 12, tag: "shelter", label: "Construction Assessment" },
         randomEvents: [
           { chance: 0.2, text: "You find a natural rock overhang nearby — thermal mass and wind break combined.", effect: { conditionAdd: "spotted_overhang", moraleMod: 10 } },
           { chance: 0.15, text: "The lean-to's main ridgepole has a stress crack — it needs reinforcement soon.", effect: { conditionAdd: "poor_shelter", moraleMod: -10 } },
@@ -4680,7 +4680,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Caloric Assessment",
         situation: "You've been foraging opportunistically but with no system. Before expanding effort, you need to understand what the environment can realistically provide.",
-        check: { stat: "perception", difficulty: 11, tag: "food", label: "Environment Assessment" },
+        check: { stat: "perception", difficulty: 10, tag: "food", label: "Environment Assessment" },
         randomEvents: [
           { chance: 0.25, text: "Fresh deer tracks in soft mud near the stream — large animal in the area.", effect: { moraleMod: 10 } },
           { chance: 0.2, text: "You spot a large stand of cattail — one of the highest-calorie wild plants available.", effect: { conditionAdd: "found_water", moraleMod: 12 } },
@@ -4708,7 +4708,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Acorn Processing",
         situation: "You've found a substantial acorn cache under the oak stand. Raw acorns in quantity cause real gastrointestinal distress from tannins — but processed correctly they're a reliable carbohydrate source.",
-        check: { stat: "knowledge", difficulty: 12, tag: "food", label: "Food Processing" },
+        check: { stat: "knowledge", difficulty: 11, tag: "food", label: "Food Processing" },
         randomEvents: [
           { chance: 0.2, text: "Squirrel middens nearby confirm these acorns are viable — animals have cached them.", effect: { moraleMod: 8 } },
           { chance: 0.15, text: "A section of the oak stand has fallen nuts still in caps — unaffected by mould.", effect: { moraleMod: 6 } },
@@ -4736,7 +4736,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Caloric Reserve",
         situation: "You now have multiple food sources running simultaneously. The question is whether to consume day-to-day or begin preserving a reserve for the harder days ahead.",
-        check: { stat: "composure", difficulty: 11, tag: "food", label: "Resource Planning" },
+        check: { stat: "composure", difficulty: 10, tag: "food", label: "Resource Planning" },
         randomEvents: [
           { chance: 0.2, text: "A cold front is visible on the horizon — precipitation likely in 36 hours. Food-gathering window may be closing.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "Your snare catches a larger animal — more protein than one meal requires.", effect: { moraleMod: 15 } },
@@ -4988,7 +4988,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Triage",
         situation: "Your passenger has a deep gash on her thigh and a swelling temple. The pilot is slumped motionless in the cockpit. You have minutes of useful light and one working pair of hands: yours.",
-        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Triage" },
+        check: { stat: "knowledge", difficulty: 10, tag: "medical", label: "Triage" },
         randomEvents: [
           { chance: 0.2, text: "Fuel drips from the torn wing root — the sharp sweet smell of avgas under the pine.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "Her phone lights up in her pocket: one bar, then none.", effect: { moraleMod: -5 } },
@@ -5016,7 +5016,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Shelter or Wreckage",
         situation: "Dark in an hour. −6°C and dropping. The fuselage is intact but reeks of fuel — avgas, fumes, and leaking fuel are a fire and explosion hazard. Check for leaks before sheltering anywhere near the wreck; camp and fires go upwind and uphill of it, never in or against it. The forest offers spruce boughs and dry wood.",
-        check: { stat: "knowledge", difficulty: 11, tag: "shelter", label: "Shelter Choice" },
+        check: { stat: "knowledge", difficulty: 10, tag: "shelter", label: "Shelter Choice" },
         randomEvents: [
           { chance: 0.25, text: "Something large moves in the treeline — a moose, uninterested, gone.", effect: { moraleMod: -5 } },
         ],
@@ -5043,7 +5043,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Being Seen",
         situation: "Morning. Clear and cold. Somewhere, someone is working the overdue flight plan. The question is how hard you wave.",
-        check: { stat: "perception", difficulty: 11, tag: "signal", label: "Signaling" },
+        check: { stat: "perception", difficulty: 10, tag: "signal", label: "Signaling" },
         randomEvents: [
           { chance: 0.2, text: "A float plane drones past, far off, on someone else's business.", effect: { moraleMod: 8 } },
         ],
@@ -5070,7 +5070,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — The Second Night",
         situation: "Second night. −12°C. The fire is your furnace and your enemy — it demands feeding every hour.",
-        check: { stat: "endurance", difficulty: 12, tag: "warmth", label: "Cold Management" },
+        check: { stat: "endurance", difficulty: 11, tag: "warmth", label: "Cold Management" },
         randomEvents: [
           { chance: 0.25, text: "Wolves call far off — one long howl, answered. They want nothing to do with your fire.", effect: { moraleMod: -8 } },
         ],
@@ -5112,7 +5112,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Water Discipline",
         situation: "Four people, two litres of water, and ocean in every direction that you must not drink. Everyone is thirsty and scared right now.",
-        check: { stat: "composure", difficulty: 11, tag: "water", label: "Water Discipline" },
+        check: { stat: "composure", difficulty: 10, tag: "water", label: "Water Discipline" },
         randomEvents: [
           { chance: 0.2, text: "A flying fish lands in the raft. Four people stare at it like a miracle.", effect: { moraleMod: 8 } },
         ],
@@ -5139,7 +5139,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — The Sun",
         situation: "Day two. 31°C, no wind, a white sun that finds every inch of skin. Out here sunburn isn't discomfort — it's fluid loss.",
-        check: { stat: "endurance", difficulty: 11, tag: "warmth", label: "Sun Management" },
+        check: { stat: "endurance", difficulty: 10, tag: "warmth", label: "Sun Management" },
         randomEvents: [
           { chance: 0.25, text: "A brief squall — you spread every cloth to catch the rain.", effect: { moraleMod: 10, conditionAdd: "rain_caught" } },
         ],
@@ -5166,7 +5166,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — The Horizon",
         situation: "Day three. A smudge on the horizon that might be a ship. The flare pistol holds three flares. The mirror is free forever.",
-        check: { stat: "perception", difficulty: 12, tag: "signal", label: "Signaling" },
+        check: { stat: "perception", difficulty: 11, tag: "signal", label: "Signaling" },
         randomEvents: [
           { chance: 0.15, text: "A container ship passes hull-down on the horizon, never altering course.", effect: { moraleMod: -10 } },
         ],
@@ -5193,7 +5193,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Nerves",
         situation: "Day four. A fin has been circling since dawn — curious, not committed. Nerves are fraying faster than supplies.",
-        check: { stat: "composure", difficulty: 12, tag: "psychology", label: "Nerves" },
+        check: { stat: "composure", difficulty: 11, tag: "psychology", label: "Nerves" },
         randomEvents: [
           { chance: 0.2, text: "Dolphins ride the swell alongside for ten minutes, indifferent to everything.", effect: { moraleMod: 10 } },
         ],
@@ -5359,7 +5359,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Heat Without Poison",
         situation: "The house is already cooling. You need heat tonight — but every indoor flame is a bargain with carbon monoxide.",
-        check: { stat: "knowledge", difficulty: 11, tag: "energy", label: "Heat Without Poison" },
+        check: { stat: "knowledge", difficulty: 10, tag: "energy", label: "Heat Without Poison" },
         randomEvents: [
           { chance: 0.2, text: "The CO detector chirps its low-battery warning — you swap in fresh batteries by headlamp.", effect: { moraleMod: 5 } },
         ],
@@ -5386,7 +5386,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — The Pipes",
         situation: "Day two. The upstairs bathroom is 2°C. If the pipes freeze and burst, you'll have no water when the power returns — and a flood.",
-        check: { stat: "knowledge", difficulty: 10, tag: "building", label: "The Pipes" },
+        check: { stat: "knowledge", difficulty: 9, tag: "building", label: "The Pipes" },
         randomEvents: [
           { chance: 0.2, text: "The neighbour's pipes burst at 4am — you hear the water running down their driveway.", effect: { moraleMod: -10 } },
         ],
@@ -5413,7 +5413,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — The Fridge",
         situation: "Day two. The fridge has been shut for 36 hours. The freezer is still hard. What's safe, what's not, and what gets eaten tonight?",
-        check: { stat: "knowledge", difficulty: 10, tag: "food", label: "The Fridge" },
+        check: { stat: "knowledge", difficulty: 9, tag: "food", label: "The Fridge" },
         randomEvents: [
           { chance: 0.15, text: "Hydro's automated line says crews are 'assessing'. Nobody believes it anymore.", effect: { moraleMod: -8 } },
         ],
@@ -5440,7 +5440,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — The Neighbours",
         situation: "Day three. The elderly couple next door hasn't answered their door. Their house is dark. Yours is warm. The walk is 200 metres at −30°.",
-        check: { stat: "composure", difficulty: 11, tag: "community", label: "The Neighbours" },
+        check: { stat: "composure", difficulty: 10, tag: "community", label: "The Neighbours" },
         randomEvents: [
           { chance: 0.2, text: "A snowmobile passes on the road — the first sign all week that the world still moves.", effect: { moraleMod: 10 } },
         ],
@@ -5482,7 +5482,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Stop the Spiral",
         situation: "Your chest is tight and every direction looks identical. Panic is already making decisions for you — faster walking, worse choices. The first survival task isn't navigation. It's your own nervous system.",
-        check: { stat: "composure", difficulty: 9, tag: "psychology", label: "Panic Control" },
+        check: { stat: "composure", difficulty: 7, tag: "psychology", label: "Panic Control" },
         randomEvents: [
           { chance: 0.2, text: "A branch snaps behind you — just a squirrel. Your heart disagrees.", effect: { moraleMod: -5 } },
           { chance: 0.15, text: "Your water bottle is still half full. Small mercies.", effect: { moraleMod: 5 } },
@@ -5510,7 +5510,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Pick a Line",
         situation: "Calmer now. Three options, each with a real logic: retrace your steps to the last known point, climb for a vantage, or follow the drainage downhill toward people.",
-        check: { stat: "knowledge", difficulty: 10, tag: "navigation", label: "Route Decision" },
+        check: { stat: "knowledge", difficulty: 8, tag: "navigation", label: "Route Decision" },
         randomEvents: [
           { chance: 0.2, text: "A distant dog barks — civilization is somewhere, but sound lies about distance.", effect: { moraleMod: 5 } },
           { chance: 0.15, text: "Clouds thicken. That vantage point just got less useful.", effect: { moraleMod: -5 } },
@@ -5538,7 +5538,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — The Night You Didn't Plan",
         situation: "The sun is touching the ridge. You're still out. Tonight's shelter won't be comfortable — it just needs to keep you warm enough to think straight at dawn.",
-        check: { stat: "knowledge", difficulty: 10, tag: "shelter", label: "Improvised Shelter" },
+        check: { stat: "knowledge", difficulty: 8, tag: "shelter", label: "Improvised Shelter" },
         randomEvents: [
           { chance: 0.2, text: "You find a natural rock overhang — half a shelter, free of charge.", effect: { moraleMod: 8 } },
           { chance: 0.2, text: "The temperature is dropping faster than the forecast suggested.", effect: { moraleMod: -8 } },
@@ -5566,7 +5566,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Be Findable",
         situation: "Dawn. You're cold but functional, and searchers may already be looking. This stage isn't about moving — it's about being impossible to miss.",
-        check: { stat: "knowledge", difficulty: 9, tag: "signal", label: "Rescue Signaling" },
+        check: { stat: "knowledge", difficulty: 7, tag: "signal", label: "Rescue Signaling" },
         randomEvents: [
           { chance: 0.25, text: "A search helicopter thumps somewhere to the east — close enough to matter.", effect: { moraleMod: 10 } },
           { chance: 0.15, text: "Morning fog settles in the valley. Visual signals just got harder.", effect: { moraleMod: -8 } },
@@ -5609,7 +5609,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Don't Run",
         situation: "A bear is ten metres away, head swinging between you and the food bag. Your friend is on the ground, hurt. Every instinct says run. Every instinct is wrong.",
-        check: { stat: "composure", difficulty: 11, tag: "security", label: "Predator Deterrence" },
+        check: { stat: "composure", difficulty: 10, tag: "security", label: "Predator Deterrence" },
         randomEvents: [
           { chance: 0.2, text: "The bear bluff-charges two steps and stops — testing you.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "Your headlamp catches its eyes; it flinches from the light.", effect: { moraleMod: 5 } },
@@ -5637,7 +5637,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Blood First",
         situation: "The bear is gone. Your friend has deep lacerations on the forearm and scalp — bleeding hard but conscious. This is the golden window for bleeding control.",
-        check: { stat: "knowledge", difficulty: 12, tag: "medical", label: "Bleeding Control" },
+        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Bleeding Control" },
         randomEvents: [
           { chance: 0.2, text: "Shock is setting in — they're going pale and quiet.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "Someone finds the actual first-aid kit, not just the wishful-thinking one.", effect: { moraleMod: 8 } },
@@ -5665,7 +5665,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — It Knows Where the Food Is",
         situation: "Dawn is hours off and the bear now associates this camp with an easy meal. It will be back — tonight, or tomorrow. The camp has to change.",
-        check: { stat: "knowledge", difficulty: 11, tag: "security", label: "Camp Hardening" },
+        check: { stat: "knowledge", difficulty: 10, tag: "security", label: "Camp Hardening" },
         randomEvents: [
           { chance: 0.2, text: "You hear it crashing through brush nearby — circling, not leaving.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "The moon sets. Full dark now; every sound is louder.", effect: { moraleMod: -5 } },
@@ -5693,7 +5693,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Walk Out or Wait",
         situation: "First light. Your friend is stable but needs real medical care within a day. The trailhead is a hard half-day carry; your check-in contact expects you tomorrow evening.",
-        check: { stat: "knowledge", difficulty: 12, tag: "medical", label: "Evacuation Decision" },
+        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Evacuation Decision" },
         randomEvents: [
           { chance: 0.2, text: "The wounds look angrier this morning — redness spreading at the edges.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "Clear sky and a steady breeze: good travel weather.", effect: { moraleMod: 5 } },
@@ -5863,7 +5863,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Read the Ocean",
         situation: "Strong shaking, then the sea retreats, then the roar. Three natural warnings, no siren needed. The question is what you do with the seconds you have.",
-        check: { stat: "knowledge", difficulty: 10, tag: "utility", label: "Warning Recognition" },
+        check: { stat: "knowledge", difficulty: 9, tag: "utility", label: "Warning Recognition" },
         randomEvents: [
           { chance: 0.2, text: "A neighbor stands filming the exposed seabed, walking toward it.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "The town siren finally starts — late, but unmistakable.", effect: { moraleMod: 8 } },
@@ -5891,7 +5891,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Up, Not Along",
         situation: "The hill road climbs behind the town; the designated assembly point is two kilometres inland; the concrete hotel offers upper floors. All uphill or inland — never along the coast.",
-        check: { stat: "endurance", difficulty: 11, tag: "navigation", label: "Evacuation Route" },
+        check: { stat: "endurance", difficulty: 10, tag: "navigation", label: "Evacuation Route" },
         randomEvents: [
           { chance: 0.2, text: "Traffic jams the coast road — cars going nowhere, horns blaring.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "A marked evacuation route sign points uphill — someone planned for this.", effect: { moraleMod: 5 } },
@@ -5919,7 +5919,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — No One Left Below",
         situation: "Halfway up the hill you see them: an elderly couple, moving slowly, and a mother carrying a toddler plus a bag. The water isn't here yet. It will be.",
-        check: { stat: "composure", difficulty: 11, tag: "community", label: "Assisted Evacuation" },
+        check: { stat: "composure", difficulty: 10, tag: "community", label: "Assisted Evacuation" },
         randomEvents: [
           { chance: 0.2, text: "The roar is suddenly much louder — the first wave is visible now.", effect: { moraleMod: -12 } },
           { chance: 0.15, text: "A pickup stops — the driver is taking elderly passengers uphill.", effect: { moraleMod: 8 } },
@@ -5947,7 +5947,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — The Water Leaves Things Behind",
         situation: "It's over — the sea went back out, twice. The town below is a debris field: splintered houses, drowned cars, and water standing where streets were.",
-        check: { stat: "knowledge", difficulty: 12, tag: "utility", label: "Post-Wave Hazards" },
+        check: { stat: "knowledge", difficulty: 11, tag: "utility", label: "Post-Wave Hazards" },
         randomEvents: [
           { chance: 0.2, text: "A gas leak hisses from a shattered house — and someone is walking toward it with a cigarette.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "A neighbor's dog is barking from a rooftop, unhurt and furious.", effect: { moraleMod: 5 } },
@@ -6117,7 +6117,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — The Sick Room",
         situation: "Two sick, three healthy — for now. The virus doesn't care about floor plans, but floor plans are all you have. Where does the illness live for the next three weeks?",
-        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Household Isolation" },
+        check: { stat: "knowledge", difficulty: 10, tag: "medical", label: "Household Isolation" },
         randomEvents: [
           { chance: 0.2, text: "The healthy teenager announces the whole thing is overblown and tries to visit the sick room.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "A neighbor texts: their household has it too. Misery is widely distributed today.", effect: { moraleMod: 5 } },
@@ -6145,7 +6145,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Caregiving With What You Have",
         situation: "No spare respirators. A box of cloth masks, soap, bleach, dishwashing gloves, and an old raincoat. The sick need nursing; the healthy need to stay that way. How do you cross the threshold?",
-        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Improvised Infection Control" },
+        check: { stat: "knowledge", difficulty: 10, tag: "medical", label: "Improvised Infection Control" },
         randomEvents: [
           { chance: 0.2, text: "The bleach bottle is nearly empty — one more batch of surface solution, then it's soap and water only.", effect: { moraleMod: -5 } },
           { chance: 0.15, text: "Opening the sick-room windows drops the feverish complaints by half. Fresh air is doing quiet work.", effect: { moraleMod: 8 } },
@@ -6173,7 +6173,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Three Weeks of Supplies",
         situation: "Inventory day. Sixteen days of food at normal use — for a crisis the radio says will run three weeks minimum. One course of fever medication. And your father-in-law's blood pressure pills, which cannot simply stop.",
-        check: { stat: "knowledge", difficulty: 12, tag: "utility", label: "Household Triage" },
+        check: { stat: "knowledge", difficulty: 11, tag: "utility", label: "Household Triage" },
         randomEvents: [
           { chance: 0.2, text: "The grocery delivery slot you booked is cancelled — driver shortage. No resupply this week.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "You find two forgotten cans of soup behind the cleaning supplies. Small victories count.", effect: { moraleMod: 8 } },
@@ -6201,7 +6201,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Red Flags and Dark Days",
         situation: "Day seventeen. One patient's cough has deepened — and the teenager hasn't really spoken in two days. Two problems now: knowing when home care stops being enough, and keeping five confined people human.",
-        check: { stat: "knowledge", difficulty: 12, tag: "medical", label: "Escalation Thresholds" },
+        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Escalation Thresholds" },
         randomEvents: [
           { chance: 0.2, text: "The teenager finally cries at dinner — about the illness, the boredom, all of it. The table goes quiet, then everyone talks.", effect: { moraleMod: 10 } },
           { chance: 0.2, text: "Nobody has slept well in a week. Tempers spark over nothing, twice today.", effect: { moraleMod: -10 } },
@@ -6371,7 +6371,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — The Ration",
         situation: "The well is failing and everyone knows it. This morning's water point line nearly became a fight. Forty people, one shrinking source. How do you share what's left without the village tearing itself apart?",
-        check: { stat: "knowledge", difficulty: 11, tag: "community", label: "Water Rationing" },
+        check: { stat: "knowledge", difficulty: 10, tag: "community", label: "Water Rationing" },
         randomEvents: [
           { chance: 0.2, text: "A family is caught drawing a second share at dawn. They claim the first was short. Nobody believes them.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "The council elder proposes the morning count be done aloud, in public. Transparency as policy.", effect: { moraleMod: 8 } },
@@ -6399,7 +6399,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — New Water",
         situation: "The old well gives less every week. Three plays on the table: deepen the failing shaft, dig a new well where the low ground stays green, or organize daily caravans to the river eight kilometers off.",
-        check: { stat: "knowledge", difficulty: 12, tag: "water", label: "Water Prospecting" },
+        check: { stat: "knowledge", difficulty: 11, tag: "water", label: "Water Prospecting" },
         randomEvents: [
           { chance: 0.2, text: "A boy reports damp soil in the green hollow east — two hand-spans down, cool to the touch.", effect: { moraleMod: 8 } },
           { chance: 0.15, text: "The old well's rope comes up frayed and short. The water is further down than the rope.", effect: { moraleMod: -8 } },
@@ -6427,7 +6427,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Stay or Go",
         situation: "The well is failing faster than the digging. The district town sixty kilometers north has boreholes and relief distribution. The council meets tonight. Who moves, who stays — and is 'everyone' an answer?",
-        check: { stat: "knowledge", difficulty: 11, tag: "community", label: "Migration Decision" },
+        check: { stat: "knowledge", difficulty: 10, tag: "community", label: "Migration Decision" },
         randomEvents: [
           { chance: 0.2, text: "A trader passes through: the town's boreholes are running, but the relief line is long and growing.", effect: { moraleMod: -5 } },
           { chance: 0.15, text: "Clouds build in the afternoon, tease, and dissolve. The old men stop watching the sky.", effect: { moraleMod: -8 } },
@@ -6455,7 +6455,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — The Long Walk",
         situation: "The decision is made: the village moves, sixty kilometers to the boreholes. Forty people, children, elders, donkeys, and the heat. How do you walk them there alive?",
-        check: { stat: "endurance", difficulty: 12, tag: "water", label: "Movement Discipline" },
+        check: { stat: "endurance", difficulty: 11, tag: "water", label: "Movement Discipline" },
         randomEvents: [
           { chance: 0.2, text: "A donkey goes lame on the second morning. Its load is redistributed among four teenagers who pretend not to mind.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "The elders set a walking song, and the children's complaining stops for a full hour.", effect: { moraleMod: 10 } },
@@ -6625,7 +6625,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Where You Ride It Out",
         situation: "The warning is real and the sky is doing the thing. You need to be somewhere survivable before it arrives.",
-        check: { stat: "knowledge", difficulty: 10, tag: "shelter", label: "Shelter Choice" },
+        check: { stat: "knowledge", difficulty: 8, tag: "shelter", label: "Shelter Choice" },
         randomEvents: [
           { chance: 0.25, text: "The power flickers and dies. The radio keeps going on batteries.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "Your neighbor texts: their cellar door is open if you need it.", effect: { moraleMod: 10 } },
@@ -6653,7 +6653,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — The Roar",
         situation: "It is here. The house sounds like it is being unmade. You have seconds to protect the only things that matter.",
-        check: { stat: "composure", difficulty: 10, tag: "utility", label: "Protective Position" },
+        check: { stat: "composure", difficulty: 8, tag: "utility", label: "Protective Position" },
         randomEvents: [
           { chance: 0.2, text: "Something heavy hits the roof above you. Plaster dust rains down.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "The dog, shaking, crawls in under the mattress with you.", effect: { moraleMod: 8 } },
@@ -6681,7 +6681,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — The Quiet After",
         situation: "Silence. Then car alarms. Your street is unrecognizable — roofs in yards, a power line down across the road, and someone calling for help two houses over.",
-        check: { stat: "knowledge", difficulty: 11, tag: "utility", label: "Aftermath Hazards" },
+        check: { stat: "knowledge", difficulty: 9, tag: "utility", label: "Aftermath Hazards" },
         randomEvents: [
           { chance: 0.2, text: "You smell gas near the wrecked garage. Sharp, unmistakable.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "A second storm cell is on the radio — not tornadic, but more wind coming.", effect: { moraleMod: -8 } },
@@ -6724,7 +6724,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Reading the Signs",
         situation: "The vapor is still a few streets away. Your eyes are starting to water. What do you establish before you move?",
-        check: { stat: "perception", difficulty: 11, tag: "utility", label: "Hazard Recognition" },
+        check: { stat: "perception", difficulty: 10, tag: "utility", label: "Hazard Recognition" },
         randomEvents: [
           { chance: 0.2, text: "A dog is barking frantically two doors down — its owners are not home.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "You spot the tanker's diamond placard through binoculars: numbers visible.", effect: { moraleMod: 8 } },
@@ -6752,7 +6752,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Run or Seal",
         situation: "The vapor is two streets away and closing. Your household is together. The car is in the driveway. Decide: evacuate or shelter in place.",
-        check: { stat: "knowledge", difficulty: 12, tag: "shelter", label: "Evacuate vs Seal" },
+        check: { stat: "knowledge", difficulty: 11, tag: "shelter", label: "Evacuate vs Seal" },
         randomEvents: [
           { chance: 0.25, text: "The wind picks up — the cloud is moving faster than it was ten minutes ago.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "An emergency alert buzzes every phone: shelter in place, avoid the highway.", effect: { moraleMod: 8 } },
@@ -6780,7 +6780,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Decontamination",
         situation: "You are clear of the plume, but your clothes and skin were in the outer edge of it. The kids' eyes are red. Decontaminate before you contaminate the shelter.",
-        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Decontamination" },
+        check: { stat: "knowledge", difficulty: 10, tag: "medical", label: "Decontamination" },
         randomEvents: [
           { chance: 0.2, text: "Your youngest is crying — scared, not hurt. Fear makes everything harder.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "A neighbor with a garden hose offers water before you even ask.", effect: { moraleMod: 10 } },
@@ -6808,7 +6808,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — What the Responders Need",
         situation: "Fire crews are staging upwind. They need information only people who were there can give. What you tell them shapes the response.",
-        check: { stat: "composure", difficulty: 10, tag: "signal", label: "Responder Report" },
+        check: { stat: "composure", difficulty: 9, tag: "signal", label: "Responder Report" },
         randomEvents: [
           { chance: 0.2, text: "A second tanker is visible behind the first — intact, but the crews do not know that yet.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "Your phone has one bar and a dying battery. Make it count.", effect: { moraleMod: -8 } },
@@ -6851,7 +6851,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Picking the Line",
         situation: "Three ways home. The highway is direct but exposed. The back roads wind but offer cover and water. The rail line runs straight and empty.",
-        check: { stat: "knowledge", difficulty: 11, tag: "navigation", label: "Route Selection" },
+        check: { stat: "knowledge", difficulty: 10, tag: "navigation", label: "Route Selection" },
         randomEvents: [
           { chance: 0.2, text: "A column of smoke rises from the highway interchange — something is burning there.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "You find a discarded paper road map in an abandoned car. Better than memory.", effect: { moraleMod: 10 } },
@@ -6879,7 +6879,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Water Along the Way",
         situation: "Day four. Your bottles are low and the next town is two days off. A farm pond, a stream, and a house with a well are all within reach.",
-        check: { stat: "knowledge", difficulty: 10, tag: "water", label: "Water Resupply" },
+        check: { stat: "knowledge", difficulty: 9, tag: "water", label: "Water Resupply" },
         randomEvents: [
           { chance: 0.25, text: "The stream you counted on is running low and silty.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "Morning rain fills every ditch. Free water, everywhere, briefly.", effect: { moraleMod: 10 } },
@@ -6907,7 +6907,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Feet and Pace",
         situation: "Day eight. Your feet are the journey now — hot spots blooming, shoulders raw. How you walk the next six days matters more than how far.",
-        check: { stat: "endurance", difficulty: 12, tag: "utility", label: "Pace & Foot Care" },
+        check: { stat: "endurance", difficulty: 11, tag: "utility", label: "Pace & Foot Care" },
         randomEvents: [
           { chance: 0.2, text: "A blister on your heel bursts inside your sock. Every step announces it.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "You find a pair of discarded wool socks, clean and dry, on a fence post.", effect: { moraleMod: 8 } },
@@ -6935,7 +6935,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Cache or Carry",
         situation: "Day eleven. A village ahead has a working hand pump and a farm stand of unguarded food. Your pack is heavy and your knees are keeping score.",
-        check: { stat: "knowledge", difficulty: 11, tag: "utility", label: "Load Strategy" },
+        check: { stat: "knowledge", difficulty: 10, tag: "utility", label: "Load Strategy" },
         randomEvents: [
           { chance: 0.2, text: "You find a sheltered culvert — a perfect cache spot, dry and invisible from the road.", effect: { moraleMod: 8 } },
           { chance: 0.15, text: "Another walker passes going the other way. Hungry-looking. Notes your pack.", effect: { moraleMod: -8 } },
@@ -6978,7 +6978,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — The Inventory",
         situation: "You finally do the honest count: the pantry, the freezer, the emergency box under the bed. It is less than you hoped and more than you feared.",
-        check: { stat: "knowledge", difficulty: 10, tag: "food", label: "Ration Planning" },
+        check: { stat: "knowledge", difficulty: 9, tag: "food", label: "Ration Planning" },
         randomEvents: [
           { chance: 0.2, text: "The freezer starts thawing — the power has been flickering for days.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "You find a forgotten case of canned beans behind the winter coats.", effect: { moraleMod: 12 } },
@@ -7006,7 +7006,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Neighbors",
         situation: "Week three. The couple upstairs has a baby and no formula. The man across the hall has been quietly stockpiling for years and is now quietly watching everyone. Pool, hide, or trade?",
-        check: { stat: "composure", difficulty: 11, tag: "community", label: "Community Strategy" },
+        check: { stat: "composure", difficulty: 10, tag: "community", label: "Community Strategy" },
         randomEvents: [
           { chance: 0.2, text: "Someone breaks into the ground-floor storage units overnight. Nothing of yours was there.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "The upstairs couple shares their last fresh bread with your kids, unasked.", effect: { moraleMod: 12 } },
@@ -7034,7 +7034,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — When the Taps Falter",
         situation: "Week four. The water pressure is dropping — the pumps need power the grid cannot spare. What is in the pipes now may be all you get for a while.",
-        check: { stat: "knowledge", difficulty: 11, tag: "water", label: "Water Capture" },
+        check: { stat: "knowledge", difficulty: 10, tag: "water", label: "Water Capture" },
         randomEvents: [
           { chance: 0.25, text: "The pressure drops to a trickle at noon. The building's top floors go dry first.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "A neighbor on the ground floor offers access to their rain barrel.", effect: { moraleMod: 8 } },
@@ -7062,7 +7062,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Stay or Leave",
         situation: "Week five. Your cousin in the countryside says there is food growing there and a spare room. The city still has your apartment, your neighbors, and the unknown. The decision cannot wait much longer.",
-        check: { stat: "composure", difficulty: 12, tag: "community", label: "Stay or Leave" },
+        check: { stat: "composure", difficulty: 11, tag: "community", label: "Stay or Leave" },
         randomEvents: [
           { chance: 0.2, text: "Rumors of a supply convoy next week. Rumors have been wrong before.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "The cousin calls again: the offer stands, but the roads are getting rougher.", effect: { moraleMod: 8 } },
@@ -7232,7 +7232,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Choosing the Source",
         situation: "Three options, one decision. The spring seeps clean 400 metres uphill. The stream is sixty metres away and visibly not clean. The ground under camp is soft enough to dig.",
-        check: { stat: "knowledge", difficulty: 11, tag: "water", label: "Source Assessment" },
+        check: { stat: "knowledge", difficulty: 10, tag: "water", label: "Source Assessment" },
         randomEvents: [
           { chance: 0.2, text: "An old-timer points out green vegetation in a dry gully — a classic sign of shallow groundwater.", effect: { moraleMod: 6 } },
           { chance: 0.15, text: "After rain the stream runs brown with upstream runoff. Everyone sees what they have been drinking.", effect: { moraleMod: -8 } },
@@ -7260,7 +7260,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Hands",
         situation: "The plan is set. Now the labour: twenty-five people, and the build competes directly with foraging, cooking, repairs, and childcare. Everyone is needed in two places at once.",
-        check: { stat: "composure", difficulty: 10, tag: "community", label: "Labour Organisation" },
+        check: { stat: "composure", difficulty: 9, tag: "community", label: "Labour Organisation" },
         randomEvents: [
           { chance: 0.2, text: "Two teenagers turn out to be natural stone-stackers. The lining work suddenly goes twice as fast.", effect: { moraleMod: 8 } },
           { chance: 0.15, text: "A foraging party comes back light. The berry patches are picked over and game is scarce.", effect: { moraleMod: -8 } },
@@ -7288,7 +7288,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — The Filter",
         situation: "The source flows. Now it must be made reliably safe: sediment, cloudiness, and whatever the stream carried in. Clear water is not the same as safe water, and the camp needs both.",
-        check: { stat: "knowledge", difficulty: 12, tag: "water", label: "Filtration Build" },
+        check: { stat: "knowledge", difficulty: 11, tag: "water", label: "Filtration Build" },
         randomEvents: [
           { chance: 0.2, text: "A bed of clean coarse sand is found in a cutbank downstream — exactly the right grain, free for the hauling.", effect: { moraleMod: 6 } },
           { chance: 0.15, text: "The first filter barrel leaks at the seam. A day's work of sand sits in a puddle.", effect: { moraleMod: -8 } },
@@ -7316,7 +7316,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Guarding the Water",
         situation: "The system works. Now the long game: keeping it working. Latrines creep downhill toward water when nobody is watching. Animals foul what they can reach. Good water is a habit, not a build.",
-        check: { stat: "knowledge", difficulty: 11, tag: "water", label: "Source Protection" },
+        check: { stat: "knowledge", difficulty: 10, tag: "water", label: "Source Protection" },
         randomEvents: [
           { chance: 0.2, text: "A child spots a dead animal upstream of the old stream intake — exactly the kind of thing the new system was built to stop mattering.", effect: { moraleMod: 5 } },
           { chance: 0.15, text: "Goats break into the spring enclosure overnight. The eye is trampled and muddy by morning.", effect: { conditionAdd: "spring_fouled", moraleMod: -10 } },
@@ -7486,7 +7486,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Reading the Ground",
         situation: "Three candidate plots. The south bottomland is black and rich but a forty-minute walk from the palisade. The near field is thin, stony soil ten minutes away. The river terrace is fertile and close to water — and floods in wet springs.",
-        check: { stat: "knowledge", difficulty: 11, tag: "agriculture", label: "Soil Assessment" },
+        check: { stat: "knowledge", difficulty: 10, tag: "agriculture", label: "Soil Assessment" },
         randomEvents: [
           { chance: 0.2, text: "An elder who farmed before the fall walks the bottomland, nods once, and says nothing. The others take it as a sign.", effect: { moraleMod: 6 } },
           { chance: 0.15, text: "Spring rain hammers the terrace for a day. Water stands in the low corner for hours.", effect: { moraleMod: -6 } },
@@ -7514,7 +7514,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — What Feeds Forty",
         situation: "Seed is finite and every bed is a bet. Roots give the most calories per area but need cool, dark storage. Grains store for years but yield less per bed and need threshing and milling. A mixed planting spreads the risk — and the workload.",
-        check: { stat: "knowledge", difficulty: 12, tag: "agriculture", label: "Crop Planning" },
+        check: { stat: "knowledge", difficulty: 11, tag: "agriculture", label: "Crop Planning" },
         randomEvents: [
           { chance: 0.2, text: "A trader passes through with a sack of unfamiliar seed. Nobody can vouch for the variety.", effect: { moraleMod: 4 } },
           { chance: 0.15, text: "A late cold snap threatens. The old hands watch the sky and argue about covering the beds.", effect: { moraleMod: -6 } },
@@ -7542,7 +7542,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — The Hungry Season",
         situation: "Midsummer. Something is eating the brassicas, a gray mold is creeping through the beans, and there are no chemical sprays anymore — there never will be again. Barriers and hand-picking work but devour labor. Beneficial habitat and rotation are slower but systemic. Or you rip out and burn everything infected, sacrificing yield to save the field.",
-        check: { stat: "knowledge", difficulty: 11, tag: "agriculture", label: "Pest Management" },
+        check: { stat: "knowledge", difficulty: 10, tag: "agriculture", label: "Pest Management" },
         randomEvents: [
           { chance: 0.25, text: "A flock of birds discovers the grain beds. Netting goes up in a hurry.", effect: { moraleMod: -6 } },
           { chance: 0.15, text: "Ladybird larvae appear on the aphid-hit beans — the predators found them first.", effect: { moraleMod: 8 } },
@@ -7570,7 +7570,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — The Storage Is the Survival",
         situation: "Harvest is in — or most of it. Now the real test: a crop in the field is a promise, a crop in store is food. One big granary is efficient and a single fire away from famine. Scattered caches survive disaster but are hard to guard and monitor. Or you pour labor into preservation — drying, fermenting, salting — stretching every sack further.",
-        check: { stat: "knowledge", difficulty: 12, tag: "food", label: "Harvest Storage" },
+        check: { stat: "knowledge", difficulty: 11, tag: "food", label: "Harvest Storage" },
         randomEvents: [
           { chance: 0.2, text: "Mice find the grain sacks in the first week. The cat population is about to become very popular.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "A dry, windy week — perfect curing weather. The drying racks work faster than planned.", effect: { moraleMod: 8 } },
@@ -7740,7 +7740,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — What Gets Copied First",
         situation: "There are more rotting books than copyists, and the readers who understand the technical volumes are aging. Medical texts save lives now. Agricultural knowledge feeds next year. Engineering and mechanical texts rebuild capacity — eventually. You can't copy everything before it's gone.",
-        check: { stat: "knowledge", difficulty: 11, tag: "community", label: "Knowledge Triage" },
+        check: { stat: "knowledge", difficulty: 10, tag: "community", label: "Knowledge Triage" },
         randomEvents: [
           { chance: 0.2, text: "A child's fever breaks the day after a poultice from a copied herbal page. Coincidence, almost certainly — fevers break on their own — but the medical faction gains a true believer, and unearned trust is a hazard of its own.", effect: { moraleMod: 8 } },
           { chance: 0.15, text: "Mold takes a whole shelf of engineering texts in a damp week. What's lost is lost.", effect: { moraleMod: -8 } },
@@ -7768,7 +7768,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Paper and Ink from Nothing",
         situation: "The salvaged paper stock is finite and the books worth copying are not. Rag paper — from linen and cotton scraps — is the best you'll ever make, but rags run out. Plant fiber paper is renewable and labor-hungry. Parchment from hides is nearly indestructible and competes directly with clothing and shoes.",
-        check: { stat: "knowledge", difficulty: 12, tag: "utility", label: "Papermaking" },
+        check: { stat: "knowledge", difficulty: 11, tag: "utility", label: "Papermaking" },
         randomEvents: [
           { chance: 0.2, text: "A cache of old cotton sheets is found in a ruined house — the papermakers' eyes go wide.", effect: { moraleMod: 8 } },
           { chance: 0.15, text: "The first ink batch separates and fades within weeks. Back to the recipe.", effect: { moraleMod: -6 } },
@@ -7796,7 +7796,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Teaching the Children",
         situation: "Copies are accumulating and the readers are aging. Knowledge kept in one head dies with it. Apprenticeships teach deeply but reach few. A schoolroom teaches literacy to all — and takes children away from work the settlement needs. Or you encode the essentials in songs and stories, which survive even burning libraries but blur the details.",
-        check: { stat: "knowledge", difficulty: 11, tag: "community", label: "Knowledge Transmission" },
+        check: { stat: "knowledge", difficulty: 10, tag: "community", label: "Knowledge Transmission" },
         randomEvents: [
           { chance: 0.2, text: "A ten-year-old recites the planting calendar back perfectly — months, crops, rotations. The schoolroom goes quiet.", effect: { moraleMod: 10 } },
           { chance: 0.15, text: "The master smith takes ill for a month. His apprentice keeps the forge running — barely.", effect: { moraleMod: -6 } },
@@ -7824,7 +7824,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Where the Copies Sleep",
         situation: "The archive exists — copies, masters, teaching slates. Now it has to survive fire, damp, mice, and thieves, possibly for longer than anyone alive. One fortified room is easy to guard and one disaster away from oblivion. Copies in three places survive anything except the tripled labor. A buried sealed cache hides from raiders and fire — and fights damp every day.",
-        check: { stat: "knowledge", difficulty: 12, tag: "utility", label: "Archive Protection" },
+        check: { stat: "knowledge", difficulty: 11, tag: "utility", label: "Archive Protection" },
         randomEvents: [
           { chance: 0.2, text: "Mice get into the teaching slates' store. The trap line becomes a rostered chore.", effect: { moraleMod: -6 } },
           { chance: 0.15, text: "A dry lightning storm passes. The archive guard doubles the watch without being asked.", effect: { moraleMod: 8 } },
@@ -8121,7 +8121,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — The Cough",
         situation: "Two goats coughing, one off its feed. It could be dust, or it could be the start of something that takes the pen. You have to decide before you know which.",
-        check: { stat: "knowledge", difficulty: 12, tag: "medical", label: "Disease Response" },
+        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Disease Response" },
         randomEvents: [
           { chance: 0.2, text: "A third goat shows symptoms overnight — whatever it is, it's moving.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "The sick goats still drink well — a small good sign.", effect: { moraleMod: 5 } },
@@ -8149,7 +8149,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Bloodlines",
         situation: "The cough is handled. Now the slow problem: twelve goats and four cattle breeding in a closed circle will weaken within a few generations. Genetics without a lab means records, selection, and hard choices.",
-        check: { stat: "knowledge", difficulty: 11, tag: "agriculture", label: "Breeding Plan" },
+        check: { stat: "knowledge", difficulty: 10, tag: "agriculture", label: "Breeding Plan" },
         randomEvents: [
           { chance: 0.2, text: "The best milker turns out to be the cough survivor — vigor worth breeding for.", effect: { moraleMod: 8 } },
           { chance: 0.15, text: "A kid is born weak and crooked-legged. Inbreeding's calling card.", effect: { moraleMod: -8 } },
@@ -8177,7 +8177,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Winter Feed",
         situation: "First frost is coming. Sixteen animals need to eat for five months, and pasture is about to become a memory. Hay is the entire question, and the math is unforgiving.",
-        check: { stat: "knowledge", difficulty: 11, tag: "agriculture", label: "Winter Feed Planning" },
+        check: { stat: "knowledge", difficulty: 10, tag: "agriculture", label: "Winter Feed Planning" },
         randomEvents: [
           { chance: 0.2, text: "Early snow flattens the last uncut meadow. That hay is lost.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "A dry spell cures the cut hay perfectly — no mold, no waste.", effect: { moraleMod: 8 } },
@@ -8205,7 +8205,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Teeth in the Dark",
         situation: "Something took a kid goat last night — dragged it through a gap in the pen fence. Tracks say canids, and they will be back. The herd sleeps outside your walls, and the walls have gaps.",
-        check: { stat: "perception", difficulty: 11, tag: "security", label: "Predator Defense" },
+        check: { stat: "perception", difficulty: 10, tag: "security", label: "Predator Defense" },
         randomEvents: [
           { chance: 0.25, text: "Fresh tracks at dawn — a pair, circling, learning the fence line.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "An old herder remembers which gullies the packs den in.", effect: { moraleMod: 5 } },
@@ -8248,7 +8248,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Walking the Line",
         situation: "Before a single sack of grain moves, someone has to walk the ground and choose the route. Three ways present themselves, and each one charges a different price.",
-        check: { stat: "perception", difficulty: 12, tag: "navigation", label: "Route Survey" },
+        check: { stat: "perception", difficulty: 11, tag: "navigation", label: "Route Survey" },
         randomEvents: [
           { chance: 0.2, text: "Fresh boot prints on the old road — someone else walks it regularly.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "A collapsed bridge on the ridge route turns out to be repairable with local timber.", effect: { moraleMod: 8 } },
@@ -8276,7 +8276,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — How It Travels",
         situation: "Route chosen. Now: what carries the grain 60 kilometers? Animals, wheels, or backs — each demands something the settlement may not have to spare.",
-        check: { stat: "knowledge", difficulty: 11, tag: "utility", label: "Transport Method" },
+        check: { stat: "knowledge", difficulty: 10, tag: "utility", label: "Transport Method" },
         randomEvents: [
           { chance: 0.2, text: "One of the mules goes lame a week before the first run.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "A wheelwright in Harrow's Hollow offers to build cart wheels — for grain.", effect: { moraleMod: 8 } },
@@ -8304,7 +8304,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — The Table",
         situation: "Grain for salt, labor for ironwork. But on what terms? The first negotiation sets the pattern for years — generosity now is either wisdom or a mistake you'll repeat forever.",
-        check: { stat: "composure", difficulty: 12, tag: "community", label: "Trade Negotiation" },
+        check: { stat: "composure", difficulty: 11, tag: "community", label: "Trade Negotiation" },
         randomEvents: [
           { chance: 0.2, text: "Harrow's Hollow had a poor salt harvest — they're harder bargainers this season.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "Their smith admires your grain quality openly. Goodwill is currency too.", effect: { moraleMod: 8 } },
@@ -8332,7 +8332,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Keeping It Open",
         situation: "Trade is flowing. Now it has to survive weather, breakdowns, and the people who'd rather take than trade. A road is only a road while it's usable.",
-        check: { stat: "knowledge", difficulty: 11, tag: "security", label: "Route Security" },
+        check: { stat: "knowledge", difficulty: 10, tag: "security", label: "Route Security" },
         randomEvents: [
           { chance: 0.2, text: "A way-camp's food cache is found broken open — animals or people, unclear.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "A storm drops a bridge timber. The ford route users smirk.", effect: { moraleMod: -5 } },
@@ -8375,7 +8375,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Who Watches",
         situation: "Every night needs eyes on the perimeter, and eyes need sleep the next day. The rota you design now will be lived with — resented — for months.",
-        check: { stat: "knowledge", difficulty: 11, tag: "security", label: "Watch Organization" },
+        check: { stat: "knowledge", difficulty: 10, tag: "security", label: "Watch Organization" },
         randomEvents: [
           { chance: 0.2, text: "A watcher falls asleep on shift. Nothing happens — this time — but everyone hears about it.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "Two teenagers volunteer eagerly and turn out to be excellent at staying alert.", effect: { moraleMod: 8 } },
@@ -8403,7 +8403,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Seen or Unseen",
         situation: "The watch exists. Now the question of posture: do you advertise strength — light, noise, visible patrols — or go dark and quiet? Both are defenses. They defend against different things.",
-        check: { stat: "knowledge", difficulty: 10, tag: "security", label: "Deterrence Posture" },
+        check: { stat: "knowledge", difficulty: 9, tag: "security", label: "Deterrence Posture" },
         randomEvents: [
           { chance: 0.2, text: "A lantern left burning all night draws comment — some feel safer, some feel exposed.", effect: { moraleMod: -5 } },
           { chance: 0.15, text: "The dogs learn the patrol route and start walking it unprompted.", effect: { moraleMod: 5 } },
@@ -8431,7 +8431,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Words at the Fence",
         situation: "Dusk. Five strangers at the boundary track — hungry-looking, armed with tools rather than weapons, asking to talk. The watch is mustered. What happens next is diplomacy, not combat.",
-        check: { stat: "composure", difficulty: 12, tag: "psychology", label: "De-escalation" },
+        check: { stat: "composure", difficulty: 11, tag: "psychology", label: "De-escalation" },
         randomEvents: [
           { chance: 0.2, text: "One of the strangers is clearly injured — a bad cut, going septic.", effect: { moraleMod: -5 } },
           { chance: 0.15, text: "They offer news: another settlement was hit last week, twenty kilometers east.", effect: { moraleMod: -8 } },
@@ -8459,7 +8459,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Stay or Go",
         situation: "Word comes at noon: a large armed group is moving this way, two days out, and they have hit two settlements already. The council meets. This is the decision everything else was preparation for.",
-        check: { stat: "composure", difficulty: 12, tag: "community", label: "Evacuation Decision" },
+        check: { stat: "composure", difficulty: 11, tag: "community", label: "Evacuation Decision" },
         randomEvents: [
           { chance: 0.2, text: "A scout confirms the numbers: too many to deter, too organized to bluff.", effect: { moraleMod: -10 } },
           { chance: 0.15, text: "The fallback site — the old quarry — is stocked and dry. The plan exists.", effect: { moraleMod: 8 } },
@@ -8502,7 +8502,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — The First Duty",
         situation: "Before ritual, before burial: handling. The dead of most disasters do not spread disease to the living — the real risks are wounds, water contamination, and, for diseases like cholera or Ebola, body fluids. Careful handling and respect still matter, and the work is non-negotiable.",
-        check: { stat: "knowledge", difficulty: 12, tag: "medical", label: "Sanitary Handling" },
+        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Sanitary Handling" },
         randomEvents: [
           { chance: 0.2, text: "One of the handling team develops a fever — fear moves through the settlement faster than facts.", effect: { moraleMod: -12 } },
           { chance: 0.15, text: "The fever turns out to be exhaustion, not infection. Relief is physical.", effect: { moraleMod: 8 } },
@@ -8530,7 +8530,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — Frozen Ground",
         situation: "The dead are handled safely. Now they need a grave, and the earth is frozen a meter deep. Every option costs something the settlement can barely spare.",
-        check: { stat: "endurance", difficulty: 11, tag: "utility", label: "Winter Burial" },
+        check: { stat: "endurance", difficulty: 10, tag: "utility", label: "Winter Burial" },
         randomEvents: [
           { chance: 0.2, text: "A thaw-day softens the top few centimeters — just enough to start.", effect: { moraleMod: 5 } },
           { chance: 0.15, text: "Two diggers are down with the lingering cough. Fewer hands, same frozen ground.", effect: { moraleMod: -8 } },
@@ -8558,7 +8558,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Names, Not Numbers",
         situation: "The bodies are cared for. What remains is the harder work: nine holes in seventy-one lives. Grief unaddressed doesn't fade — it ferments. The settlement needs its mourning the way it needs its harvest.",
-        check: { stat: "composure", difficulty: 11, tag: "psychology", label: "Collective Grief" },
+        check: { stat: "composure", difficulty: 10, tag: "psychology", label: "Collective Grief" },
         randomEvents: [
           { chance: 0.2, text: "A child asks where her grandmother went. The adults realize they've been avoiding the question.", effect: { moraleMod: -8 } },
           { chance: 0.15, text: "Someone starts carving name markers unasked. Others quietly join in.", effect: { moraleMod: 10 } },
@@ -8848,7 +8848,7 @@ const SCENARIOS = [
       {
         id: "s1", title: "Stage 1 — Day Two, 41°C",
         situation: "Inside it's 34°C and climbing. You're sweating through your shirt, headachy, a little nauseous. The fridge died yesterday. Your phone is at 18%.",
-        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Heat Triage" },
+        check: { stat: "knowledge", difficulty: 10, tag: "medical", label: "Heat Triage" },
         choices: [
           { id: "cool", q: "sound", label: "Cool the body, not the room", desc: "Wet towel on neck and armpits, feet in cool water, sip steadily. Lower your core temp directly.", statHint: "knowledge", tag: "medical" },
           { id: "fan", q: "poor", label: "Fan on full, windows open", desc: "Move the air. A breeze feels like cooling.", statHint: "endurance", tag: "utility" },
@@ -8872,7 +8872,7 @@ const SCENARIOS = [
       {
         id: "s2", title: "Stage 2 — The Neighbour",
         situation: "Mrs. Abernathy, 78, lives alone two doors down. She finally answers — confused, slurred, skin hot and DRY. She insists she's fine and tries to close the door.",
-        check: { stat: "composure", difficulty: 12, tag: "medical", label: "Heat Stroke Response" },
+        check: { stat: "composure", difficulty: 11, tag: "medical", label: "Heat Stroke Response" },
         randomEvents: [
           { chance: 0.2, text: "Her cat weaves between your ankles, meowing — its water bowl is empty and bone dry.", effect: { moraleMod: -6 } },
         ],
@@ -8899,7 +8899,7 @@ const SCENARIOS = [
       {
         id: "s3", title: "Stage 3 — Water Discipline",
         situation: "Day three. The taps still run but the pressure is dropping and nobody knows for how long. You have 6 litres stored. Mrs. Abernathy needs watching. It's 40°C again.",
-        check: { stat: "endurance", difficulty: 11, tag: "water", label: "Rationing" },
+        check: { stat: "endurance", difficulty: 10, tag: "water", label: "Rationing" },
         choices: [
           { id: "ration", q: "sound", label: "Strict rationing + electrolytes", desc: "Measured sips through the day, pinch of salt and sugar in each litre. Nothing wasted.", statHint: "knowledge", tag: "water" },
           { id: "drink", q: "poor", label: "Drink freely while water flows", desc: "The taps work now. Hydrate hard today, worry about tomorrow tomorrow.", statHint: "endurance", tag: "water" },
@@ -8923,7 +8923,7 @@ const SCENARIOS = [
       {
         id: "s4", title: "Stage 4 — Night Without Power",
         situation: "29°C at midnight. The apartment won't cool. The fridge has been dead for two days and something in there smells wrong. You need sleep — tomorrow will be just as hot.",
-        check: { stat: "knowledge", difficulty: 11, tag: "shelter", label: "Hot Nights" },
+        check: { stat: "knowledge", difficulty: 10, tag: "shelter", label: "Hot Nights" },
         choices: [
           { id: "basement", q: "sound", label: "Sleep in the basement / lowest floor", desc: "Heat rises. The ground floor or basement is 5–8 degrees cooler. Take a mat down.", statHint: "knowledge", tag: "shelter" },
           { id: "roof", q: "risky", label: "Sleep on the roof under the sky", desc: "Open air, maybe a breeze. Cooler than the brick box.", statHint: "endurance", tag: "shelter" },
@@ -13159,7 +13159,7 @@ const STAGE_SITUATIONS = {
 function buildHybridStages(subtypes, env) {
   const count     = subtypes.length === 3 ? 4 : 3;
   const statPool  = ["knowledge", "endurance", "composure", "perception", "strength"];
-  const diffBase  = 10 + subtypes.length;
+  const diffBase  = 9 + subtypes.length;
   const titles    = ["Stage 1 — Immediate Response","Stage 2 — Compound Pressure","Stage 3 — Sustained Threat","Stage 4 — Final Decision"];
   return Array.from({ length: count }, (_, i) => {
     const sub     = subtypes[i % subtypes.length];
@@ -13521,7 +13521,7 @@ function renderMenu(root) {
           return Object.keys(phaseGroups).sort((a,b) => a-b).map(phase => `
             <div class="scenario-phase-group">
               <div class="scenario-phase-label">${phaseLabels[phase] || "Phase " + phase}</div>
-              ${phaseGroups[phase].map(s => {
+              ${phaseGroups[phase].sort((a,b) => a.difficulty - b.difficulty).map(s => {
                 const dots = "●".repeat(s.difficulty) + "○".repeat(3 - s.difficulty);
                 return `
                   <button class="scenario-row" data-id="${s.id}">
