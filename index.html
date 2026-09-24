@@ -13952,16 +13952,17 @@ function resolveStageChoice(root, choice) {
   } else {
     RUN.stageResolved = true;
   }
-  const st = root.scrollTop; // choice → inline result is in-place: keep scroll
   const toDebrief = RUN.phase === "debrief";
   renderSimulator(root);
   if (toDebrief) { root.scrollTop = 0; return; } // fatal outcome → fresh screen, start at top
-  // Full-container innerHTML swaps can make the browser drop a synchronously-set
-  // scrollTop (scroll anchoring / post-layout adjustments), so re-assert after paint.
-  root.scrollTop = st;
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    if (root.isConnected) root.scrollTop = st;
-  }));
+  // Choice → inline result: bring the fresh verdict into view where the choices
+  // were, instead of snapping to page top (or clamping to 0 when the result is
+  // shorter than the stage was). Deterministic — no reliance on prior offset.
+  const anchor = root.querySelector(".result-stage-banner");
+  if (anchor) {
+    const y = anchor.getBoundingClientRect().top + root.scrollTop;
+    root.scrollTop = Math.max(0, y - 96);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
