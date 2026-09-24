@@ -1191,7 +1191,6 @@ body::after {
 .choice-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .choice-stat { font-family: var(--font-m); font-size: 10px; color: var(--amber); }
 .choice-item { font-family: var(--font-m); font-size: 10px; color: var(--green-lt); }
-.choice-roll-hint { font-family: var(--font-m); font-size: 10px; color: var(--text-faint); }
 .choice-arrow { color: var(--text-faint); font-size: 20px; flex-shrink: 0; transition: color var(--speed); }
 .choice-btn:hover .choice-arrow { color: var(--amber); }
 
@@ -1201,19 +1200,25 @@ body::after {
 .inv-tray-item.inv-depleted { opacity: .35; }
 .inv-uses { font-family: var(--font-m); font-size: 10px; color: var(--text-faint); }
 
-/* ── Rolling / Dice ──────────────────────────────────────────────────────── */
-.rolling-page { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; }
-.rolling-action { font-family: var(--font-d); font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
-.rolling-check { font-family: var(--font-m); font-size: 11px; color: var(--text-faint); margin-bottom: 32px; letter-spacing: .08em; }
-.dice-container { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-.dice { font-family: var(--font-d); font-size: 72px; font-weight: 800; color: var(--white); width: 110px; height: 110px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border2); border-radius: 12px; background: var(--bg2); transition: border-color 200ms, color 200ms; }
-.dice.dice-ok { color: var(--green-lt); border-color: var(--green); }
-.dice.dice-fail { color: var(--red-lt); border-color: var(--red); }
-.dice.dice-crit { color: var(--amber); border-color: var(--amber); box-shadow: 0 0 20px rgba(191,126,28,.3); }
-.dice.dice-fumble { color: var(--red-lt); border-color: var(--red); box-shadow: 0 0 20px rgba(136,64,64,.3); }
-.dice-formula { font-family: var(--font-m); font-size: 11px; color: var(--text-dim); text-align: center; }
-.roll-verdict { font-family: var(--font-m); font-size: 13px; font-weight: 600; letter-spacing: .06em; margin-top: 12px; padding: 8px 20px; border-radius: var(--radius); }
+/* ── Resolution (readiness assessment — no dice) ─────────────────────────── */
+.rolling-page, .resolution-page { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; }
+.rolling-action { font-family: var(--font-d); font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 4px; text-align: center; }
+.rolling-check { font-family: var(--font-m); font-size: 11px; color: var(--text-faint); margin-bottom: 8px; letter-spacing: .08em; }
+.factors { display: flex; flex-direction: column; gap: 6px; width: min(420px, 90vw); margin: 18px 0 8px; font-family: var(--font-m); }
+.factor-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-dim); padding: 7px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg2); }
+.factor-val { color: var(--white); font-weight: 700; }
+.factor-val.f-neg { color: var(--red-lt); }
+.factor-val.f-pos { color: var(--green-lt); }
+.factors-total { width: min(420px, 90vw); margin-bottom: 6px; }
+.factor-row.factor-total { border-color: var(--green); }
+.factor-row.factor-total .factor-val { color: var(--green-lt); }
+.choice-tier { font-family: var(--font-m); font-size: 10px; font-weight: 700; letter-spacing: .08em; padding: 3px 8px; border-radius: 4px; border: 1px solid; white-space: nowrap; }
+.tier-solid { color: var(--green-lt); border-color: var(--green); }
+.tier-costly { color: var(--amber); border-color: var(--amber); }
+.tier-risky { color: var(--red-lt); border-color: var(--red); }
+.roll-verdict { font-family: var(--font-m); font-size: 13px; font-weight: 600; letter-spacing: .06em; margin-top: 12px; padding: 8px 20px; border-radius: var(--radius); text-align: center; }
 .verdict-ok { color: var(--green-lt); background: var(--green-pale); border: 1px solid var(--green); }
+.verdict-costly { color: var(--amber); background: var(--bg2); border: 1px solid var(--amber); }
 .verdict-fail { color: var(--red-lt); background: var(--red-pale); border: 1px solid var(--red); }
 
 /* ── Stage result ────────────────────────────────────────────────────────── */
@@ -2811,21 +2816,39 @@ function spendStatPoint(char, statId) {
   return { ...char, stats: { ...char.stats, [statId]: char.stats[statId] + 1 }, statPoints: char.statPoints - 1 };
 }
 
-function rollCheck(statValue, difficulty, itemBonus = 0) {
-  const d10 = Math.floor(Math.random() * 10) + 1;
-  const total = statValue + d10 + itemBonus;
-  const success = total >= difficulty;
+// ── Readiness assessment (replaces dice rolls) ───────────────────────────────
+// Luck is real, but it is not a die roll on your competence.
+//   readiness = competence (stat) + preparation (kit) + steady effort (constant)
+//   demand    = situation difficulty, adjusted by conditions and environment
+//   margin >= 2 → "solid":  clean success — your preparation carries it
+//   margin >= 0 → "costly":  success, but the situation takes something out of you
+//   margin <  0 → "failed":  failure branch — you were not ready for this approach
+// The unforeseen (random events, friction on thin margins) adds COST, never a veto.
+// Death comes only from fatal situations, fatal decisions, or compounding states.
+const STEADY_EFFORT = 5;
+
+function assessReadiness(statValue, demand, itemBonus = 0) {
+  const readiness = statValue + itemBonus + STEADY_EFFORT;
+  const margin = readiness - demand;
+  const tier = margin >= 2 ? "solid" : margin >= 0 ? "costly" : "failed";
   return {
-    roll: d10, stat: statValue, bonus: itemBonus,
-    total, difficulty, success, margin: total - difficulty,
-    critical: d10 === 10, fumble: d10 === 1,
+    stat: statValue, bonus: itemBonus, effort: STEADY_EFFORT,
+    readiness, demand, margin, tier,
+    success: tier !== "failed",
   };
 }
 
-function xpForStage(success, margin, stageIndex) {
-  let base = success ? 20 : 5;
-  if (success && margin >= 4) base += 8;
-  if (success && margin >= 8) base += 8;
+// Friction: on a costly success the situation extracts a small, transparent price.
+// Bounded and never capable of flipping the outcome.
+const FRICTION_COSTS = [
+  { effects: { moraleMod: -6 },                          label: "It takes longer than it should. The grind wears on you." },
+  { effects: { conditionAdd: "fatigued" },               label: "The effort leaves you fatigued going forward." },
+  { effects: { moraleMod: -4, conditionAdd: "delayed" }, label: "Delays ripple outward. Nothing is free." },
+];
+
+function xpForStage(tier, margin, stageIndex) {
+  let base = tier === "failed" ? 10 : 20;   // you learn from failure too
+  if (tier === "solid" && margin >= 4) base += 8;   // clean mastery
   base += stageIndex * 4;
   return base;
 }
@@ -9411,7 +9434,7 @@ const RUN = {
   scenario:     null,
   stageIndex:   0,
   chosenChoice: null,
-  lastRoll:     null,
+  lastAssess:   null,
   lastOutcome:  null,
   conditions:   [],
   inventory:    {},
@@ -9433,7 +9456,7 @@ let pendingLevelUp = false;
 function resetRun() {
   Object.assign(RUN, {
     phase:"menu", scenario:null, stageIndex:0, chosenChoice:null,
-    lastRoll:null, lastOutcome:null, conditions:[], inventory:{},
+    lastAssess:null, lastOutcome:null, conditions:[], inventory:{},
     xpEarned:0, stageLog:[], randomEvent:null, survived:false,
     systems:initCoreSystems(), env:{}, tickEvents:[],
     atlasRegion: null,
@@ -9628,7 +9651,7 @@ function renderSimulator(root, onOpenArticle) {
     case "kit":     renderKit(root);                    break;
     case "brief":   renderBrief(root);                  break;
     case "stage":   renderStage(root);                  break;
-    case "rolling": renderRolling(root);                break;
+    case "resolution": renderResolution(root);            break;
     case "result":  renderStageResult(root, openArticle); break;
     case "debrief": renderDebrief(root, openArticle); break;
     case "levelup": renderLevelUp(root);                break;
@@ -10323,8 +10346,8 @@ function renderStage(root) {
       <div class="check-block">
         <span class="card-label">${stage.check.label}</span>
         <span class="check-formula">
-          ${STAT_DEFS.find(s=>s.id===stage.check.stat)?.label} + d10
-          vs <strong>${adjDiff}</strong>
+          ${STAT_DEFS.find(s=>s.id===stage.check.stat)?.label} + kit + effort
+          vs <strong>${adjDiff}</strong> demand
           ${pen > 0 ? `<span class="pen-note">(+${pen} penalty)</span>` : ""}
           ${bon > 0 ? `<span class="bon-note">(−${bon} bonus)</span>` : ""}
           ${envMod > 0 ? `<span class="pen-note">(+${envMod} region)</span>` : ""}
@@ -10339,7 +10362,11 @@ function renderStage(root) {
           const statVal = char.stats[statId] || 3;
           const statDef = STAT_DEFS.find(s=>s.id===statId);
           const { item, bonus } = getBestItem(RUN.inventory, ch.tag || stage.check.tag);
-          const pct = Math.min(99, Math.max(5, Math.round((statVal + 5.5 + bonus) / adjDiff * 100)));
+          const readiness = statVal + bonus + STEADY_EFFORT;
+          const margin = readiness - adjDiff;
+          const tierInfo = margin >= 2 ? ["SOLID", "tier-solid"]
+                       : margin >= 0 ? ["COSTLY", "tier-costly"]
+                       : ["RISKY", "tier-risky"];
           return `
             <button class="choice-btn" data-id="${ch.id}">
               <div class="choice-content">
@@ -10348,7 +10375,7 @@ function renderStage(root) {
                 <div class="choice-meta">
                   <span class="choice-stat">${statDef?.icon} ${statDef?.label} ${statVal}</span>
                   ${item ? `<span class="choice-item">${item.icon} +${bonus}</span>` : ""}
-                  <span class="choice-roll-hint">~${pct}% success</span>
+                  <span class="choice-tier ${tierInfo[1]}">${tierInfo[0]}</span>
                 </div>
               </div>
               <span class="choice-arrow">›</span>
@@ -10367,7 +10394,7 @@ function renderStage(root) {
   root.querySelectorAll(".choice-btn").forEach(btn =>
     btn.addEventListener("click", () => {
       RUN.chosenChoice = stage.choices.find(c => c.id === btn.dataset.id);
-      RUN.phase = "rolling";
+      RUN.phase = "resolution";
       renderSimulator(root);
     })
   );
@@ -10380,62 +10407,68 @@ function renderStage(root) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ROLLING — dice animation
-// ═══════════════════════════════════════════════════════════════════════════════
+// RESOLUTION — readiness assessment (no dice)
+// Factors are revealed one by one, then the verdict. The situation unfolds;
+// nothing is rolled. Thin margins cost you; they never veto a sound plan.
 
-function renderRolling(root) {
+function renderResolution(root) {
   const stage   = RUN.scenario.stages[RUN.stageIndex];
   const choice  = RUN.chosenChoice;
   const statId  = choice.statHint || stage.check.stat;
   const statVal = char.stats[statId] || 3;
+  const statDef = STAT_DEFS.find(s => s.id === statId);
   const { item, bonus } = getBestItem(RUN.inventory, choice.tag || stage.check.tag);
   const pen     = condPenalty();
   const bon     = condBonus();
   const envMod  = envDiffMod(stage.check.tag);
   const adjDiff = Math.max(4, stage.check.difficulty + pen - bon + envMod);
 
+  const rows = [{ k: statDef?.label || "Stat", v: `+${statVal}` }];
+  if (item) rows.push({ k: `${item.icon} ${item.name}`, v: `+${bonus}` });
+  rows.push({ k: "Steady effort", v: `+${STEADY_EFFORT}` });
+  if (pen > 0)    rows.push({ k: "Conditions working against you", v: `demand +${pen}`, neg: true });
+  if (bon > 0)    rows.push({ k: "Conditions in your favour",      v: `demand −${bon}`, pos: true });
+  if (envMod > 0) rows.push({ k: "Environment", v: `demand +${envMod}`, neg: true });
+  if (envMod < 0) rows.push({ k: "Environment", v: `demand ${envMod}`,  pos: true });
+
   root.innerHTML = `
-    <div class="sim-page rolling-page">
+    <div class="sim-page resolution-page">
       <div class="rolling-action">${choice.label}</div>
       <div class="rolling-check">${stage.check.label}</div>
-      <div class="dice-container">
-        <div class="dice" id="dice">?</div>
-        <div class="dice-formula">
-          ${STAT_DEFS.find(s=>s.id===statId)?.label} (${statVal})
-          ${item ? `+ ${item.icon} (${bonus})` : ""}
-          + d10 vs ${adjDiff}
-        </div>
-      </div>
+      <div class="factors" id="factors"></div>
+      <div class="factors-total" id="factors-total"></div>
       <div class="roll-verdict" id="roll-verdict"></div>
     </div>`;
 
-  const diceEl  = root.querySelector("#dice");
-  const verdict = root.querySelector("#roll-verdict");
-  let ticks = 0;
+  const factorsEl = root.querySelector("#factors");
+  const totalEl   = root.querySelector("#factors-total");
+  const verdict   = root.querySelector("#roll-verdict");
+  let i = 0;
 
   const iv = setInterval(() => {
-    diceEl.textContent = Math.floor(Math.random() * 10) + 1;
-    if (++ticks < 16) return;
+    if (i < rows.length) {
+      const r = rows[i++];
+      factorsEl.insertAdjacentHTML("beforeend",
+        `<div class="factor-row"><span>${r.k}</span><span class="factor-val${r.neg ? " f-neg" : r.pos ? " f-pos" : ""}">${r.v}</span></div>`);
+      return;
+    }
     clearInterval(iv);
 
     if (item) RUN.inventory = consumeItem(RUN.inventory, item.id);
 
-    const roll = rollCheck(statVal, adjDiff, bonus);
-    RUN.lastRoll = roll;
-    diceEl.textContent = roll.roll;
-    diceEl.classList.add(roll.success ? "dice-ok" : "dice-fail");
-    if (roll.critical) diceEl.classList.add("dice-crit");
-    if (roll.fumble)   diceEl.classList.add("dice-fumble");
+    const assess = assessReadiness(statVal, adjDiff, bonus);
+    RUN.lastAssess = assess;
+    totalEl.innerHTML = `<div class="factor-row factor-total"><span>Readiness vs demand</span><span class="factor-val">${assess.readiness} vs ${assess.demand}</span></div>`;
 
-    verdict.textContent = `${roll.total} vs ${adjDiff} — ${
-      roll.critical ? "⚡ Critical Hit!" :
-      roll.fumble   ? "💀 Critical Fail!" :
-      roll.success  ? "✓ Success" : "✗ Failed"
-    }`;
-    verdict.className = "roll-verdict " + (roll.success ? "verdict-ok" : "verdict-fail");
+    verdict.textContent =
+      assess.tier === "solid"  ? "✓ SOLID — your preparation carries it." :
+      assess.tier === "costly" ? "~ COSTLY — it works, but it takes something out of you." :
+                                 "✗ NOT READY — beyond your current means.";
+    verdict.className = "roll-verdict " + (
+      assess.tier === "solid" ? "verdict-ok" : assess.tier === "costly" ? "verdict-costly" : "verdict-fail");
 
     setTimeout(() => {
-      // Legacy per-stage random events
+      // Per-stage random events — the world's luck, never a veto on your competence
       RUN.randomEvent = null;
       for (const ev of (stage.randomEvents || [])) {
         if (Math.random() < ev.chance) { RUN.randomEvent = ev; applyEffects(ev.effect); break; }
@@ -10443,11 +10476,19 @@ function renderRolling(root) {
 
       // Stage outcome
       const outcomeMap = stage.outcomes[choice.id];
-      const outcome    = roll.success ? outcomeMap?.success : outcomeMap?.failure;
+      const outcome    = assess.success ? outcomeMap?.success : outcomeMap?.failure;
       RUN.lastOutcome  = outcome;
       applyEffects(outcome?.effects);
 
-      const xp = xpForStage(roll.success, roll.margin, RUN.stageIndex);
+      // Friction on thin margins: a cost, never a veto
+      let frictionLabel = null;
+      if (assess.tier === "costly") {
+        const fr = FRICTION_COSTS[Math.floor(Math.random() * FRICTION_COSTS.length)];
+        applyEffects(fr.effects);
+        frictionLabel = fr.label;
+      }
+
+      const xp = xpForStage(assess.tier, assess.margin, RUN.stageIndex);
       RUN.xpEarned += xp;
 
       // Steps 4–11 — full simulation tick
@@ -10455,7 +10496,7 @@ function renderRolling(root) {
 
       RUN.stageLog.push({
         stageTitle: stage.title, choiceLabel: choice.label,
-        roll, success: roll.success, xp,
+        assess, success: assess.success, xp, frictionLabel,
         fatal: outcome?.effects?.fatal === true,
         tickEvents: RUN.tickEvents.map(e => e.label || e.id),
         learnMore: outcome?.learnMore || [],
@@ -10469,7 +10510,7 @@ function renderRolling(root) {
       }
       renderSimulator(root);
     }, 900);
-  }, 75);
+  }, 220);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -10477,8 +10518,10 @@ function renderRolling(root) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function renderStageResult(root, onOpenArticle) {
-  const roll     = RUN.lastRoll;
+  const assess   = RUN.lastAssess;
   const outcome  = RUN.lastOutcome;
+  const friction = RUN.stageLog.length ? RUN.stageLog[RUN.stageLog.length - 1].frictionLabel : null;
+  const tierBadge = assess.tier === "solid" ? "✓ Solid" : assess.tier === "costly" ? "~ Costly" : "✗ Failed";
   const stage    = RUN.scenario.stages[RUN.stageIndex];
   const isLast   = RUN.stageIndex >= RUN.scenario.stages.length - 1;
   const stageNum = RUN.stageIndex + 1;
@@ -10500,10 +10543,10 @@ function renderStageResult(root, onOpenArticle) {
 
   root.innerHTML = `
     <div class="sim-page">
-      <div class="result-stage-banner ${roll.success ? "rsb-ok" : "rsb-fail"}">
-        <span class="rsb-badge">${roll.critical ? "⚡ Critical" : roll.fumble ? "💀 Fumble" : roll.success ? "✓ Passed" : "✗ Failed"}</span>
+      <div class="result-stage-banner ${assess.success ? "rsb-ok" : "rsb-fail"}">
+        <span class="rsb-badge">${tierBadge}</span>
         <span class="rsb-stage">Stage ${stageNum} of ${RUN.scenario.stages.length}</span>
-        <span class="rsb-roll">${roll.total} vs ${roll.difficulty}</span>
+        <span class="rsb-roll">${assess.readiness} vs ${assess.demand} readiness</span>
       </div>
 
       ${RUN.randomEvent ? `
@@ -10550,12 +10593,18 @@ function renderStageResult(root, onOpenArticle) {
           }).join("")}
         </div>` : ""}
 
+      ${friction ? `
+        <div class="result-tip" style="border-left-color:var(--amber)">
+          <span class="card-label">Cost</span>
+          <p>${friction}</p>
+        </div>` : ""}
+
       <div class="result-row-stats">
-        <div class="rstat"><div class="rstat-val ${roll.success ? "rs-ok" : "rs-fail"}">${roll.roll}</div><div class="rstat-label">d10</div></div>
-        <div class="rstat"><div class="rstat-val">${roll.stat}</div><div class="rstat-label">Stat</div></div>
-        ${roll.bonus ? `<div class="rstat"><div class="rstat-val">${roll.bonus}</div><div class="rstat-label">Item</div></div>` : ""}
-        <div class="rstat"><div class="rstat-val">${roll.total}</div><div class="rstat-label">Total</div></div>
-        <div class="rstat"><div class="rstat-val text-dim">${roll.difficulty}</div><div class="rstat-label">Target</div></div>
+        <div class="rstat"><div class="rstat-val">${assess.stat}</div><div class="rstat-label">Stat</div></div>
+        ${assess.bonus ? `<div class="rstat"><div class="rstat-val">+${assess.bonus}</div><div class="rstat-label">Kit</div></div>` : ""}
+        <div class="rstat"><div class="rstat-val">+${assess.effort}</div><div class="rstat-label">Effort</div></div>
+        <div class="rstat"><div class="rstat-val ${assess.success ? "rs-ok" : "rs-fail"}">${assess.readiness}</div><div class="rstat-label">Ready</div></div>
+        <div class="rstat"><div class="rstat-val text-dim">${assess.demand}</div><div class="rstat-label">Demand</div></div>
       </div>
 
       <div class="systems-readout">
@@ -10716,7 +10765,7 @@ function renderDebrief(root, onOpenArticle) {
                 </div>` : ""}
             </div>
             <div class="log-right">
-              <span class="log-roll">${entry.roll.total} vs ${entry.roll.difficulty}</span>
+              <span class="log-roll">${entry.assess.readiness} vs ${entry.assess.demand} · ${entry.assess.tier.toUpperCase()}</span>
               <span class="log-xp">+${entry.xp} xp</span>
             </div>
           </div>`).join("")}
@@ -11445,7 +11494,7 @@ function renderProfile(root) {
           <span class="profile-section-chevron">▾</span>
         </div>
         <div class="profile-section-body"><div class="psb-inner">
-          ${hasPoints ? `<p class="points-hint">Tap <strong>+</strong> to allocate stat points. Higher stats improve dice rolls in the simulator.</p>` : ""}
+          ${hasPoints ? `<p class="points-hint">Tap <strong>+</strong> to allocate stat points. Higher stats raise your readiness in the simulator.</p>` : ""}
           <div class="stats-list">
             ${STAT_DEFS.map(s => {
               const val = char.stats[s.id];
