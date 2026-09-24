@@ -714,6 +714,17 @@ body::after {
 .enc-select option { background: var(--bg2); }
 
 .domain-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 22px; }
+/* Mobile: 32 domain chips become a horizontal scroll strip instead of a
+   wrapping wall — guarantees no mid-text clipping at narrow widths. */
+@media (max-width: 560px) {
+  .domain-chips {
+    flex-wrap: nowrap; overflow-x: auto; margin-bottom: 16px;
+    padding-bottom: 6px; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .domain-chips::-webkit-scrollbar { display: none; }
+  .domain-chips .chip { flex-shrink: 0; }
+}
 
 .article-grid {
   display: grid;
