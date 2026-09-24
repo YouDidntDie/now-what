@@ -11991,8 +11991,9 @@ function bindGridEvents(root, onOpenArticle) {
 
   root.querySelectorAll(".article-card").forEach(card =>
     card.addEventListener("click", () => {
-      store.ui.currentArticleId = card.dataset.articleId;
-      renderEncyclopedia(root, onOpenArticle);
+      // Real navigation entry: the article lands on the history stack, so
+      // the topbar back button returns here (not to the list).
+      if (onOpenArticle) onOpenArticle(card.dataset.articleId);
     })
   );
 }
@@ -12006,8 +12007,8 @@ function refreshGrid(root, onOpenArticle) {
     : `<div class="enc-empty">No articles found</div>`;
   grid.querySelectorAll(".article-card").forEach(card =>
     card.addEventListener("click", () => {
-      store.ui.currentArticleId = card.dataset.articleId;
-      renderEncyclopedia(root, onOpenArticle);
+      // Same as renderGrid: article opens as a real history entry.
+      if (onOpenArticle) onOpenArticle(card.dataset.articleId);
     })
   );
 }
@@ -12108,13 +12109,6 @@ function renderArticle(root, article, onOpenArticle, onBack) {
   root.querySelector("#art-loadout").addEventListener("click", () => {
     goTo("simulator", { section: "loadout" });
   });
-}
-
-function openArticleById(root, articleId, onOpenArticle) {
-  const article = store.articlesById[articleId];
-  if (!article) return;
-  store.ui.currentArticleId = articleId;
-  renderArticle(root, article, onOpenArticle);
 }
 
 
