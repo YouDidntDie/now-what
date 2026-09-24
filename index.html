@@ -1157,6 +1157,22 @@ body::after {
 .brief-stage-pip { font-family: var(--font-m); font-size: 11px; color: var(--text-dim); padding: 4px 0; border-bottom: 1px solid var(--border); }
 .brief-stage-pip:last-child { border-bottom: none; }
 
+/* ── Setup phase (location + loadout, merged) ─────────────────────────────── */
+.setup-section { margin-bottom: 26px; }
+.setup-loc-current { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--green-dk); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; color: var(--white); margin-bottom: 12px; }
+.setup-loc-change { font-family: var(--font-m); font-size: 10px; color: var(--text-faint); margin-left: auto; }
+.kit-card-selected { border-color: var(--amber) !important; background: var(--bg3); box-shadow: 0 0 0 1px var(--amber-dk); }
+.kit-card-selected .kit-name::after { content: " ✓"; color: var(--amber); }
+
+/* ── Mission brief collapsible (run phase) ───────────────────────────────── */
+.brief-details { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; }
+.brief-details > summary { cursor: pointer; padding: 12px 16px; font-family: var(--font-m); font-size: 10px; letter-spacing: .14em; color: var(--text-dim); list-style: none; }
+.brief-details > summary::-webkit-details-marker { display: none; }
+.brief-details > summary::before { content: "▸ "; color: var(--amber); }
+.brief-details[open] > summary::before { content: "▾ "; }
+.brief-details > summary:hover { color: var(--text); }
+.brief-details-body { padding: 2px 16px 16px; }
+
 /* ── Run HUD ─────────────────────────────────────────────────────────────── */
 .run-hud { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 20px; }
 .hud-progress { display: flex; gap: 4px; margin-bottom: 10px; }
@@ -12745,6 +12761,7 @@ const RUN = {
   stageLog:     [],
   randomEvent:  null,
   survived:     false,
+  stageResolved:  false,   // run phase: choice resolved, result shown inline
   // v2 fields
   systems:      null,
   env:          {},
@@ -12762,8 +12779,10 @@ function resetRun() {
     lastAssess:null, lastOutcome:null, lastResolve:null, lastFactors:null, conditions:[], inventory:{},
     xpEarned:0, stageLog:[], randomEvent:null, survived:false,
     systems:initCoreSystems(), env:{}, tickEvents:[],
-    atlasRegion: null,
+    atlasRegion: null, stageResolved:false,
   });
+  _setupSel = null;
+  _rp.query = ""; _rp.expanded = null;
 }
 
 // ── Condition helpers ──────────────────────────────────────────────────────────
@@ -12950,11 +12969,8 @@ function renderSimulator(root, onOpenArticle) {
   root.innerHTML = "";
   switch (RUN.phase) {
     case "menu":    renderMenu(root);                   break;
-    case "region":  renderRegionPicker(root);           break;
-    case "kit":     renderKit(root);                    break;
-    case "brief":   renderBrief(root);                  break;
-    case "stage":   renderStage(root);                  break;
-    case "result":  renderStageResult(root, openArticle); break;
+    case "setup":   renderSetup(root);                  break;
+    case "run":     renderRun(root, openArticle);       break;
     case "debrief": renderDebrief(root, openArticle); break;
     case "levelup": renderLevelUp(root);                break;
   }
@@ -13057,7 +13073,7 @@ function renderMenu(root) {
         RUN.scenario = SCENARIOS.find(s => s.id === btn.dataset.id);
         RUN.env      = buildLegacyEnv(RUN.scenario);
       }
-      RUN.phase = "region";
+      RUN.phase = "setup";
       renderSimulator(root);
     })
   );
@@ -13081,9 +13097,162 @@ function buildLegacyEnv(scenario) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // ATLAS REGION PICKER
 // ═══════════════════════════════════════════════════════════════════════════════
+// SETUP — mission setup: location + loadout on one screen
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── Section A: location (flat searchable Atlas list, updates in place) ────────
+
+function setupRegionSectionHTML() {
+  const s = RUN.scenario;
+  const sel = RUN.atlasRegion;
+
+  const filterNote = (s.biomes && s.biomes.length && rpAtlasTagged())
+    ? `<div class="rp-filter-note">Showing only regions that fit this scenario: ${s.biomes.map(b => b.replace(/_/g, " ")).join(" · ")}${s.climates && s.climates.length ? " · " + s.climates.join(" / ") + " climates" : ""}.</div>`
+    : "";
+
+  return `
+    <div class="menu-section-label"><span class="card-label">📍 Location</span></div>
+    <div class="region-picker-sub" style="margin-bottom:10px">${s.icon} <strong style="color:var(--white)">${s.title}</strong> — pick where this takes place, or skip.</div>
+    ${sel ? `<div class="setup-loc-current">✓ ${sel.continent.icon} ${sel.region.name} · ${sel.country.name}<span class="setup-loc-change">change below</span></div>` : ""}
+    ${filterNote}
+    <button class="rp-skip-btn" id="setup-skip">Skip — use default environment</button>
+    <input class="rp-search" id="setup-search" type="text" placeholder="Search regions or countries…" value="${_rp.query.replace(/"/g, "&quot;")}">
+    <div id="setup-region-list"></div>`;
+}
+
+function setupRegionListHTML() {
+  const s = RUN.scenario;
+  const all = rpFlatRegions(s);
+  const q = _rp.query.trim().toLowerCase();
+  const list = q
+    ? all.filter(({ c, co, r }) => (r.name + " " + co.name + " " + c.name).toLowerCase().includes(q))
+    : all;
+
+  if (!all.length) return `
+    <div class="rp-empty">
+      <div class="rp-empty-title">No mapped regions fit this scenario</div>
+      <div class="rp-empty-sub">${s.icon} <strong style="color:var(--white)">${s.title}</strong> doesn't take place in any mapped land region — the default environment will be used instead.</div>
+    </div>`;
+  if (!list.length) return `
+    <div class="rp-empty"><div class="rp-empty-sub">No regions match "${_rp.query.replace(/</g, "&lt;")}".</div></div>`;
+  return `
+    <div class="rp-list">
+      ${list.map(({ c, co, r }) => {
+        const open = _rp.expanded === r.id;
+        const threats = [...((r.threats?.weather || []).slice(0, 2)), ...((r.threats?.wildlife || []).slice(0, 1))];
+        const water = (r.water?.sources || []).slice(0, 2);
+        return `
+        <div class="rp-flat-item ${open ? "open" : ""}">
+          <button class="rp-list-item" data-rid="${r.id}" style="width:100%">
+            <div class="rp-list-item-body">
+              <div class="rp-list-item-name">${c.icon} ${r.name}</div>
+              <div class="rp-list-item-meta">${co.name} · ${c.name}</div>
+            </div>
+            <span class="rp-list-arrow">${open ? "▾" : "▸"}</span>
+          </button>
+          ${open ? `
+            <div class="rp-flat-detail">
+              <div style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:8px">${r.terrain || ""}</div>
+              ${threats.length ? `<div class="rp-detail-label">Key threats</div>${threats.map(t => `<div class="rp-threat">⚠ ${t}</div>`).join("")}` : ""}
+              ${water.length ? `<div class="rp-detail-label" style="margin-top:8px">Water</div>${water.map(w => `<div class="rp-water">✓ ${w}</div>`).join("")}` : ""}
+              <button class="rp-confirm-btn" data-confirm="${r.id}">Set as scenario location →</button>
+            </div>` : ""}
+        </div>`;
+      }).join("")}
+    </div>`;
+}
+
+function refreshSetupRegionSection(root) {
+  const sec = root.querySelector("#setup-region-section");
+  if (!sec) return;
+  sec.innerHTML = setupRegionSectionHTML();
+  wireSetupRegion(root);
+}
+
+function refreshSetupRegionList(root) {
+  const el = root.querySelector("#setup-region-list");
+  if (!el) return;
+  el.innerHTML = setupRegionListHTML();
+  wireSetupRegionList(root);
+}
+
+function wireSetupRegion(root) {
+  const listEl = root.querySelector("#setup-region-list");
+  if (listEl) { listEl.innerHTML = setupRegionListHTML(); }
+
+  const skip = root.querySelector("#setup-skip");
+  if (skip) skip.addEventListener("click", () => {
+    RUN.atlasRegion = null;
+    setupResetEnv();
+    _rp.query = ""; _rp.expanded = null;
+    refreshSetupRegionSection(root);
+  });
+
+  const search = root.querySelector("#setup-search");
+  if (search) search.addEventListener("input", () => {
+    _rp.query = search.value; _rp.expanded = null;
+    // Only the list re-renders — the input keeps focus.
+    refreshSetupRegionList(root);
+  });
+
+  wireSetupRegionList(root);
+}
+
+function wireSetupRegionList(root) {
+  root.querySelectorAll("#setup-region-list .rp-list-item[data-rid]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      _rp.expanded = _rp.expanded === btn.dataset.rid ? null : btn.dataset.rid;
+      refreshSetupRegionList(root);
+    });
+  });
+  root.querySelectorAll("#setup-region-list [data-confirm]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const all = rpFlatRegions(RUN.scenario);
+      const found = all.find(({ r }) => r.id === btn.dataset.confirm);
+      if (!found) return;
+      RUN.atlasRegion = {
+        continent: { id: found.c.id, name: found.c.name, icon: found.c.icon },
+        country:   { id: found.co.id,  name: found.co.name },
+        region:    found.r,
+      };
+      setupResetEnv();
+      applyAtlasRegionToEnv(found.r);
+      _rp.query = ""; _rp.expanded = null;
+      refreshSetupRegionSection(root);
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 
 // Internal picker state (resets each time we enter picker)
 const _rp = { step: "continent", continent: null, country: null };
+
+
+// ── Setup-phase selection state ──────────────────────────────────────────────
+// Survives in-place re-renders of the setup screen; cleared by resetRun().
+// "Change setup" from a run keeps it, so the screen rehydrates the user's picks.
+let _setupSel = null;   // { mode:"kit"|"custom", kitId, customOpen, customItems:Set }
+const SETUP_MAX_CUSTOM = 6;
+
+function setupSelDefaults() {
+  const available  = Object.values(KITS).filter(k => char.unlockedKits.includes(k.id));
+  const ownedItems = (char.ownedGear || []).filter(id => ITEMS[id]);
+  _setupSel = {
+    mode: "kit",
+    kitId: available.length ? available[0].id : null,
+    customOpen: false,
+    customItems: new Set(ownedItems.slice(0, SETUP_MAX_CUSTOM)),
+  };
+}
+
+// Rebuild RUN.env from the scenario, then apply the atlas region (if any).
+// Makes region changes idempotent — no double-stacking of env modifiers.
+function setupResetEnv() {
+  const s = RUN.scenario;
+  RUN.env = s.isHybrid ? { ...s.mergedEnv } : buildLegacyEnv(s);
+  if (!RUN.env.wind_speed) RUN.env.wind_speed = 15;
+}
 
 // ── Scenario ↔ region compatibility (biome + climate) ─────────────────────────
 // A scenario may only be placed in regions whose biome tags intersect its own.
@@ -13105,7 +13274,6 @@ function rpContinentCount(c, s) {
   for (const co of (c.countries || [])) for (const r of (co.regions || [])) if (rpRegionOK(r, s)) n++;
   return n;
 }
-function rpUseDefault(root) { RUN.atlasRegion = null; RUN.phase = "kit"; renderSimulator(root); }
 
 // Flat list of every scenario-compatible region across all continents.
 function rpFlatRegions(s) {
@@ -13118,107 +13286,6 @@ function rpFlatRegions(s) {
     }
   }
   return out;
-}
-
-// ── Region picker: ONE flat searchable screen (no drill-down) ─────────────────
-// Every compatible region in one list. Tap to expand, set, done.
-function renderRegionPicker(root) {
-  if (!atlasState.loaded) {
-    loadAtlas().then(() => renderRegionPicker(root));
-    root.innerHTML = `<div class="region-picker"><div class="region-picker-header"><div class="region-picker-title">Loading Atlas…</div></div></div>`;
-    return;
-  }
-
-  const s = RUN.scenario;
-  _rp.query    = _rp.query || "";
-  _rp.expanded = _rp.expanded || null;
-
-  const all = rpFlatRegions(s);
-  const q = _rp.query.trim().toLowerCase();
-  const list = q
-    ? all.filter(({ c, co, r }) => (r.name + " " + co.name + " " + c.name).toLowerCase().includes(q))
-    : all;
-
-  const filterNote = (s.biomes && s.biomes.length && rpAtlasTagged())
-    ? `<div class="rp-filter-note">Showing only regions that fit this scenario: ${s.biomes.map(b => b.replace(/_/g, " ")).join(" · ")}${s.climates && s.climates.length ? " · " + s.climates.join(" / ") + " climates" : ""}.</div>`
-    : "";
-
-  root.innerHTML = `
-    <div class="region-picker">
-      <button class="back-btn" id="rp-back">← Scenarios</button>
-      <div class="region-picker-header">
-        <div class="region-picker-title">📍 Set Location</div>
-        <div class="region-picker-sub">${s.icon} <strong style="color:var(--white)">${s.title}</strong> — pick where this takes place, or skip.</div>
-        ${filterNote}
-      </div>
-      <button class="rp-skip-btn" id="rp-skip">Skip — use default environment</button>
-      <input class="rp-search" id="rp-search" type="text" placeholder="Search regions or countries…" value="${_rp.query.replace(/"/g, "&quot;")}">
-      ${!all.length ? `
-        <div class="rp-empty">
-          <div class="rp-empty-title">No mapped regions fit this scenario</div>
-          <div class="rp-empty-sub">${s.icon} <strong style="color:var(--white)">${s.title}</strong> doesn't take place in any mapped land region — the default environment will be used instead.</div>
-          <button class="rp-confirm-btn" id="rp-nodefault">Continue with default environment →</button>
-        </div>` : !list.length ? `
-        <div class="rp-empty"><div class="rp-empty-sub">No regions match "${ _rp.query.replace(/</g, "&lt;") }".</div></div>` : `
-        <div class="rp-list">
-          ${list.map(({ c, co, r }) => {
-            const open = _rp.expanded === r.id;
-            const threats = [...((r.threats?.weather || []).slice(0, 2)), ...((r.threats?.wildlife || []).slice(0, 1))];
-            const water = (r.water?.sources || []).slice(0, 2);
-            return `
-            <div class="rp-flat-item ${open ? "open" : ""}">
-              <button class="rp-list-item" data-rid="${r.id}" style="width:100%">
-                <div class="rp-list-item-body">
-                  <div class="rp-list-item-name">${c.icon} ${r.name}</div>
-                  <div class="rp-list-item-meta">${co.name} · ${c.name}</div>
-                </div>
-                <span class="rp-list-arrow">${open ? "▾" : "▸"}</span>
-              </button>
-              ${open ? `
-                <div class="rp-flat-detail">
-                  <div style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:8px">${r.terrain || ""}</div>
-                  ${threats.length ? `<div class="rp-detail-label">Key threats</div>${threats.map(t => `<div class="rp-threat">⚠ ${t}</div>`).join("")}` : ""}
-                  ${water.length ? `<div class="rp-detail-label" style="margin-top:8px">Water</div>${water.map(w => `<div class="rp-water">✓ ${w}</div>`).join("")}` : ""}
-                  <button class="rp-confirm-btn" data-confirm="${r.id}">Set as scenario location →</button>
-                </div>` : ""}
-            </div>`;
-          }).join("")}
-        </div>`}
-    </div>`;
-
-  root.querySelector("#rp-back").addEventListener("click", () => { RUN.phase = "menu"; renderSimulator(root); });
-  root.querySelector("#rp-skip").addEventListener("click", () => rpUseDefault(root));
-  const noFitBtn = root.querySelector("#rp-nodefault");
-  if (noFitBtn) noFitBtn.addEventListener("click", () => rpUseDefault(root));
-
-  const search = root.querySelector("#rp-search");
-  search.addEventListener("input", () => { _rp.query = search.value; _rp.expanded = null; renderRegionPicker(root); });
-  // Keep focus in the search box while typing (re-render steals it)
-  search.focus();
-  search.setSelectionRange(search.value.length, search.value.length);
-
-  root.querySelectorAll(".rp-list-item[data-rid]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      _rp.expanded = _rp.expanded === btn.dataset.rid ? null : btn.dataset.rid;
-      renderRegionPicker(root);
-    });
-  });
-
-  root.querySelectorAll("[data-confirm]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const found = all.find(({ r }) => r.id === btn.dataset.confirm);
-      if (!found) return;
-      RUN.atlasRegion = {
-        continent: { id: found.c.id, name: found.c.name, icon: found.c.icon },
-        country:   { id: found.co.id,  name: found.co.name },
-        region:    found.r,
-      };
-      applyAtlasRegionToEnv(found.r);
-      _rp.query = ""; _rp.expanded = null;
-      RUN.phase = "kit";
-      renderSimulator(root);
-    });
-  });
 }
 
 // ── Apply Atlas region data to RUN.env ─────────────────────────────────────────
@@ -13340,169 +13407,54 @@ function buildRegionalIntelBlock(atlasRegion) {
     </div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// KIT SELECTION
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── Setup screen ───────────────────────────────────────────────────────────────
 
-function renderKit(root) {
-  // Gear premise: you can't always be ready. Crash scenarios skip the kit.
-  const gear = RUN.scenario.gear || "kit";
-  if (gear === "pockets") return renderPockets(root);
-  if (gear === "nothing") return renderNoGear(root);
-
-  const available  = Object.values(KITS).filter(k => char.unlockedKits.includes(k.id));
-  const locked     = Object.values(KITS).filter(k => !char.unlockedKits.includes(k.id));
-  const ownedItems = (char.ownedGear || []).filter(id => ITEMS[id]);
-  const hasOwned   = ownedItems.length > 0;
-
-  // Custom loadout state (max 6 items)
-  const MAX_CUSTOM = 6;
-  let customSelected = new Set(ownedItems.slice(0, MAX_CUSTOM));
-
-  function renderCustomBuilder() {
-    const allItemsSorted = Object.values(ITEMS).sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
-    return `
-      <div class="custom-kit-builder" id="custom-kit-builder">
-        <div class="ckb-header">
-          <span class="card-label">Custom Loadout</span>
-          <span class="ckb-count" id="ckb-count">${customSelected.size} / ${MAX_CUSTOM} items</span>
-        </div>
-        <p class="ckb-hint">Select up to ${MAX_CUSTOM} items. Owned gear (◈) is pre-selected. All items available regardless of ownership.</p>
-        <div class="ckb-grid">
-          ${allItemsSorted.map(item => {
-            const owned   = ownedItems.includes(item.id);
-            const checked = customSelected.has(item.id);
-            const statLabel = { knowledge: "KNO", endurance: "END", strength: "STR", perception: "PER", composure: "COM" };
-            return `
-              <label class="ckb-item ${checked ? "ckb-checked" : ""} ${owned ? "ckb-owned" : ""}" data-item-id="${item.id}">
-                <input type="checkbox" class="ckb-checkbox" data-item-id="${item.id}" ${checked ? "checked" : ""} style="display:none">
-                <span class="ckb-item-icon">${item.icon}</span>
-                <div class="ckb-item-body">
-                  <div class="ckb-item-name">${item.name}${owned ? " <span class='ckb-owned-dot'>◈</span>" : ""}</div>
-                  <div class="ckb-item-stat">+${item.bonus} ${statLabel[item.bonusStat] || item.bonusStat} · ${item.uses >= 99 ? "∞" : item.uses} uses</div>
-                </div>
-                <span class="ckb-check-icon">${checked ? "✓" : ""}</span>
-              </label>`;
-          }).join("")}
-        </div>
-        <button class="btn-solid" id="btn-start-custom" style="width:100%;margin-top:16px;padding:13px">
-          Start with Custom Kit (${customSelected.size} items) →
-        </button>
-      </div>`;
+function renderSetup(root) {
+  const s = RUN.scenario;
+  if (!s) { RUN.phase = "menu"; renderSimulator(root); return; }
+  if (!atlasState.loaded) {
+    loadAtlas().then(() => renderSetup(root));
+    root.innerHTML = `<div class="sim-page"><div class="region-picker"><div class="region-picker-header"><div class="region-picker-title">Loading Atlas…</div></div></div></div>`;
+    return;
   }
+  if (!_setupSel) setupSelDefaults();
+  _rp.query    = _rp.query || "";
+  _rp.expanded = _rp.expanded || null;
 
   root.innerHTML = `
     <div class="sim-page">
-      <button class="back-btn" id="btn-back">← Scenarios</button>
-      <div class="sim-eyebrow">${RUN.scenario.icon} ${RUN.scenario.title}</div>
-      <h2 class="sim-title">Select Starting Kit</h2>
-      <p class="stage-situation">${RUN.scenario.intro}</p>
+      <button class="back-btn" id="setup-back">← Scenarios</button>
+      <div class="sim-eyebrow">${s.icon} ${s.title}</div>
+      <h2 class="sim-title">Mission Setup</h2>
 
-      <div class="kit-grid">
-        ${available.map(kit => `
-          <button class="kit-card" data-kit="${kit.id}">
-            <div class="kit-name">${kit.name}</div>
-            <div class="kit-desc">${kit.desc}</div>
-            <div class="kit-items-list">
-              ${kit.items.map(id => ITEMS[id] ? `<span class="kit-item-tag">${ITEMS[id].icon} ${ITEMS[id].name}</span>` : "").join("")}
-            </div>
-          </button>`).join("")}
-
-        ${hasOwned ? `
-          <button class="kit-card kit-card-custom" id="btn-custom-kit">
-            <div class="kit-name">⚙ Custom Loadout</div>
-            <div class="kit-desc">Build your own kit from purchased gear. Up to ${MAX_CUSTOM} items.</div>
-            <div class="kit-items-list">
-              ${ownedItems.slice(0, 6).map(id => `<span class="kit-item-tag">${ITEMS[id].icon} ${ITEMS[id].name}</span>`).join("")}
-              ${ownedItems.length > 6 ? `<span class="kit-item-tag">+${ownedItems.length - 6} more</span>` : ""}
-            </div>
-          </button>` : ""}
+      <div class="setup-section" id="setup-region-section">
+        ${setupRegionSectionHTML()}
       </div>
 
-      ${locked.length ? `
-        <div class="kit-locked-row">
-          <span class="card-label">Locked</span>
-          ${locked.map(k => `<span class="kit-locked-tag">⚿ ${k.name} · Lvl ${k.level}</span>`).join("")}
-        </div>` : ""}
+      <div class="setup-section">
+        <div class="menu-section-label"><span class="card-label">🎒 Loadout</span></div>
+        <div id="setup-loadout-body">${setupLoadoutHTML()}</div>
+      </div>
 
-      ${!hasOwned ? `
-        <div class="kit-store-nudge">
-          <span>💡 Purchase gear in the </span>
-          <button class="kit-store-link" id="btn-goto-store">Field Gear store</button>
-          <span> to build custom loadouts.</span>
-        </div>` : ""}
-
-      <div id="custom-builder-slot"></div>
+      <button class="btn-solid" id="setup-continue" style="width:100%;padding:14px">Continue →</button>
     </div>`;
 
-  root.querySelector("#btn-back").addEventListener("click", () => { resetRun(); renderSimulator(root); });
-
-  // Standard kit selection
-  root.querySelectorAll(".kit-card:not(#btn-custom-kit)").forEach(btn =>
-    btn.addEventListener("click", () => {
-      RUN.inventory = buildRunInventory(btn.dataset.kit);
-      RUN.phase = "brief";
-      renderSimulator(root);
-    })
-  );
-
-  // Store link nudge
-  root.querySelector("#btn-goto-store")?.addEventListener("click", () => {
-    resetRun();
-    document.dispatchEvent(new CustomEvent("nav:goto", { detail: "store" }));
-  });
-
-  // Custom kit toggle
-  const customBtn = root.querySelector("#btn-custom-kit");
-  if (customBtn) {
-    customBtn.addEventListener("click", () => {
-      const slot = root.querySelector("#custom-builder-slot");
-      if (slot.innerHTML) { slot.innerHTML = ""; customBtn.classList.remove("kit-card-active"); return; }
-      customBtn.classList.add("kit-card-active");
-      slot.innerHTML = renderCustomBuilder();
-
-      // Wire checkboxes
-      slot.querySelectorAll(".ckb-item").forEach(label => {
-        label.addEventListener("click", () => {
-          const id  = label.dataset.itemId;
-          const chk = label.querySelector(".ckb-checkbox");
-          if (customSelected.has(id)) {
-            customSelected.delete(id);
-            chk.checked = false;
-            label.classList.remove("ckb-checked");
-            label.querySelector(".ckb-check-icon").textContent = "";
-          } else {
-            if (customSelected.size >= MAX_CUSTOM) return;
-            customSelected.add(id);
-            chk.checked = true;
-            label.classList.add("ckb-checked");
-            label.querySelector(".ckb-check-icon").textContent = "✓";
-          }
-          slot.querySelector("#ckb-count").textContent = `${customSelected.size} / ${MAX_CUSTOM} items`;
-          slot.querySelector("#btn-start-custom").textContent = `Start with Custom Kit (${customSelected.size} items) →`;
-        });
-      });
-
-      slot.querySelector("#btn-start-custom").addEventListener("click", () => {
-        if (customSelected.size === 0) return;
-        RUN.inventory = buildCustomInventory([...customSelected]);
-        RUN.phase = "brief";
-        renderSimulator(root);
-      });
-    });
-  }
+  root.querySelector("#setup-back").addEventListener("click", () => { resetRun(); renderSimulator(root); });
+  wireSetupRegion(root);
+  wireSetupLoadout(root);
+  root.querySelector("#setup-continue").addEventListener("click", () => setupContinue(root));
 }
 
-// ── Pockets / Nothing — you can't always be ready ────────────────────────────
-// If you crash, you won't have your kit. These screens replace kit selection
-// when the scenario's gear premise is "pockets" or "nothing".
-function renderPockets(root) {
-  const items = POCKET_GEAR_IDS.map(id => ITEMS[id]).filter(Boolean);
-  root.innerHTML = `
-    <div class="sim-page">
-      <button class="back-btn" id="btn-back">← Scenarios</button>
-      <div class="sim-eyebrow">${RUN.scenario.icon} ${RUN.scenario.title}</div>
-      <h2 class="sim-title">Empty Your Pockets</h2>
+// ── Section B: loadout ───────────────────────────────────────────────────────
+// Gear premise: you can't always be ready. Crash scenarios skip the kit.
+
+function setupLoadoutHTML() {
+  const s = RUN.scenario;
+  const gear = s.gear || "kit";
+
+  if (gear === "pockets") {
+    const items = POCKET_GEAR_IDS.map(id => ITEMS[id]).filter(Boolean);
+    return `
       <p class="stage-situation">No time to pack. No kit. Whatever was on you when it started — that's your gear.</p>
       <div class="kit-grid">
         <div class="kit-card" style="cursor:default">
@@ -13512,47 +13464,176 @@ function renderPockets(root) {
             ${items.map(it => `<span class="kit-item-tag">${it.icon} ${it.name}</span>`).join("")}
           </div>
         </div>
+      </div>`;
+  }
+
+  if (gear === "nothing") {
+    return `<p class="stage-situation">You have nothing but the clothes on your back. No tools, no supplies. Just you — and the decisions you're about to make.</p>`;
+  }
+
+  const available  = Object.values(KITS).filter(k => char.unlockedKits.includes(k.id));
+  const locked     = Object.values(KITS).filter(k => !char.unlockedKits.includes(k.id));
+  const ownedItems = (char.ownedGear || []).filter(id => ITEMS[id]);
+  const hasOwned   = ownedItems.length > 0;
+
+  return `
+    <p class="stage-situation" style="margin-bottom:12px">${s.intro}</p>
+    <div class="kit-grid">
+      ${available.map(kit => `
+        <button class="kit-card ${_setupSel.mode === "kit" && _setupSel.kitId === kit.id ? "kit-card-selected" : ""}" data-kit="${kit.id}">
+          <div class="kit-name">${kit.name}</div>
+          <div class="kit-desc">${kit.desc}</div>
+          <div class="kit-items-list">
+            ${kit.items.map(id => ITEMS[id] ? `<span class="kit-item-tag">${ITEMS[id].icon} ${ITEMS[id].name}</span>` : "").join("")}
+          </div>
+        </button>`).join("")}
+
+      ${hasOwned ? `
+        <button class="kit-card kit-card-custom ${_setupSel.mode === "custom" ? "kit-card-selected" : ""}" id="setup-custom-kit">
+          <div class="kit-name">⚙ Custom Loadout</div>
+          <div class="kit-desc">Build your own kit from purchased gear. Up to ${SETUP_MAX_CUSTOM} items.</div>
+          <div class="kit-items-list">
+            ${[..._setupSel.customItems].slice(0, 6).map(id => ITEMS[id] ? `<span class="kit-item-tag">${ITEMS[id].icon} ${ITEMS[id].name}</span>` : "").join("")}
+          </div>
+        </button>` : ""}
+    </div>
+
+    ${locked.length ? `
+      <div class="kit-locked-row">
+        <span class="card-label">Locked</span>
+        ${locked.map(k => `<span class="kit-locked-tag">⚿ ${k.name} · Lvl ${k.level}</span>`).join("")}
+      </div>` : ""}
+
+    ${!hasOwned ? `
+      <div class="kit-store-nudge">
+        <span>💡 Purchase gear in the </span>
+        <button class="kit-store-link" id="setup-goto-store">Field Gear store</button>
+        <span> to build custom loadouts.</span>
+      </div>` : ""}
+
+    <div id="setup-custom-slot">${_setupSel.customOpen ? setupCustomBuilderHTML() : ""}</div>`;
+}
+
+function setupCustomBuilderHTML() {
+  const statLabel = { knowledge: "KNO", endurance: "END", strength: "STR", perception: "PER", composure: "COM" };
+  const allItemsSorted = Object.values(ITEMS).sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
+  const ownedItems = (char.ownedGear || []).filter(id => ITEMS[id]);
+  return `
+    <div class="custom-kit-builder" id="setup-custom-builder">
+      <div class="ckb-header">
+        <span class="card-label">Custom Loadout</span>
+        <span class="ckb-count" id="setup-ckb-count">${_setupSel.customItems.size} / ${SETUP_MAX_CUSTOM} items</span>
       </div>
-      <button class="btn-solid" id="btn-pockets-go" style="width:100%;margin-top:16px;padding:13px">Start With What's In Your Pockets →</button>
+      <p class="ckb-hint">Select up to ${SETUP_MAX_CUSTOM} items. Owned gear (◈) is pre-selected. All items available regardless of ownership.</p>
+      <div class="ckb-grid">
+        ${allItemsSorted.map(item => {
+          const owned   = ownedItems.includes(item.id);
+          const checked = _setupSel.customItems.has(item.id);
+          return `
+            <label class="ckb-item ${checked ? "ckb-checked" : ""} ${owned ? "ckb-owned" : ""}" data-item-id="${item.id}">
+              <input type="checkbox" class="ckb-checkbox" data-item-id="${item.id}" ${checked ? "checked" : ""} style="display:none">
+              <span class="ckb-item-icon">${item.icon}</span>
+              <div class="ckb-item-body">
+                <div class="ckb-item-name">${item.name}${owned ? " <span class='ckb-owned-dot'>◈</span>" : ""}</div>
+                <div class="ckb-item-stat">+${item.bonus} ${statLabel[item.bonusStat] || item.bonusStat} · ${item.uses >= 99 ? "∞" : item.uses} uses</div>
+              </div>
+              <span class="ckb-check-icon">${checked ? "✓" : ""}</span>
+            </label>`;
+        }).join("")}
+      </div>
+      <button class="btn-solid" id="setup-use-custom" style="width:100%;margin-top:16px;padding:13px">
+        Use This Custom Kit (${_setupSel.customItems.size} items) →
+      </button>
     </div>`;
-  root.querySelector("#btn-back").addEventListener("click", () => { resetRun(); renderSimulator(root); });
-  root.querySelector("#btn-pockets-go").addEventListener("click", () => {
-    RUN.inventory = buildPocketsInventory();
-    RUN.phase = "brief";
-    renderSimulator(root);
+}
+
+function refreshSetupLoadout(root) {
+  const body = root.querySelector("#setup-loadout-body");
+  if (!body) return;
+  body.innerHTML = setupLoadoutHTML();
+  wireSetupLoadout(root);
+}
+
+function wireSetupLoadout(root) {
+  root.querySelectorAll('#setup-loadout-body .kit-card[data-kit]').forEach(btn =>
+    btn.addEventListener("click", () => {
+      _setupSel.mode = "kit";
+      _setupSel.kitId = btn.dataset.kit;
+      refreshSetupLoadout(root);
+    })
+  );
+
+  root.querySelector("#setup-goto-store")?.addEventListener("click", () => {
+    resetRun();
+    document.dispatchEvent(new CustomEvent("nav:goto", { detail: "store" }));
+  });
+
+  const customBtn = root.querySelector("#setup-custom-kit");
+  if (customBtn) {
+    customBtn.addEventListener("click", () => {
+      _setupSel.customOpen = !_setupSel.customOpen;
+      refreshSetupLoadout(root);
+    });
+  }
+  wireSetupCustomBuilder(root);
+}
+
+function wireSetupCustomBuilder(root) {
+  const builder = root.querySelector("#setup-custom-builder");
+  if (!builder) return;
+  builder.querySelectorAll(".ckb-item").forEach(label => {
+    label.addEventListener("click", () => {
+      const id  = label.dataset.itemId;
+      const chk = label.querySelector(".ckb-checkbox");
+      if (_setupSel.customItems.has(id)) {
+        _setupSel.customItems.delete(id);
+        chk.checked = false;
+        label.classList.remove("ckb-checked");
+        label.querySelector(".ckb-check-icon").textContent = "";
+      } else {
+        if (_setupSel.customItems.size >= SETUP_MAX_CUSTOM) return;
+        _setupSel.customItems.add(id);
+        chk.checked = true;
+        label.classList.add("ckb-checked");
+        label.querySelector(".ckb-check-icon").textContent = "✓";
+      }
+      builder.querySelector("#setup-ckb-count").textContent = `${_setupSel.customItems.size} / ${SETUP_MAX_CUSTOM} items`;
+      builder.querySelector("#setup-use-custom").textContent = `Use This Custom Kit (${_setupSel.customItems.size} items) →`;
+    });
+  });
+  builder.querySelector("#setup-use-custom").addEventListener("click", () => {
+    if (_setupSel.customItems.size === 0) return;
+    _setupSel.mode = "custom";
+    _setupSel.customOpen = false;
+    refreshSetupLoadout(root);
   });
 }
 
-function renderNoGear(root) {
-  root.innerHTML = `
-    <div class="sim-page">
-      <button class="back-btn" id="btn-back">← Scenarios</button>
-      <div class="sim-eyebrow">${RUN.scenario.icon} ${RUN.scenario.title}</div>
-      <h2 class="sim-title">Nothing</h2>
-      <p class="stage-situation">You have nothing but the clothes on your back. No tools, no supplies. Just you — and the decisions you're about to make.</p>
-      <button class="btn-solid" id="btn-nogear-go" style="width:100%;margin-top:16px;padding:13px">Start With Nothing →</button>
-    </div>`;
-  root.querySelector("#btn-back").addEventListener("click", () => { resetRun(); renderSimulator(root); });
-  root.querySelector("#btn-nogear-go").addEventListener("click", () => {
-    RUN.inventory = {};
-    RUN.phase = "brief";
-    renderSimulator(root);
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// BRIEF
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function renderBrief(root) {
+function setupContinue(root) {
   const s = RUN.scenario;
-  const backLabel = (s.gear && s.gear !== "kit") ? "← Gear" : "← Kit";
-  root.innerHTML = `
-    <div class="sim-page">
-      <button class="back-btn" id="btn-back">${backLabel}</button>
-      <div class="sim-eyebrow">Scenario Brief</div>
-      <h2 class="sim-title">${s.icon} ${s.title}</h2>
+  const gear = s.gear || "kit";
+  if (gear === "kit") {
+    RUN.inventory = (_setupSel.mode === "custom" && _setupSel.customItems.size > 0)
+      ? buildCustomInventory([..._setupSel.customItems])
+      : buildRunInventory(_setupSel.kitId);
+  } else if (gear === "pockets") {
+    RUN.inventory = buildPocketsInventory();
+  } else {
+    RUN.inventory = {};
+  }
+  RUN.stageIndex    = 0;
+  RUN.stageResolved = false;
+  RUN.phase         = "run";
+  renderSimulator(root);
+}
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// BRIEF — mission brief content (rendered inside a <details> on the run screen)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function briefDetailsHTML() {
+  const s = RUN.scenario;
+  return `
       ${s.isHybrid ? `
         <div class="hybrid-badge">
           <span class="card-label">Hybrid · ${s.subtypes.length} Combined Threat Vectors</span>
@@ -13593,22 +13674,15 @@ function renderBrief(root) {
           ${s.stages.length} Stages${s.isHybrid ? " — Procedurally Generated" : ""}
         </div>
         ${s.stages.map((st, i) => `<div class="brief-stage-pip">${i + 1}. ${st.title}</div>`).join("")}
-      </div>
-
-      <button class="btn-solid" id="btn-start" style="margin-top:24px;width:100%;padding:14px">Begin →</button>
-    </div>`;
-
-  root.querySelector("#btn-back").addEventListener("click", () => { RUN.phase = "kit"; renderSimulator(root); });
-  root.querySelector("#btn-start").addEventListener("click", () => { RUN.stageIndex = 0; RUN.phase = "stage"; renderSimulator(root); });
+      </div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// STAGE
+// STAGE — stage body + wiring (rendered inside the run screen)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function renderStage(root) {
+function stageBodyHTML() {
   const stage = RUN.scenario.stages[RUN.stageIndex];
-  if (!stage) { finaliseRun(true); RUN.phase = "debrief"; renderSimulator(root); return; }
 
   const pen      = condPenalty();
   const bon      = condBonus();
@@ -13640,7 +13714,7 @@ function renderStage(root) {
       </div>`;
   }).join("");
 
-  root.innerHTML = `
+  return `
     <div class="sim-page">
       <div class="run-hud">
         <div class="hud-progress">
@@ -13714,7 +13788,10 @@ function renderStage(root) {
           </span>`).join("")}
       </div>
     </div>`;
+}
 
+function wireStageScreen(root) {
+  const stage = RUN.scenario.stages[RUN.stageIndex];
   root.querySelectorAll(".choice-btn").forEach(btn =>
     btn.addEventListener("click", () => {
       const choice = stage.choices.find(c => c.id === btn.dataset.id);
@@ -13727,16 +13804,13 @@ function renderStage(root) {
     RUN.phase = "menu";
     renderSimulator(root);
   });
+
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// RESOLUTION — readiness assessment (no dice)
-// Factors are revealed one by one, then the verdict. The situation unfolds;
-// nothing is rolled. Thin margins cost you; they never veto a sound plan.
+// RESOLUTION — choice resolution (readiness math untouched)
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// ── Synchronous stage resolution (no forced animation) ────────────────────────
-// Tap a choice → everything computes instantly → result screen.
-// Doctrine picks the branch, readiness picks the price.
 function resolveStageChoice(root, choice) {
   const stage   = RUN.scenario.stages[RUN.stageIndex];
   const statId  = choice.statHint || stage.check.stat;
@@ -13804,15 +13878,16 @@ function resolveStageChoice(root, choice) {
     finaliseRun(false);
     RUN.phase = "debrief";
   } else {
-    RUN.phase = "result";
+    RUN.stageResolved = true;
   }
   renderSimulator(root);
 }
 
-// STAGE RESULT
+// ═══════════════════════════════════════════════════════════════════════════════
+// RESULT — inline result body + wiring (rendered inside the run screen)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function renderStageResult(root, onOpenArticle) {
+function resultBodyHTML() {
   const assess   = RUN.lastAssess;
   const res      = RUN.lastResolve || { quality: "risky", branch: assess?.success ? "success" : "failure", priceTier: assess?.tier };
   const outcome  = RUN.lastOutcome;
@@ -13902,7 +13977,7 @@ function renderStageResult(root, onOpenArticle) {
         ${RUN.conditions.map(c => `<span class="cond-tag">${c.replace(/_/g," ")}</span>`).join("")}
       </div>` : ""}`;
 
-  root.innerHTML = `
+  return `
     <div class="sim-page">
       <div class="result-stage-banner ${won ? "rsb-ok" : "rsb-fail"}">
         <span class="rsb-badge">${vd.badge}</span>
@@ -13937,7 +14012,9 @@ function renderStageResult(root, onOpenArticle) {
         ${isLast ? "Complete Scenario →" : "Next Stage →"}
       </button>
     </div>`;
+}
 
+function wireResultScreen(root, onOpenArticle) {
   root.querySelectorAll(".collapse-toggle").forEach(btn =>
     btn.addEventListener("click", () => {
       const body = root.querySelector("#collapse-" + btn.dataset.collapse);
@@ -13952,13 +14029,46 @@ function renderStageResult(root, onOpenArticle) {
   );
 
   root.querySelector("#btn-next").addEventListener("click", () => {
+    RUN.stageResolved = false;
     RUN.stageIndex++;
     if (RUN.stageIndex >= RUN.scenario.stages.length) {
       finaliseRun(true);
       RUN.phase = "debrief";
-    } else {
-      RUN.phase = "stage";
     }
+    renderSimulator(root);
+  });
+
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RUN — one screen per stage: mission brief (collapsible) + stage + inline result
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderRun(root, onOpenArticle) {
+  const stage = RUN.scenario.stages[RUN.stageIndex];
+  if (!stage) { finaliseRun(true); RUN.phase = "debrief"; renderSimulator(root); return; }
+
+  const canChangeSetup = !RUN.stageResolved && RUN.stageIndex === 0 && RUN.stageLog.length === 0;
+
+  root.innerHTML = `
+    <div class="sim-page">
+      <details class="brief-details">
+        <summary>MISSION BRIEF — ${RUN.scenario.icon} ${RUN.scenario.title}</summary>
+        <div class="brief-details-body">${briefDetailsHTML()}</div>
+      </details>
+
+      ${canChangeSetup ? `<button class="back-btn" id="btn-change-setup" style="margin-bottom:16px">← Change setup</button>` : ""}
+
+      ${RUN.stageResolved ? resultBodyHTML() : stageBodyHTML()}
+    </div>`;
+
+  if (RUN.stageResolved) wireResultScreen(root, onOpenArticle);
+  else wireStageScreen(root);
+
+  const csBtn = root.querySelector("#btn-change-setup");
+  if (csBtn) csBtn.addEventListener("click", () => {
+    // No resetRun: keeps scenario, region and loadout picks — setup rehydrates.
+    RUN.phase = "setup";
     renderSimulator(root);
   });
 }
@@ -14125,7 +14235,7 @@ function renderDebrief(root, onOpenArticle) {
     RUN.scenario = scen;
     RUN.env      = scen.isHybrid ? { ...scen.mergedEnv } : buildLegacyEnv(scen);
     if (!RUN.env.wind_speed) RUN.env.wind_speed = 15;
-    RUN.phase    = "kit";
+    RUN.phase    = "setup";
     renderSimulator(root, onOpenArticle);
   });
   root.querySelector("#btn-menu").addEventListener("click", () => { resetRun(); renderSimulator(root, onOpenArticle); });
@@ -15875,6 +15985,8 @@ function goTo(screenName, opts = {}) {
   root.scrollTop = 0;
 
   if (screenName === "simulator") {
+    // SIMULATOR tab tapped mid-run: abandon the run and land on the menu.
+    if (RUN.scenario && (RUN.phase === "setup" || RUN.phase === "run")) resetRun();
     renderSimulator(root, (articleId) => {
       store.ui.currentArticleId = articleId;
       goTo("encyclopedia");
@@ -15965,7 +16077,7 @@ function runBootSequence() {
   const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const FULL = [
-    ["head", "YDDNW FIELD OS v2.6.1 \u2014 \u201cmorning after\u201d build"],
+    ["head", "YDDNW FIELD OS v2.7.0 \u2014 \u201cmorning after\u201d build"],
     ["head", "(c) You Didn't Die Systems \u00b7 all rights reserved \u00b7 most of them"],
     ["blank"],
     ["line", "mounting optimism", "NOT FOUND", "fail"],
@@ -15979,7 +16091,7 @@ function runBootSequence() {
     ["sub", "Here's what you need to do next."]
   ];
   const QUICK = [
-    ["head", "YDDNW FIELD OS v2.6.1 \u2014 welcome back"],
+    ["head", "YDDNW FIELD OS v2.7.0 \u2014 welcome back"],
     ["blank"],
     ["line", "resuming denial", "OK", "ok"],
     ["line", "will_to_live", "still 7%", "warn"],
