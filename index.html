@@ -8109,6 +8109,350 @@ const SCENARIOS = [
       },
     ],
   },
+{
+    id: "hurricane",
+    title: "The Long Wind",
+    icon: "🌀",
+    difficulty: 3,
+    phase: 0,
+    timeOfDay: "09:40",
+    environment: "Single-storey coastal home, 3km from the shoreline. Evacuation Zone B. One car, half a tank.",
+    weather: "Outer bands arriving. 48 hours to projected landfall. Category 3, storm surge forecast 2–3m.",
+    relatedDomain: "disasters",
+    intro: "The hurricane has a name and it's coming for your coastline. You have two days, one car, and a house full of decisions. In hurricanes, water kills more people than wind — and almost every one of those deaths was a decision made too late.",
+    stages: [
+      {
+        id: "s1", title: "Stage 1 — 48 Hours Out",
+        situation: "The forecast cone puts your street inside the surge zone. Officials haven't ordered evacuation yet, but the highways out are still moving. Your car has half a tank and the gas stations already have lines.",
+        check: { stat: "knowledge", difficulty: 11, tag: "navigation", label: "Evacuation Call" },
+        randomEvents: [
+          { chance: 0.2, text: "The forecast shifts 30km toward you. The cone tightens like a noose.", effect: { moraleMod: -8 } },
+        ],
+        choices: [
+          { id: "leave", label: "Leave now, inland to family", desc: "Beat the rush. Two hours inland to high ground, before the highways clog.", statHint: "knowledge", tag: "navigation" },
+          { id: "prepare", label: "Stay and harden the house", desc: "Board windows, stock water, charge everything. Ride it out above the surge line.", statHint: "endurance", tag: "shelter" },
+          { id: "wait", label: "Wait for the official order", desc: "Don't overreact. If they order evacuation, you'll go then.", statHint: "composure", tag: "utility" },
+        ],
+        outcomes: {
+          leave: {
+            success: { narrative: "You fuel up at the second station, take the inland highway while it's still moving at speed, and arrive at your sister's — 40m above sea level — by dinner. The storm hits an empty house.", effects: { conditionAdd: "evac_clear", moraleMod: 12, xpBonus: 20 }, tip: "In hurricanes, water kills more people than wind. Leaving a surge zone early is the single highest-value decision.", learnMore: ["ds003", "ep005"] },
+            failure: { narrative: "You leave, but late — the highway is a parking lot by noon. You burn half your fuel idling and reach the shelter after dark, exhausted, sleeping on a gymnasium floor.", effects: { conditionAdd: "fatigued", conditionAdd2: "displaced", moraleMod: -10 }, tip: "A late evacuation can be worse than a prepared shelter-in-place. If you go, go before the crowd.", learnMore: ["ds003", "ep005"] },
+          },
+          prepare: {
+            success: { narrative: "You check the elevation maps: your street sits 6m above sea level, above the forecast surge. You board the windows, fill the tub, stock three days of water and food, and charge every battery. The house becomes a bunker.", effects: { conditionAdd: "sheltered", moraleMod: 8, xpBonus: 20 }, tip: "Sheltering in place is legitimate — but only above the surge line, in a structure rated for the wind. Elevation first, shutters second.", learnMore: ["ds003", "s014"] },
+            failure: { narrative: "You board windows and stock up — but never check your elevation against the surge forecast. Your street is 2m above sea level. The preparations are excellent and completely beside the point.", effects: { conditionAdd: "poor_shelter", moraleMod: -12 }, tip: "Boarded windows don't stop water. In a surge zone, the only preparation that matters is leaving.", learnMore: ["ds003", "s014"] },
+          },
+          wait: {
+            success: { narrative: "The order comes at dawn and you move instantly — go-bag by the door, car pointed out, route memorised. You join the evacuation in the first wave.", effects: { conditionAdd: "evac_clear", moraleMod: 6, xpBonus: 10 }, tip: "If you wait for the order, be ready to move the minute it comes: bag packed, car fuelled, route chosen.", learnMore: ["ep005", "ep003"] },
+            failure: { narrative: "The order comes at noon. So does everyone else. The highway locks up, the fuel light comes on in stop-and-go traffic, and you're still 30km from high ground when the outer bands arrive.", effects: { conditionAdd: "stranded", conditionAdd2: "fatigued", moraleMod: -15 }, tip: "Mandatory evacuation with clogged roads is how people die in cars. The order is the last safe moment, not the first.", learnMore: ["ep005", "tr015"] },
+          },
+        },
+      },
+      {
+        id: "s2", title: "Stage 2 — The Water Comes First",
+        situation: "Landfall minus six hours. You're sheltering at your sister's — but your neighbour refused to leave and just called: water is in his street, rising fast, and he's thinking about the attic.",
+        check: { stat: "composure", difficulty: 12, tag: "shelter", label: "Surge Advice" },
+        choices: [
+          { id: "roof", label: "Tell him: up to the roof, not the attic", desc: "Attics trap people. The roof can be seen and reached. Bring an axe if he must go up.", statHint: "knowledge", tag: "shelter" },
+          { id: "attic", label: "Tell him: attic is fine, stay dry", desc: "Higher is drier. The attic keeps him out of the water.", statHint: "composure", tag: "shelter" },
+          { id: "wade", label: "Tell him: wade out to your car now", desc: "The water's only knee-deep. He can still walk out.", statHint: "endurance", tag: "water" },
+        ],
+        outcomes: {
+          roof: {
+            success: { narrative: "He climbs out the dormer onto the roof with a flashlight and a white sheet. At dawn, a rescue boat spots the sheet in minutes. The attic below fills to the rafters overnight.", effects: { moraleMod: 14, xpBonus: 20 }, tip: "In rising water, the roof beats the attic: rescuers can see you, and you can't be trapped by water below and roof above.", learnMore: ["ds003", "ds005"] },
+            failure: { narrative: "He gets to the roof but the wind takes his footing on the wet shingles — he slides, catches the gutter, and hangs on until the boat comes. Alive, bruised, lucky.", effects: { moraleMod: -6 }, tip: "Roofs are slippery and wind-exposed. Tie off if you can, stay on the lee side, and never climb in the worst of the wind.", learnMore: ["ds003", "s014"] },
+          },
+          attic: {
+            success: { narrative: "He takes an axe to the attic with him, as an afterthought. When the water reaches the joists he chops through the roof and climbs out. The afterthought saves him.", effects: { moraleMod: 4 }, tip: "If anyone must use an attic, they need a way OUT through the roof — an axe, and the knowledge to use it.", learnMore: ["ds005", "ep005"] },
+            failure: { narrative: "The water rises past the attic floorboards. There is no axe, no dormer, no way through the roof. He is found three days later. Some advice kills.", effects: { moraleMod: -25, conditionAdd: "haunted" }, tip: "Attics without roof access are traps in floods. Never advise the attic without the axe.", learnMore: ["ds005"] },
+          },
+          wade: {
+            success: { narrative: "He moves fast, before the current builds — knee-deep, steady on a stick, reaching your car while the water is still walkable. Timing is everything.", effects: { moraleMod: 8, xpBonus: 10 }, tip: "Moving through floodwater is a race against the current: go early or don't go. Six inches of moving water can knock an adult down.", learnMore: ["hz003", "ds005"] },
+            failure: { narrative: "Halfway across, the current finds him. Fifteen centimetres of fast water takes his legs and the street becomes a river. He catches a fence and claws back, hypothermic and shaking.", effects: { conditionAdd: "soaked", conditionAdd2: "cold_stressed", moraleMod: -15 }, tip: "Never wade through moving floodwater. Twelve inches floats a car; six inches can take you off your feet.", learnMore: ["hz003", "ds005"] },
+          },
+        },
+      },
+      {
+        id: "s3", title: "Stage 3 — The Eye Lies",
+        situation: "The wind dies. Sun breaks through. Your sister opens the front door — the street is calm, debris everywhere, and neighbours are emerging to inspect damage.",
+        check: { stat: "knowledge", difficulty: 11, tag: "utility", label: "Eye Discipline" },
+        choices: [
+          { id: "inside", label: "Keep everyone inside until the all-clear", desc: "The calm is the eye. The back eyewall hits from the other side, just as hard.", statHint: "knowledge", tag: "utility" },
+          { id: "inspect", label: "Quick look at the damage, then back in", desc: "Five minutes to check the roof and the car. In and out.", statHint: "perception", tag: "utility" },
+          { id: "help", label: "Go help the neighbours clear debris", desc: "The street needs hands. The worst seems over.", statHint: "strength", tag: "utility" },
+        ],
+        outcomes: {
+          inside: {
+            success: { narrative: "Twenty minutes later the sky goes black from the opposite direction and the back eyewall slams the street with the full fury the first half only promised. Everyone is inside. The debris does its worst against empty pavement.", effects: { conditionAdd: "composed", moraleMod: 10, xpBonus: 20 }, tip: "The eye is the halftime, not the end. The back eyewall arrives fast from the opposite direction — stay sheltered until officials declare it over.", learnMore: ["ds003", "wx011"] },
+            failure: { narrative: "You keep everyone in, but the waiting frays nerves — the kids cry, your sister snaps at you, and the tension in the house rivals the storm outside.", effects: { moraleMod: -8 }, tip: "Sheltering through the eye is right, but plan for the psychology: tasks, information, and a clear 'we go back out when' rule.", learnMore: ["ds003", "p026"] },
+          },
+          inspect: {
+            success: { narrative: "Four minutes: roof intact, car dented, one fence down. You're back inside with the door bolted before the light changes. The back wall hits an empty yard.", effects: { xpBonus: 10 }, tip: "If you must step out in the eye, set a hard time limit and watch the sky — the calm can end in minutes.", learnMore: ["ds003"] },
+            failure: { narrative: "You're on the roof checking shingles when the wind returns — from behind you, without warning. You flatten against the chimney as debris starts flying and crawl back inside shaken.", effects: { conditionAdd: "suppressed", moraleMod: -12 }, tip: "The eye's edge is a cliff, not a slope. People are injured every hurricane stepping out 'for a minute.'", learnMore: ["ds003", "wx011"] },
+          },
+          help: {
+            success: { narrative: "You clear the storm drain on your corner in ten minutes flat — just as the back eyewall arrives. That drain saves three basements on the street. Then you're inside.", effects: { moraleMod: 8, xpBonus: 10 }, tip: "Clearing drains before the second half is genuinely valuable — but watch the clock ruthlessly.", learnMore: ["ds003", "s025"] },
+            failure: { narrative: "You're mid-street with a neighbour hauling branches when the wind flips direction and doubles. You both sprint for cover as a sheet of plywood sails past at head height.", effects: { conditionAdd: "suppressed", moraleMod: -15 }, tip: "Debris in the back eyewall kills. No chore is worth being outside when it arrives.", learnMore: ["ds003"] },
+          },
+        },
+      },
+      {
+        id: "s4", title: "Stage 4 — After the Water Leaves",
+        situation: "It's over. Your street is a swamp of mud, downed lines, and floating debris. Your neighbour's house took a metre of water. He's wading back in to save his photo albums.",
+        check: { stat: "knowledge", difficulty: 12, tag: "water", label: "Floodwater Hazards" },
+        randomEvents: [
+          { chance: 0.25, text: "A transformer up the street buzzes, pops, and goes dark. The lines in the water may still be live.", effect: { moraleMod: -8 } },
+        ],
+        choices: [
+          { id: "stop", label: "Stop him: floodwater is poison", desc: "Sewage, chemicals, hidden debris, live wires. Nothing in that house is worth the water.", statHint: "knowledge", tag: "water" },
+          { id: "gear", label: "Go in with him, properly equipped", desc: "Boots, gloves, a stick to probe ahead. Quick in-and-out for the essentials.", statHint: "endurance", tag: "utility" },
+          { id: "power", label: "Focus on power: get his generator running", desc: "The fridge is warming. A generator in the garage will save the food.", statHint: "knowledge", tag: "fire" },
+        ],
+        outcomes: {
+          stop: {
+            success: { narrative: "You talk him down with the facts: the water carries sewage and fuel, the outlets are live, and one submerged nail ends the day at the ER. The albums dry out later — mud washes off, infections don't.", effects: { moraleMod: 10, xpBonus: 20 }, tip: "Floodwater is a chemical and biological hazard plus electrocution risk. Wait for the water to recede and the power to be confirmed off.", learnMore: ["ds005", "hz003"] },
+            failure: { narrative: "He goes anyway. You spend the afternoon arguing at the waterline while he wades through it — the stress of watching someone you can't stop is its own injury.", effects: { moraleMod: -10 }, tip: "You can't physically stop everyone. State the risks clearly once, then protect yourself.", learnMore: ["ds005"] },
+          },
+          gear: {
+            success: { narrative: "Boots laced, gloves on, probing every step with a broken broom handle. You find the albums on the high shelf, dry — and you're out in nine minutes, washing down with clean water after.", effects: { xpBonus: 10 }, tip: "If entry is unavoidable: boots, gloves, probe ahead, wash everything after. Assume every wire is live.", learnMore: ["ds005", "w020"] },
+            failure: { narrative: "Three steps in, the broom handle finds nothing and your foot finds a submerged piece of guttering. The gash is deep, the water is filthy, and the clinic is underwater.", effects: { conditionAdd: "bleeding_slow", conditionAdd2: "infection_risk", moraleMod: -14 }, tip: "Hidden debris is the most common flood injury. This is why 'don't go in' is the default advice.", learnMore: ["ds005", "m006"] },
+          },
+          power: {
+            success: { narrative: "You set the generator up and something in your training screams — you move it outside, 6m from the house, exhaust pointed downwind. That night it runs clean and the fridge survives.", effects: { conditionAdd: "powered", moraleMod: 8, xpBonus: 10 }, tip: "Generators kill with carbon monoxide: outside only, far from windows and doors, exhaust downwind. Never in a garage, even with the door open.", learnMore: ["ep004", "s032"] },
+            failure: { narrative: "The generator goes in the garage 'with the door open.' By midnight the CO alarm — thank god for the CO alarm — is screaming and everyone's stumbling out into the yard with headaches.", effects: { conditionAdd: "toxic", moraleMod: -18 }, tip: "An open garage door does NOT make a generator safe. CO is invisible and odourless — outside, 6+ metres from the house, always.", learnMore: ["ep004"] },
+          },
+        },
+      },
+    ],
+  }
+,
+  {
+    id: "heatwave-blackout",
+    title: "The Hot Grid",
+    icon: "🌡️",
+    difficulty: 2,
+    phase: 0,
+    timeOfDay: "14:20",
+    environment: "Third-floor apartment, dense city. Grid down for 36 hours. No elevator, no AC, taps still running.",
+    weather: "41°C, humid, no wind. Third consecutive day. Nighttime low only 29°C.",
+    relatedDomain: "disasters",
+    intro: "The grid died yesterday and the heat didn't get the memo. Your apartment is a brick oven, the stairwell smells of other people's cooking, and your elderly neighbour hasn't answered her door since morning. Heat is the deadliest weather there is — it just kills quietly.",
+    stages: [
+      {
+        id: "s1", title: "Stage 1 — Day Two, 41°C",
+        situation: "Inside it's 34°C and climbing. You're sweating through your shirt, headachy, a little nauseous. The fridge died yesterday. Your phone is at 18%.",
+        check: { stat: "knowledge", difficulty: 11, tag: "medical", label: "Heat Triage" },
+        choices: [
+          { id: "cool", label: "Cool the body, not the room", desc: "Wet towel on neck and armpits, feet in cool water, sip steadily. Lower your core temp directly.", statHint: "knowledge", tag: "medical" },
+          { id: "fan", label: "Fan on full, windows open", desc: "Move the air. A breeze feels like cooling.", statHint: "endurance", tag: "utility" },
+          { id: "shower", label: "Cold shower, then rest", desc: "One hard reset under cold water, then lie still and conserve.", statHint: "composure", tag: "water" },
+        ],
+        outcomes: {
+          cool: {
+            success: { narrative: "Towel on the neck, feet in the basin, steady sips. Within half an hour the headache loosens its grip. You're not comfortable — you're functional, which is the actual goal.", effects: { conditionAdd: "cooled", moraleMod: 8, xpBonus: 20 }, tip: "In extreme heat, cool the person not the room: wet skin, neck, armpits, groin. Evaporation is your air conditioner.", learnMore: ["ds010", "m019"] },
+            failure: { narrative: "You wet the towel but keep moving — tidying, checking the phone, pacing. The cooling can't keep up with the activity and by evening you're dizzy every time you stand.", effects: { conditionAdd: "heat_strain", moraleMod: -8 }, tip: "Cooling only works if you stop generating heat. Rest is part of the treatment.", learnMore: ["ds010", "m019"] },
+          },
+          fan: {
+            success: { narrative: "The fan helps — because you're also misting your skin with a spray bottle. Moving air over wet skin evaporates heat fast. Dry skin in front of a fan at 41°C would be a different story.", effects: { conditionAdd: "cooled", xpBonus: 10 }, tip: "Fans help only if your skin is wet or the air is below ~40°C. Above that, a fan on dry skin blows hot air over you like a convection oven.", learnMore: ["ds010", "wx013"] },
+            failure: { narrative: "The fan roars all afternoon, blowing 41-degree air across dry skin. You feel breezy and keep working — and slide quietly from heat exhaustion toward something worse without noticing.", effects: { conditionAdd: "heat_strain", conditionAdd2: "dehydrated", moraleMod: -10 }, tip: "At extreme temperatures a fan gives false comfort. Wet the skin or don't count on it.", learnMore: ["ds010", "wx013"] },
+          },
+          shower: {
+            success: { narrative: "Three minutes under the cold tap drops your core temperature like a stone. You lie on the tile floor afterwards, still, letting the cool soak in. The afternoon becomes survivable.", effects: { conditionAdd: "cooled", conditionAdd2: "rested", moraleMod: 6, xpBonus: 10 }, tip: "Full cold-water immersion is the fastest field cooling there is. A foot or hand bath barely moves core temperature — don’t count on it as primary cooling, especially for older adults.", learnMore: ["m019", "ds010"] },
+            failure: { narrative: "The shower helps for twenty minutes. Then you're back in the hot room, wet hair drying, core temp climbing again — and you've used water you'll want later.", effects: { conditionAdd: "heat_strain", moraleMod: -6 }, tip: "One cooling session isn't a strategy. Heat management has to be continuous through the hot hours.", learnMore: ["ds010", "w016"] },
+          },
+        },
+      },
+      {
+        id: "s2", title: "Stage 2 — The Neighbour",
+        situation: "Mrs. Abernathy, 78, lives alone two doors down. She finally answers — confused, slurred, skin hot and DRY. She insists she's fine and tries to close the door.",
+        check: { stat: "composure", difficulty: 12, tag: "medical", label: "Heat Stroke Response" },
+        randomEvents: [
+          { chance: 0.2, text: "Her cat weaves between your ankles, meowing — its water bowl is empty and bone dry.", effect: { moraleMod: -6 } },
+        ],
+        choices: [
+          { id: "immerse", label: "Cool her aggressively, right now", desc: "Cold wet towels, fanning, ice from the dead freezer on neck and groin. Call emergency services. Don't wait.", statHint: "knowledge", tag: "medical" },
+          { id: "water", label: "Get water into her first", desc: "She's dehydrated. Fluids first, then cooling.", statHint: "composure", tag: "water" },
+          { id: "rest", label: "Help her lie down and rest", desc: "She's elderly and exhausted. Rest in a cool spot is the gentle option.", statHint: "composure", tag: "medical" },
+        ],
+        outcomes: {
+          immerse: {
+            success: { narrative: "You don't debate it — wet towels everywhere, the last ice on her neck, phone on speaker with dispatch while you fan her. Her confusion lifts as her skin cools. The paramedics arrive to a patient, not a body.", effects: { conditionAdd: "neighbor_helped", moraleMod: 16, xpBonus: 20 }, tip: "Heat stroke (hot, dry, confused) is a cool-FIRST emergency: aggressive cooling before and during transport. Every minute of high core temp damages organs.", learnMore: ["m019", "m032"] },
+            failure: { narrative: "You cool her hard but the ice runs out and the towels warm faster than you can re-wet them. She's still confused when the paramedics arrive — but she's alive, and that's the margin you bought.", effects: { conditionAdd: "neighbor_helped", moraleMod: 4 }, tip: "Sustained cooling is the hard part without ice. Rotate towels, keep fanning, never stop until help arrives.", learnMore: ["m019"] },
+          },
+          water: {
+            success: { narrative: "Small sips while you cool her with wet cloths — fluids help, but it's the cooling doing the real work. She stabilises.", effects: { conditionAdd: "neighbor_helped", xpBonus: 10 }, tip: "Fluids support recovery from heat illness, but in heat STROKE, cooling outranks drinking. Do both, cooling first.", learnMore: ["m019", "w020"] },
+            failure: { narrative: "She can't swallow properly — confused patients aspirate. Water dribbles down her chin while her core temp keeps climbing and you lose twenty minutes you didn't have.", effects: { conditionAdd: "deteriorated", moraleMod: -16 }, tip: "Never force fluids on a confused patient. Cool first, call for help, fluids only if fully alert and swallowing safely.", learnMore: ["m019", "m032"] },
+          },
+          rest: {
+            success: { narrative: "She lies down in the coolest corner and you stay with her, wetting her skin, watching. It's heat exhaustion, not stroke — rest and cooling turn it around.", effects: { conditionAdd: "neighbor_helped", xpBonus: 10 }, tip: "Rest works for heat exhaustion (sweating, weak, nauseous, still thinking clearly). But confusion or slurred speech means stroke — dry skin or not — and stroke needs aggression, not rest.", learnMore: ["m019"] },
+            failure: { narrative: "You let her rest. An hour later she's unconscious, burning up, not sweating at all. Rest was the wrong treatment for the wrong diagnosis.", effects: { conditionAdd: "deteriorated", conditionAdd2: "guilt_heavy", moraleMod: -22 }, tip: "The fork in the road: confusion, slurring, or any altered mental state means STROKE — cool aggressively and call now, whether the skin is dry or sweating. Sweating rules out nothing.", learnMore: ["m019", "m032"] },
+          },
+        },
+      },
+      {
+        id: "s3", title: "Stage 3 — Water Discipline",
+        situation: "Day three. The taps still run but the pressure is dropping and nobody knows for how long. You have 6 litres stored. Mrs. Abernathy needs watching. It's 40°C again.",
+        check: { stat: "endurance", difficulty: 11, tag: "water", label: "Rationing" },
+        choices: [
+          { id: "ration", label: "Strict rationing + electrolytes", desc: "Measured sips through the day, pinch of salt and sugar in each litre. Nothing wasted.", statHint: "knowledge", tag: "water" },
+          { id: "drink", label: "Drink freely while water flows", desc: "The taps work now. Hydrate hard today, worry about tomorrow tomorrow.", statHint: "endurance", tag: "water" },
+          { id: "share", label: "Split everything with the neighbours", desc: "Pool all water on the floor. Nobody goes thirsty on your watch.", statHint: "composure", tag: "water" },
+        ],
+        outcomes: {
+          ration: {
+            success: { narrative: "Two litres a day, steady, with salt and a spoon of sugar per litre. No cramps, no dizziness, and the stored water stretches to cover the worst days. Discipline tastes like nothing and works like everything.", effects: { conditionAdd: "ration_discipline", moraleMod: 8, xpBonus: 20 }, tip: "In heat, ration by schedule not thirst — and replace salt. Plain water without electrolytes, in volume, can dilute blood sodium.", learnMore: ["w020", "m006"] },
+            failure: { narrative: "The rationing holds until the hottest hour, when thirst wins and you drink half a day's ration at once. The schedule breaks and doesn't quite recover.", effects: { conditionAdd: "ration_broken", moraleMod: -6 }, tip: "Binge drinking breaks rationing and risks hyponatremia. Small, frequent, scheduled sips.", learnMore: ["w020", "m006"] },
+          },
+          drink: {
+            success: { narrative: "You drink deep while it flows and feel strong — and the taps hold through the day. Sometimes the gamble pays.", effects: { conditionAdd: "hydrated", moraleMod: 6 }, tip: "Drinking ahead of thirst is fine when supply is certain. The danger is assuming 'certain' without evidence.", learnMore: ["w020"] },
+            failure: { narrative: "By evening the pressure dies to a trickle. You've drunk your reserve into sweat and urine, and the stored 6 litres are 2. The taps may not come back tomorrow.", effects: { conditionAdd: "water_low", conditionAdd2: "dehydrated", moraleMod: -14 }, tip: "In an uncertain outage, stored water is savings: spend it on schedule, not on confidence.", learnMore: ["w016", "w017"] },
+          },
+          share: {
+            success: { narrative: "The floor pools everything: 22 litres, a roster, a schedule. Mrs. Abernathy gets priority sips, nobody hoards, and the shared discipline holds better than any solo plan.", effects: { conditionAdd: "pooled_resources", moraleMod: 12, xpBonus: 20 }, tip: "Pooled resources with clear rules outperform solo hoarding — if the rules are explicit and the vulnerable get priority.", learnMore: ["w016", "ep010"] },
+            failure: { narrative: "The pool works for a day. Then someone takes extra 'for the kids' and the trust evaporates faster than the water. You're left with less than you started and a floor full of resentment.", effects: { conditionAdd: "pool_broken", moraleMod: -14 }, tip: "Sharing without enforcement fails under stress. Agree the rules AND the consequences before the shortage bites.", learnMore: ["ep004"] },
+          },
+        },
+      },
+      {
+        id: "s4", title: "Stage 4 — Night Without Power",
+        situation: "29°C at midnight. The apartment won't cool. The fridge has been dead for two days and something in there smells wrong. You need sleep — tomorrow will be just as hot.",
+        check: { stat: "knowledge", difficulty: 11, tag: "shelter", label: "Hot Nights" },
+        choices: [
+          { id: "basement", label: "Sleep in the basement / lowest floor", desc: "Heat rises. The ground floor or basement is 5–8 degrees cooler. Take a mat down.", statHint: "knowledge", tag: "shelter" },
+          { id: "roof", label: "Sleep on the roof under the sky", desc: "Open air, maybe a breeze. Cooler than the brick box.", statHint: "endurance", tag: "shelter" },
+          { id: "fridge", label: "Triage the fridge, then sleep", desc: "Sort what's safe, cook what's borderline, toss the rest. Protect the food supply first.", statHint: "knowledge", tag: "utility" },
+        ],
+        outcomes: {
+          basement: {
+            success: { narrative: "The basement is 24°C — practically autumn. You sleep on a mat by the laundry room, actually sleep, and wake up human. Heat rises; wisdom descends.", effects: { conditionAdd: "rested", conditionAdd2: "cooled", moraleMod: 10, xpBonus: 20 }, tip: "In a heatwave, sleep low: basements and ground floors can be 5–8°C cooler than upper floors. Sleep is a survival resource.", learnMore: ["ds010", "s014"] },
+            failure: { narrative: "The basement is cooler but damp, loud with other tenants' anxiety, and you sleep in fragments. Better than the apartment, worse than real rest.", effects: { conditionAdd: "rested", moraleMod: -4 }, tip: "Cooler isn't automatically restful. Bring earplugs, a mat, and a plan for the damp.", learnMore: ["ds010"] },
+          },
+          roof: {
+            success: { narrative: "A real breeze at 2am, the city exhaling. You sleep under a sheet with the skyline blinking, and it's the best sleep of the week.", effects: { conditionAdd: "rested", moraleMod: 10, xpBonus: 10 }, tip: "Rooftops cool fast at night — but check access rules, railings, and security before making it a habit.", learnMore: ["ds010"] },
+            failure: { narrative: "The breeze dies at 3am and the roof radiates the day's heat back up through your mat. You bake from below, exposed, and slink back inside at dawn unrested.", effects: { conditionAdd: "fatigued", moraleMod: -8 }, tip: "Roofs store solar heat and release it all night. Concrete roofs are radiators, not sanctuaries.", learnMore: ["ds010", "wx013"] },
+          },
+          fridge: {
+            success: { narrative: "The sniff test with a thermometer's discipline: anything above 4°C for 2+ hours goes. You cook the borderline meat thoroughly tonight, keep the condiments, and the food supply is safe.", effects: { conditionAdd: "food_secure", moraleMod: 8, xpBonus: 10 }, tip: "Fridge rule: 4°C+ for over two hours = toss it. 'Cook it and it'll be fine' doesn't kill all toxins.", learnMore: ["ep004", "f007"] },
+            failure: { narrative: "You gamble on the chicken — it smelled okay-ish. At 4am your gut files a formal complaint and the heatwave gains a second front.", effects: { conditionAdd: "food_poisoning", conditionAdd2: "dehydrated", moraleMod: -16 }, tip: "Food poisoning plus heat plus limited water is a compound emergency. When in doubt, throw it out.", learnMore: ["ep004", "m006"] },
+          },
+        },
+      },
+    ],
+  }
+,
+  {
+    id: "structure-fire",
+    title: "Get Low, Get Out",
+    icon: "🧯",
+    difficulty: 3,
+    phase: 0,
+    timeOfDay: "02:14",
+    environment: "Fourth-floor apartment, 1960s brick building. One stairwell, no sprinkler system. Your flat, your cat, your neighbours.",
+    weather: "Clear night. Irrelevant — the weather is inside the building now.",
+    relatedDomain: "fire",
+    intro: "The alarm rips you out of sleep at 2:14am. There's shouting in the hall and a smell that doesn't belong. In a building fire, smoke kills more people than flame — and most of them die making one wrong decision in the first three minutes.",
+    stages: [
+      {
+        id: "s1", title: "Stage 1 — 02:14, the Alarm",
+        situation: "Alarm screaming. The hallway smells of burning plastic. Your cat is under the bed. Your door is closed; the hall beyond it is an unknown.",
+        check: { stat: "perception", difficulty: 11, tag: "utility", label: "Read the Fire" },
+        choices: [
+          { id: "door", label: "Check the door before opening", desc: "Back of the hand on the door, low and high. Look under it. Read the hallway before you enter it.", statHint: "perception", tag: "utility" },
+          { id: "out", label: "Grab the cat and go, now", desc: "Speed is life. Out the door and down the stairs before it gets worse.", statHint: "endurance", tag: "utility" },
+          { id: "balcony", label: "Out to the balcony to look", desc: "See what's burning before deciding. Information first.", statHint: "perception", tag: "signal" },
+        ],
+        outcomes: {
+          door: {
+            success: { narrative: "Back of the hand: cool at the bottom, warm at the top. No smoke under the door. You crack it two inches — the hallway is hazy but passable, stairwell door visible. You move with information instead of hope.", effects: { conditionAdd: "exit_visible", moraleMod: 8, xpBonus: 20 }, tip: "Back of the hand on the door (more heat-sensitive), check low and high, look under it. A hot door means: don't open it.", learnMore: ["f010", "ep005"] },
+            failure: { narrative: "You check the door carefully — and waste ninety seconds doing it while the hallway fills. By the time you open it, the haze is a wall. Careful, but slow.", effects: { conditionAdd: "delayed", moraleMod: -6 }, tip: "Read fast: door check takes ten seconds, not two minutes. Speed and information have to move together.", learnMore: ["f010"] },
+          },
+          out: {
+            success: { narrative: "Cat in the pillowcase, keys in hand, you're in the hallway in forty seconds flat. The air is still breathable at knee height. Speed was the right call — this time.", effects: { conditionAdd: "exit_visible", xpBonus: 10 }, tip: "Fast evacuation is right when the path is clear. The gamble is opening the door blind — which is why the check comes first.", learnMore: ["f010", "ep005"] },
+            failure: { narrative: "You throw the door open into a hallway full of black smoke — and it pours into your flat behind you. You've lost your clean air and your refuge in one motion.", effects: { conditionAdd: "smoke_inhalation", conditionAdd2: "sealed_broken", moraleMod: -14 }, tip: "Opening a door on a smoke-filled hall feeds the fire your apartment's air and fills your refuge with smoke. Check first, always.", learnMore: ["f010", "f018"] },
+          },
+          balcony: {
+            success: { narrative: "From the balcony you see it: flames on the second floor, far stairwell side. Your stairwell is clear. You go back in, close the balcony door, and take the stairs with a known-good route.", effects: { conditionAdd: "exit_visible", xpBonus: 10 }, tip: "Knowing where the fire IS tells you which exits are viable. Thirty seconds of reconnaissance can save the evacuation.", learnMore: ["f010"] },
+            failure: { narrative: "The balcony faces the wrong side — you see nothing but night and other people's lit windows. Two minutes spent learning nothing while the hallway deteriorates.", effects: { conditionAdd: "delayed", moraleMod: -8 }, tip: "Reconnaissance has a budget. If the balcony doesn't answer the question fast, go back to the door check.", learnMore: ["ep005"] },
+          },
+        },
+      },
+      {
+        id: "s2", title: "Stage 2 — The Stairwell",
+        situation: "The hallway is filling from above. The stairwell door is 10 metres away. Below: four floors to the street. Above: the fire. The elevator dings.",
+        check: { stat: "composure", difficulty: 12, tag: "shelter", label: "Descend" },
+        choices: [
+          { id: "stairs", label: "Stairs down, staying low", desc: "Below the smoke layer, hand on the rail, steady pace. Close every door behind you.", statHint: "composure", tag: "shelter" },
+          { id: "elevator", label: "Take the elevator — it's faster", desc: "Four floors in ten seconds. The doors just opened.", statHint: "endurance", tag: "utility" },
+          { id: "up", label: "Up to the roof instead", desc: "Above the fire, fresh air, visible to rescuers. The roof is the classic escape.", statHint: "strength", tag: "shelter" },
+        ],
+        outcomes: {
+          stairs: {
+            success: { narrative: "Low, steady, hand on the rail. You close the stairwell door behind you — compartmentation holds, the smoke stays upstairs. Four floors, two minutes, street air. Textbook.", effects: { conditionAdd: "evacuated_clean", moraleMod: 12, xpBonus: 20 }, tip: "Stairs, low, doors closed behind you. Closed doors are fire's worst enemy — they starve it of oxygen and block smoke.", learnMore: ["f010", "ep005"] },
+            failure: { narrative: "Halfway down, someone has propped the stairwell door open and smoke is pouring in from the floor above. You push through coughing, eyes streaming, but you keep moving down and out.", effects: { conditionAdd: "smoke_inhalation", moraleMod: -8 }, tip: "Propped-open fire doors kill. If you see one, close it — you may save everyone above you.", learnMore: ["f010"] },
+          },
+          elevator: {
+            success: { narrative: "The car comes, the doors close, you descend — and step out into the lobby as the power flickers. You made it. You will never do that again.", effects: { moraleMod: -4 }, tip: "You got lucky. Elevators in fires fail: power cuts trap you, shafts fill with smoke, doors open onto the fire floor. Never again.", learnMore: ["f010"] },
+            failure: { narrative: "Between the third and second floor, the lights die. The car stops. You're in a steel box in a burning building with no way out, and the smoke is coming through the vents.", effects: { conditionAdd: "trapped", conditionAdd2: "smoke_inhalation", moraleMod: -22 }, tip: "This is why: power fails, cars stall between floors, shafts act as chimneys. Elevators are never an evacuation route in fire.", learnMore: ["f010", "ep005"] },
+          },
+          up: {
+            success: { narrative: "The roof door is unlocked — some are, some aren't. Fresh air, city lights, and you flag the first ladder truck with your phone light. The roof was the right call because the stairs below were already lost.", effects: { conditionAdd: "evacuated_clean", moraleMod: 10, xpBonus: 10 }, tip: "Roof refuge works only if the stairs down are already impassable AND the roof is accessible. It's a last resort, not a plan A.", learnMore: ["f010"] },
+            failure: { narrative: "The roof door is locked. Behind you the stairwell is filling. You're caught between a locked door and rising smoke with nowhere to go but back down through it.", effects: { conditionAdd: "trapped", conditionAdd2: "smoke_inhalation", moraleMod: -18 }, tip: "Locked roof doors kill. Never go up unless you've confirmed the roof is accessible — stairs down is the default.", learnMore: ["f010", "ep005"] },
+          },
+        },
+      },
+      {
+        id: "s3", title: "Stage 3 — Trapped or Out?",
+        situation: "You're out — but your neighbour's kid is at the window on the third floor, screaming. The stairwell is now impassable. Firefighters are two minutes out. The parents are frantic.",
+        check: { stat: "knowledge", difficulty: 12, tag: "fire", label: "Rescue Decision" },
+        randomEvents: [
+          { chance: 0.25, text: "A window blows out on the second floor and a tongue of flame licks up the facade.", effect: { moraleMod: -10 } },
+        ],
+        choices: [
+          { id: "guide", label: "Talk the kid through sealing the room", desc: "Shout instructions: close the door, block it with wet towels, get low, signal at the window. Buy two minutes.", statHint: "knowledge", tag: "fire" },
+          { id: "backin", label: "Go back in for the kid", desc: "Two minutes is too long. You know the stairs. Go.", statHint: "strength", tag: "fire" },
+          { id: "ladder", label: "Find a ladder — trucks, balconies, anything", desc: "Third floor is reachable. Extension ladder from the maintenance shed, or climb the balconies.", statHint: "perception", tag: "utility" },
+        ],
+        outcomes: {
+          guide: {
+            success: { narrative: "Your voice cuts through the panic: 'Close your door! Towels under it — wet! Get on the floor by the window and wave!' The kid does it. The sealed room holds. The ladder truck arrives to a live, visible, reachable child.", effects: { conditionAdd: "kid_saved", moraleMod: 18, xpBonus: 20 }, tip: "A sealed room buys 10–15 minutes: closed door, gaps blocked with wet cloth, low, signalling at the window. It's the highest-survival trapped-in-place protocol.", learnMore: ["f010", "f042"] },
+            failure: { narrative: "The kid panics and can't follow — keeps standing, keeps screaming at the open door. You keep talking, keep it simple, one instruction at a time, until the firefighters' ladder reaches the window.", effects: { moraleMod: 2 }, tip: "Panicked people can't process sequences. One instruction. Repeat. Confirm. Next instruction.", learnMore: ["f010", "f042"] },
+          },
+          backin: {
+            success: { narrative: "Wet shirt over your face, low along the wall — you know this stairwell. You reach the kid's door, seal it behind you both, and ride out the two minutes until the ladder arrives. Heroic. Stupid. It worked.", effects: { conditionAdd: "smoke_inhalation", moraleMod: 12, xpBonus: 10 }, tip: "Re-entry kills more would-be rescuers than fire kills victims. If you go, it's low, fast, wet cover, and only when you know the layout blind.", learnMore: ["f010"] },
+            failure: { narrative: "The stairwell you knew is gone — visibility zero, heat like an oven door. You collapse on the second-floor landing. Now there are two victims, and the crew has to choose.", effects: { conditionAdd: "smoke_inhalation", conditionAdd2: "burns_suffered", moraleMod: -25, fatal: false }, tip: "Firefighters have a saying: don't make two victims. Untrained re-entry into a working fire is how rescuers die.", learnMore: ["f010", "m005"] },
+          },
+          ladder: {
+            success: { narrative: "The maintenance shed has a 7m extension ladder. You and the father foot it while a neighbour climbs — steady, rungs, window. The kid comes down into waiting arms as the trucks roll in.", effects: { conditionAdd: "kid_saved", moraleMod: 14, xpBonus: 20 }, tip: "Third floor ≈ 7–9m. An extension ladder, footed by two people, is a real rescue tool — if you can get it up in under two minutes.", learnMore: ["f010", "ep005"] },
+            failure: { narrative: "The shed is locked. The balconies don't line up — there's a 2m gap and a fall onto concrete between. The ladder idea dies and you're back to shouting instructions through the panic.", effects: { moraleMod: -8 }, tip: "Improvised rescue has to be verified, not hoped. Check the ladder exists BEFORE the fire, not during.", learnMore: ["ep005"] },
+          },
+        },
+      },
+      {
+        id: "s4", title: "Stage 4 — Across the Street",
+        situation: "You're across the street with the other residents. The building burns. Your neighbour is coughing hard, grey-faced. Someone's teenager is crying about the cat still inside. Sirens everywhere.",
+        check: { stat: "composure", difficulty: 11, tag: "medical", label: "Aftermath" },
+        choices: [
+          { id: "airway", label: "Sit the cougher down, watch his breathing", desc: "Smoke inhalation can worsen over hours. Keep him still, upright, monitored until medics triage him.", statHint: "knowledge", tag: "medical" },
+          { id: "cat", label: "Go back for the teenager's cat", desc: "It's just inside the lobby. Thirty seconds, in and out.", statHint: "strength", tag: "utility" },
+          { id: "account", label: "Run the headcount for firefighters", desc: "Who's out, who's missing, which flats. Give the crew the information they need.", statHint: "perception", tag: "signal" },
+        ],
+        outcomes: {
+          airway: {
+            success: { narrative: "You sit him down, keep him calm and still, and flag the paramedics with the magic words: 'prolonged smoke exposure, grey sputum.' He's on oxygen in minutes. Smoke injuries bloom late — you caught the window.", effects: { conditionAdd: "neighbor_helped", moraleMod: 10, xpBonus: 20 }, tip: "Smoke inhalation worsens over 6–24 hours: swelling airways, delayed pulmonary edema. Anyone with heavy exposure needs medical evaluation even if they 'feel fine.'", learnMore: ["m005", "f018"] },
+            failure: { narrative: "He waves you off — 'just a cough.' Three hours later at the shelter he's struggling to breathe and gets ambulanced out. You tried; adults get to refuse.", effects: { moraleMod: -8 }, tip: "You can't force care on a refusing adult. State the risk clearly once — 'this can kill you tonight' — and tell the medics.", learnMore: ["m005"] },
+          },
+          cat: {
+            success: { narrative: "The lobby is clear, the cat is under the mailboxes, and you're out in twenty seconds. The teenager stops crying. Sometimes the small rescues are the ones that matter.", effects: { moraleMod: 12, xpBonus: 10 }, tip: "Re-entry is only defensible when the space is verified clear and the time is seconds. The lobby qualified; the stairwell wouldn't have.", learnMore: ["f010"] },
+            failure: { narrative: "The lobby was clear when you entered. Then the stairwell door sighed open and smoke rolled down like water. You come out on hands and knees, no cat, lungs full of it.", effects: { conditionAdd: "smoke_inhalation", moraleMod: -16 }, tip: "Conditions change in seconds in a working fire. 'It was clear a minute ago' is how re-entries go wrong.", learnMore: ["f010", "f018"] },
+          },
+          account: {
+            success: { narrative: "'Fourth floor: the Nguyens are out, Mr. Abernathy's flat was empty, 3B kid is at the window — ladder's on it.' The incident commander nods once and redirects a crew. Your thirty seconds of clarity moves resources.", effects: { conditionAdd: "responders_informed", moraleMod: 12, xpBonus: 20 }, tip: "Firefighters need: who's missing, where, and what's in the building. A civilian headcount is genuine incident intelligence.", learnMore: ["ep005", "f010"] },
+            failure: { narrative: "You try the headcount but nobody knows the new tenants in 2A and the panic makes every answer uncertain. You hand over a partial list — better than nothing, worse than enough.", effects: { moraleMod: -4 }, tip: "Know your neighbours BEFORE the fire. A floor contact list on the stairwell wall costs nothing.", learnMore: ["ep005"] },
+          },
+        },
+      },
+    ],
+  }
 ];
 
 
