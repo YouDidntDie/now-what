@@ -14271,7 +14271,7 @@ function situationBoardHTML(stage) {
       ${kit.length ? `
       <div><span class="card-label">What you have</span></div>
       <div class="sb-kit">
-        ${kit.map(item => `<span class="inv-tray-item ${item.remaining <= 0 ? "inv-depleted" : ""}" title="${item.name}: ${item.desc}">${item.icon}<span class="inv-uses">${item.remaining >= 99 ? "∞" : item.remaining}</span></span>`).join("")}
+        ${kit.map(item => `<span class="inv-tray-item ${item.remaining <= 0 ? "inv-depleted" : ""}" title="${item.name}">${item.icon}<span class="inv-uses">${item.remaining >= 99 ? "∞" : item.remaining}</span></span>`).join("")}
       </div>` : ""}
       ${stage.randomEvents && stage.randomEvents.length ? `
       <div class="sb-unknown">? Unknown factors in play — not everything here is knowable in advance. Decide with what you have.</div>` : ""}
