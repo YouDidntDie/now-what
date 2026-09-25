@@ -16214,7 +16214,8 @@ function renderProfile(root, opts = {}) {
     }
     clearTimeout(resetTimer);
     try {
-      [SAVE_KEY, BADGE_SAVE_KEY, LEARN_SAVE_KEY, ONBOARD_KEY, "yddnw_visited", "yddnw_last_screen"]
+      [SAVE_KEY, BADGE_SAVE_KEY, LEARN_SAVE_KEY, ONBOARD_KEY, "yddnw_visited", "yddnw_last_screen",
+       READ_ARTICLES_KEY, REGION_READS_KEY, BIOME_READS_KEY]
         .forEach(k => localStorage.removeItem(k));
     } catch(e) {}
     disarmReset();
@@ -16791,6 +16792,25 @@ function articlesForBiome(biome) {
   } catch(e){ return []; }
 }
 function getBiomeReads() { try { return JSON.parse(localStorage.getItem(BIOME_READS_KEY) || "{}"); } catch(e){ return {}; } }
+
+// One-time migration (v2.7.1): the fuzzy-match era inflated region/biome
+// unlock credits with phantom reads. Rebuild the derived credit keys from the
+// genuine article-read history — the article list is truth; region-view
+// credits from the polluted era are dropped for a clean slate.
+function migrateUnlockCredits() {
+  try {
+    if (localStorage.getItem("yddnw_unlock_migrated_v2")) return;
+    const read = JSON.parse(localStorage.getItem(READ_ARTICLES_KEY) || "{}");
+    const br = {};
+    for (const id of Object.keys(read)) {
+      const biomes = (typeof articleBiomes === "function") ? articleBiomes(id) : [];
+      for (const b of biomes) br[b] = (br[b] || 0) + 1;
+    }
+    localStorage.setItem(BIOME_READS_KEY, JSON.stringify(br));
+    localStorage.setItem(REGION_READS_KEY, JSON.stringify({}));
+    localStorage.setItem("yddnw_unlock_migrated_v2", "1");
+  } catch(e){}
+}
 const BIOME_LABELS = {
   alpine: "high mountains", arctic: "the arctic", boreal: "northern forests",
   coastal: "the coasts", desert: "deserts", grassland: "grasslands",
@@ -16880,30 +16900,44 @@ function hybridUnlock() {
 }
 
 // ── Read detection: scrolled 80% through an article, or 45s on the page ─────
+function checkReadDepth() {
+  try {
+    const id = window._readTrackId;
+    if (!id || store?.ui?.currentArticleId !== id) return false;
+    const el = document.getElementById("screen");
+    if (!el || !el.scrollHeight) return false;
+    return (el.scrollTop + el.clientHeight) >= el.scrollHeight * 0.8;
+  } catch(e){ return false; }
+}
+function finishArticleRead(articleId) {
+  try {
+    if (window._readTrackId === articleId && store?.ui?.currentArticleId === articleId) {
+      markArticleRead(articleId);
+    }
+  } catch(e){}
+  window._readTrackId = null;
+  clearTimeout(window._readTrackTimer);
+  clearInterval(window._readTrackPoll);
+}
 function armArticleReadTracking(articleId) {
   try {
     if (store && store.ui) store.ui.currentArticleId = articleId;
     window._readTrackId = articleId;
     clearTimeout(window._readTrackTimer);
-    window._readTrackTimer = setTimeout(() => {
-      if (window._readTrackId === articleId && store?.ui?.currentArticleId === articleId) {
-        markArticleRead(articleId);
-      }
-    }, 45000);
+    clearInterval(window._readTrackPoll);
+    // Time-based fallback: 45s on the page counts as a read.
+    window._readTrackTimer = setTimeout(() => finishArticleRead(articleId), 45000);
+    // Depth polling backs up the scroll listener — some environments deliver
+    // keyboard-driven scrolling without firing scroll events on #screen.
+    window._readTrackPoll = setInterval(() => {
+      if (checkReadDepth()) finishArticleRead(articleId);
+      else if (window._readTrackId !== articleId) clearInterval(window._readTrackPoll);
+    }, 1500);
   } catch(e){}
 }
 if (typeof document !== "undefined") {
   document.getElementById("screen")?.addEventListener("scroll", () => {
-    try {
-      const id = window._readTrackId;
-      if (!id || store?.ui?.currentArticleId !== id) return;
-      const el = document.getElementById("screen");
-      if (!el || !el.scrollHeight) return;
-      if (el.scrollTop + el.clientHeight >= el.scrollHeight * 0.8) {
-        markArticleRead(id);
-        window._readTrackId = null;
-      }
-    } catch(e){}
+    if (checkReadDepth()) finishArticleRead(window._readTrackId);
   });
 }
 
@@ -17534,10 +17568,14 @@ function bindAtlasSearch(root, normalSelector) {
 function atlasJumpTo(root, res) {
   const c0 = { name: res.cont.name, type: "continent", ref: res.cont };
   const c1 = { name: res.country.name, type: "country", ref: res.country };
-  const c2 = { name: res.region.name, type: "region", ref: res.region };
   // Cities have no standalone detail view — land on the parent region instead.
-  if (res.kind === "country")      atlasState.stack = [c0, c1];
-  else                            atlasState.stack = [c0, c1, c2];
+  // (Country results carry no region — accessing res.region.name threw and
+  // killed the click handler, so search rows did nothing.)
+  if (res.kind === "country") atlasState.stack = [c0, c1];
+  else {
+    const c2 = { name: res.region.name, type: "region", ref: res.region };
+    atlasState.stack = [c0, c1, c2];
+  }
   renderAtlas(root);
 }
 
@@ -17709,6 +17747,7 @@ function goTo(screenName, opts = {}) {
   navCurrent = { screen: screenName, opts: { ...opts } };
   renderScreen(screenName, navCurrent.opts);
   updateNavChrome();
+  if (typeof closeDrawer === "function") { try { closeDrawer(); } catch(e){} }
 }
 
 function sameNavEntry(a, b) {
@@ -17813,7 +17852,7 @@ function runBootSequence() {
     ["blank"],
     ["line", "mounting /dev/optimism", "NOT FOUND", "fail"],
     ["line", "encyclopedia", "605 articles \u00b7 32 domains", "ok"],
-    ["line", "simulator", scenCount + " scenarios loaded", "ok"],
+    ["line", "simulator", scenCount + " scenarios + hybrid procedural", "ok"],
     ["line", "atlas", "200 regions mapped", "ok"],
     ["line", "calibrating will_to_live", "7%", "warn"],
     ["line", "brewing coffee", "FAILED (no water, no power, no beans)", "fail"],
@@ -17890,7 +17929,12 @@ function runBootSequence() {
 }
 
 async function init() {
-  document.getElementById("menu-btn").addEventListener("click", openDrawer);
+  document.getElementById("menu-btn").addEventListener("click", () => {
+    if (store.ui.drawerOpen) closeDrawer(); else openDrawer();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && store.ui.drawerOpen) closeDrawer();
+  });
   document.getElementById("back-btn").addEventListener("click", goBack);
   overlay().addEventListener("click", closeDrawer);
   tabBtns().forEach(btn => btn.addEventListener("click", () => goTo(btn.dataset.screen)));
@@ -17920,6 +17964,7 @@ async function init() {
     updateHeader();
     await loadAtlas();
     buildCrosslinkIndexes();
+    migrateUnlockCredits();
     goTo(store.ui.activeScreen, { replace: true });
   } catch (err) {
     console.error("Content load failed:", err);
