@@ -14097,8 +14097,16 @@ function renderMenu(root) {
 
   root.querySelectorAll(".scenario-row:not(.scenario-row-locked)").forEach(btn =>
     btn.addEventListener("click", () => startScenarioById(root, btn.dataset.id)));
+  // Locked cards route to the Library with a biome-specific reading suggestion:
+  // the search box is pre-filled so the articles that unlock this scenario
+  // are exactly what the user sees first.
   root.querySelectorAll(".scenario-row-locked").forEach(btn =>
-    btn.addEventListener("click", () => goTo("library")));
+    btn.addEventListener("click", () => {
+      const sid = btn.dataset.locked;
+      const sc = (typeof SCENARIOS !== "undefined") ? SCENARIOS.find(s => s.id === sid) : null;
+      const biome = sc ? scenarioBiome(sc) : null;
+      goTo("library", { tab: "articles", searchQuery: biome ? (BIOME_SEARCH_TERM[biome] || biome) : "" });
+    }));
 }
 
 function buildLegacyEnv(scenario) {
@@ -16679,15 +16687,55 @@ function buySimItem(itemId) {
 // the simulator is never a dead end, and scenarios already survived stay open.
 const READ_ARTICLES_KEY = "yddnw_read_articles";
 const REGION_READS_KEY  = "yddnw_region_reads";
+const BIOME_READS_KEY   = "yddnw_biome_reads_v1";
 const UNLOCK_STARTER_IDS = ["winter-vehicle","lost-trail","desert-breakdown","urban-collapse","coastal-stranding","jungle-fever"];
 const UNLOCK_READS_REQUIRED = 3;
 const HYBRID_RUNS_REQUIRED = 5;
+// Article -> biome affinity, from the article's own title/summary. Reading an
+// article grants one unlock credit toward each of its biomes (max 2), so the
+// lock message "read N more articles about jungles" is literally true.
+const BIOME_ARTICLE_HINTS = [
+  ["jungle", ["jungle","rainforest","rain forest"]],
+  ["highland", ["highland","highlands"]],
+  ["alpine", ["alpine","montane","himalaya","andes","mountain","mountains"]],
+  ["desert", ["desert","arid","dune","sahara","sahel","sonoran"]],
+  ["coastal", ["coast","coastal","beach","shore","littoral"]],
+  ["island", ["island","archipelago"]],
+  ["wetland", ["wetland","swamp","marsh","mangrove","bog","everglade"]],
+  ["grassland", ["grassland","steppe","prairie","pampas","veld"]],
+  ["savanna", ["savanna","savannah"]],
+  ["boreal", ["boreal","taiga","conifer"]],
+  ["temperate_forest", ["temperate forest","deciduous forest","woodland","deciduous"]],
+  ["ocean", ["ocean","pelagic","open sea","offshore"]],
+  ["urban", ["urban","city","suburb","downtown"]],
+  ["arctic", ["arctic","tundra","polar"]],
+];
+function articleBiomes(articleId) {
+  try {
+    const a = (typeof store !== "undefined" && store.articlesById) ? store.articlesById[articleId] : null;
+    if (!a) return [];
+    const text = ((a.title || "") + " " + (a.summary || "")).toLowerCase();
+    const out = [];
+    for (const [biome, hints] of BIOME_ARTICLE_HINTS) {
+      if (hints.some(h => text.includes(h))) out.push(biome);
+    }
+    return out.slice(0, 2);
+  } catch(e){ return []; }
+}
+function getBiomeReads() { try { return JSON.parse(localStorage.getItem(BIOME_READS_KEY) || "{}"); } catch(e){ return {}; } }
 const BIOME_LABELS = {
   alpine: "high mountains", arctic: "the arctic", boreal: "northern forests",
   coastal: "the coasts", desert: "deserts", grassland: "grasslands",
   highland: "highlands", island: "islands", jungle: "jungles",
   ocean: "open ocean", savanna: "savannas", temperate_forest: "temperate forests",
   urban: "urban areas", wetland: "wetlands",
+};
+// Search term pre-filled in the Library when a locked card of that biome is clicked.
+const BIOME_SEARCH_TERM = {
+  alpine: "alpine", arctic: "arctic", boreal: "boreal", coastal: "coast",
+  desert: "desert", grassland: "grassland", highland: "highland",
+  island: "island", jungle: "jungle", ocean: "ocean", savanna: "savanna",
+  temperate_forest: "temperate", urban: "urban", wetland: "wetland",
 };
 
 function getReadArticles() { try { return JSON.parse(localStorage.getItem(READ_ARTICLES_KEY) || "{}"); } catch(e){ return {}; } }
@@ -16702,8 +16750,9 @@ function getRegionReads()  {
   } catch(e){ return {}; }
 }
 
-// One credit per article. Each credited article fans out to the Atlas regions
-// its keywords match, so reading about Laos feeds highland + jungle scenarios.
+// One credit per article. Each credited article grants one unlock credit toward
+// each of its own biomes; viewing an Atlas region separately credits that
+// region's biomes once.
 function markArticleRead(articleId) {
   if (!articleId) return;
   try {
@@ -16711,11 +16760,11 @@ function markArticleRead(articleId) {
     if (read[articleId]) return;
     read[articleId] = Date.now();
     localStorage.setItem(READ_ARTICLES_KEY, JSON.stringify(read));
-    const regs = (typeof articleRegionsFor === "function") ? articleRegionsFor(articleId) : [];
-    if (regs && regs.length) {
-      const rr = getRegionReads();
-      for (const r of regs) rr[r.regionId] = (rr[r.regionId] || 0) + 1;
-      localStorage.setItem(REGION_READS_KEY, JSON.stringify(rr));
+    const biomes = (typeof articleBiomes === "function") ? articleBiomes(articleId) : [];
+    if (biomes.length) {
+      const br = getBiomeReads();
+      for (const b of biomes) br[b] = (br[b] || 0) + 1;
+      localStorage.setItem(BIOME_READS_KEY, JSON.stringify(br));
     }
   } catch(e){}
 }
@@ -16734,13 +16783,15 @@ function markRegionViewed(regionId) {
 function scenarioBiome(sc) { return (sc.biomes && sc.biomes[0]) || null; }
 function biomeLabel(b) { return BIOME_LABELS[b] || b || "the field"; }
 
-// Total reads across every region sharing the scenario's primary biome.
+// Total reads for the scenario's primary biome: article credits for that
+// biome plus one credit per viewed Atlas region carrying that biome.
 function scenarioReads(sc) {
   const biome = scenarioBiome(sc);
   if (!biome) return 0;
+  let total = 0;
+  try { total += (getBiomeReads()[biome] || 0); } catch(e){}
   const rr = getRegionReads();
   const rb = (typeof XL !== "undefined" && XL.regionBiomes) || {};
-  let total = 0;
   for (const id of Object.keys(rb)) {
     if ((rb[id] || []).includes(biome)) total += (rr[id] || 0);
   }
@@ -18404,6 +18455,8 @@ function renderLibraryScreen(root, opts = {}) {
   // previously opened article would reopen when returning to the grid.
   store.ui.currentDomainId  = opts.domainId  || null;
   store.ui.currentArticleId = opts.articleId || null;
+  // A locked scenario card can route here with a biome reading suggestion.
+  if (typeof opts.searchQuery === "string") store.ui.searchQuery = opts.searchQuery;
   const content = renderHubShell(root, LIBRARY_TABS, tab,
     (t) => goTo("library", { tab: t, replace: true }));
   if (tab === "articles") {
