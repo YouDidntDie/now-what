@@ -142,9 +142,9 @@ body::before {
   50% { transform: translateX(-1px); }
   75% { transform: translateX(0); }
 }
-#boot-lines { animation: boot-glitch 1.2s steps(2, end) 2; }
+#boot-line-one { animation: boot-glitch 1.2s steps(2, end) 2; }
 @media (prefers-reduced-motion: reduce) {
-  #boot-lines { animation: none; }
+  #boot-line-one { animation: none; }
   .boot-term::before, .boot-term::after { display: none; }
 }
 .phosphor-note {
@@ -157,11 +157,16 @@ body::before {
 }
 .phosphor-warn[hidden] { display: none; }
 
-/* Boot: loading bar + scrollable log region so the sequence stays in frame
-   on mobile. Dotted leaders flex instead of overflowing the viewport. */
+/* Boot: one status line at a time under a fixed centered bar + data counter.
+   Nothing scrolls, nothing overlaps, everything stays in frame on mobile.
+   Dotted leaders flex instead of overflowing the viewport. */
+.boot-mid {
+  position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%);
+  width: min(420px, 88%); text-align: center;
+}
 .boot-bar {
   height: 8px; border: 1px solid var(--border2);
-  margin-bottom: 14px;
+  width: min(320px, 72%); margin: 0 auto 18px;
 }
 .boot-bar-fill {
   height: 100%; width: 0%;
@@ -169,31 +174,26 @@ body::before {
   box-shadow: 0 0 8px color-mix(in srgb, var(--phosphor) 60%, transparent);
   transition: width .35s ease;
 }
-#boot-lines {
-  max-height: 52vh; overflow-y: auto;
-  scrollbar-width: none;
+.boot-status { min-height: 64px; }
+#boot-line-one { font-size: 13px; line-height: 1.9; }
+#boot-data {
+  font-size: 10px; letter-spacing: .12em; color: var(--text-faint);
+  margin-top: 8px; font-family: var(--font-m);
 }
-#boot-lines::-webkit-scrollbar { display: none; }
-.boot-line.bl-row { display: flex; align-items: baseline; gap: 6px; white-space: normal; }
+.boot-line.bl-row { display: flex; align-items: baseline; gap: 6px; white-space: normal; text-align: left; }
 .bl-label { flex: 0 0 auto; }
 .bl-dots {
   flex: 1 1 12px; border-bottom: 1px dotted var(--text-faint);
   transform: translateY(-3px); min-width: 12px;
 }
 .bl-status { flex: 0 1 auto; text-align: right; overflow-wrap: break-word; }
-/* Fixed frame: the bar never rides up as lines append; log text centered */
+/* Fixed frame: the bar never moves; prompt sits at the bottom */
 .boot-term {
   display: flex; flex-direction: column;
   height: min(64vh, 460px);
 }
-#boot-lines { flex: 0 1 auto; max-height: 30vh; text-align: center; }
 .boot-prompt { flex: 0 0 auto; }
-/* Bar truly fixed: absolute at vertical center, log stacks at the bottom */
 .boot-term { justify-content: flex-end; }
-.boot-bar {
-  position: absolute; top: 38%; left: 50%; transform: translate(-50%, -50%);
-  width: min(320px, 72%); margin: 0; flex: none;
-}
 
 /* ── Reset ──────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2996,8 +2996,13 @@ body::after {
   <!-- ── Boot sequence overlay ─────────────────────────────────────────── -->
   <div id="boot-overlay" role="status" aria-label="Loading You Didn't Die, Now What?">
     <div class="boot-term">
-      <div class="boot-bar" aria-hidden="true"><div class="boot-bar-fill" id="boot-bar-fill"></div></div>
-      <div id="boot-lines"></div>
+      <div class="boot-mid">
+        <div class="boot-bar" aria-hidden="true"><div class="boot-bar-fill" id="boot-bar-fill"></div></div>
+        <div class="boot-status">
+          <div id="boot-line-one"></div>
+          <div id="boot-data"></div>
+        </div>
+      </div>
       <div id="boot-prompt" class="boot-prompt" hidden>
       <button id="boot-enter" class="boot-enter-btn" type="button">TAP TO ENTER</button>
       <div class="boot-hint">or tap anywhere</div>
@@ -17937,8 +17942,10 @@ function initPhosphor() {
 function runBootSequence() {
   const overlay = document.getElementById("boot-overlay");
   if (!overlay) return;
-  const linesEl = document.getElementById("boot-lines");
+  const oneEl = document.getElementById("boot-line-one");
+  const dataEl = document.getElementById("boot-data");
   const promptEl = document.getElementById("boot-prompt");
+  const fillEl = document.getElementById("boot-bar-fill");
   const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const scenCount = (typeof SCENARIOS !== "undefined" && SCENARIOS.length) ? SCENARIOS.length : 64;
@@ -17972,21 +17979,21 @@ function runBootSequence() {
   catch (e) { seq = FULL; }
 
   const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const renderLine = (spec) => {
-    const div = document.createElement("div");
+  const DATA_TOTAL = 668130;
+  const fmtData = (n) => "ARCHIVE " + String(n).padStart(6, "0") + " / " + DATA_TOTAL;
+  // One status line at a time under the bar (no scrolling log, no overlap)
+  const renderSingle = (spec) => {
     const kind = spec[0];
-    if (kind === "blank") { div.className = "boot-line"; div.innerHTML = "&nbsp;"; }
+    if (kind === "blank") { oneEl.className = ""; oneEl.innerHTML = "&nbsp;"; }
     else if (kind === "line") {
-      const label = spec[1], status = spec[2], cls = spec[3];
-      div.className = "boot-line bl-row";
-      div.innerHTML = '<span class="bl-label">' + esc("> " + label) + "</span>" +
+      oneEl.className = "boot-line bl-row";
+      oneEl.innerHTML = '<span class="bl-label">' + esc("> " + spec[1]) + "</span>" +
         '<span class="bl-dots" aria-hidden="true"></span>' +
-        '<span class="bl-status st-' + cls + '">' + esc(status) + "</span>";
+        '<span class="bl-status st-' + spec[3] + '">' + esc(spec[2]) + "</span>";
     } else {
-      div.className = "boot-line boot-" + kind;
-      div.textContent = spec[1];
+      oneEl.className = "boot-" + kind;
+      oneEl.textContent = spec[1];
     }
-    linesEl.appendChild(div);
   };
 
   let idx = 0, finished = false, timer = null;
@@ -17996,6 +18003,8 @@ function runBootSequence() {
     if (finished) return;
     finished = true;
     if (timer) clearTimeout(timer);
+    if (fillEl) fillEl.style.width = "100%";
+    if (dataEl) dataEl.textContent = fmtData(DATA_TOTAL);
     promptEl.hidden = false;
     try { sessionStorage.setItem("yddnw_booted", "1"); } catch (e) {}
   };
@@ -18008,11 +18017,14 @@ function runBootSequence() {
   };
   const step = () => {
     if (finished) return;
+    while (idx < seq.length && seq[idx][0] === "blank") idx++;
     if (idx >= seq.length) { showPrompt(); return; }
-    renderLine(seq[idx++]);
-    var fill = document.getElementById("boot-bar-fill");
-    if (fill) fill.style.width = Math.round(idx / seq.length * 100) + "%";
-    linesEl.scrollTop = linesEl.scrollHeight;
+    renderSingle(seq[idx++]);
+    if (fillEl) fillEl.style.width = Math.round(idx / seq.length * 100) + "%";
+    if (dataEl) {
+      const n = Math.min(DATA_TOTAL, Math.round(DATA_TOTAL * idx / seq.length) + Math.floor(Math.random() * 1500));
+      dataEl.textContent = fmtData(n);
+    }
     timer = setTimeout(step, 140 + Math.random() * 120);
   };
 
@@ -18024,7 +18036,12 @@ function runBootSequence() {
   // Hard fallback: never trap the user on a loading screen.
   setTimeout(dismiss, 15000);
 
-  if (reduceMotion) { seq.forEach(renderLine); var rf = document.getElementById("boot-bar-fill"); if (rf) rf.style.width = "100%"; showPrompt(); }
+  if (reduceMotion) {
+    let last = null;
+    seq.forEach(s => { if (s[0] !== "blank") last = s; });
+    if (last) renderSingle(last);
+    showPrompt();
+  }
   else step();
 }
 
