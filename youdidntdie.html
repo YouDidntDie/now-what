@@ -175,6 +175,10 @@ body::before {
 }
 .boot-status { min-height: 64px; }
 #boot-line-one { font-size: 13px; line-height: 1.9; }
+.boot-gag {
+  font-size: 13px; line-height: 1.9; font-style: italic;
+  color: var(--text); text-wrap: balance;
+}
 #boot-data {
   font-size: 10px; letter-spacing: .12em; color: var(--text-faint);
   margin-top: 8px; font-family: var(--font-m);
@@ -17957,28 +17961,29 @@ function runBootSequence() {
     ["line", "simulator", scenCount + " scenarios + hybrid procedural", "ok"],
     ["line", "atlas", "200 regions mapped", "ok"],
   ];
-  // Absurd-toned pool (bible §13): 6 picked at random on every boot
+  // Absurd-toned pool (bible §13): 6 picked at random on every boot.
+  // Rendered as centered one-liners, not status rows — the row format kills the joke.
   const FULL_JOKES = [
-    ["line", "mounting /dev/optimism", "NOT FOUND", "fail"],
-    ["line", "calibrating will_to_live", "7%", "warn"],
-    ["line", "brewing coffee", "FAILED (no water, no power, no beans)", "fail"],
-    ["line", "locating clean water", "you'll learn how. that's the point.", "ok"],
-    ["line", "downloading survival instincts", "TIMEOUT (never had any)", "fail"],
-    ["line", "charging plot armor", "0%", "warn"],
-    ["line", "updating excuse database", "4,096 excuses installed", "ok"],
-    ["line", "scanning horizon for rescue", "no signal. shocking.", "warn"],
-    ["line", "inflating ego", "already at maximum", "ok"],
-    ["line", "defragmenting common sense", "FRAGMENTED BEYOND REPAIR", "fail"],
-    ["line", "installing patience", "97% (stuck since 2024)", "warn"],
-    ["line", "checking fridge", "EMPTY. as expected.", "fail"],
-    ["line", "measuring hope", "trace amounts detected", "warn"],
-    ["line", "dialing emergency services", "all lines busy. permanently.", "fail"],
-    ["line", "polishing survival badge", "participation trophy found", "warn"],
-    ["line", "loading plot twist", "it's tuesday. that's the twist.", "ok"],
-    ["line", "backing up excuses", "backup corrupted. convenient.", "fail"],
-    ["line", "warming up hero complex", "OVERHEATING", "warn"],
-    ["line", "reheating leftovers", "no microwave. no leftovers. no kitchen.", "fail"],
-    ["line", "counting blessings", "1 found. it's you. you're alive.", "ok"],
+    ["gag", "mounting /dev/optimism … NOT FOUND"],
+    ["gag", "calibrating will_to_live … 7%"],
+    ["gag", "brewing coffee … FAILED (no water, no power, no beans)"],
+    ["gag", "locating clean water … you'll learn how. that's the point."],
+    ["gag", "downloading survival instincts … TIMEOUT (never had any)"],
+    ["gag", "charging plot armor … 0%"],
+    ["gag", "updating excuse database … 4,096 excuses installed"],
+    ["gag", "scanning horizon for rescue … no signal. shocking."],
+    ["gag", "reconnecting to reality … CONNECTION REFUSED"],
+    ["gag", "defragmenting common sense … FRAGMENTED BEYOND REPAIR"],
+    ["gag", "installing patience … 97% (stuck since 2024)"],
+    ["gag", "checking fridge … EMPTY. as expected."],
+    ["gag", "measuring hope … trace amounts detected"],
+    ["gag", "dialing emergency services … all lines busy. permanently."],
+    ["gag", "polishing survival badge … participation trophy found"],
+    ["gag", "loading plot twist … it's tuesday. that's the twist."],
+    ["gag", "backing up excuses … backup corrupted. convenient."],
+    ["gag", "warming up hero complex … OVERHEATING"],
+    ["gag", "reheating leftovers … no microwave. no leftovers. no kitchen."],
+    ["gag", "counting blessings … 1 found. it's you. you're alive."],
   ];
   const FULL_TAIL = [
     ["closer", "CONGRATULATIONS. SOMETHING WENT CATASTROPHICALLY WRONG."],
@@ -18016,6 +18021,9 @@ function runBootSequence() {
       oneEl.innerHTML = '<span class="bl-label">' + esc("> " + spec[1]) + "</span>" +
         '<span class="bl-dots" aria-hidden="true"></span>' +
         '<span class="bl-status st-' + spec[3] + '">' + esc(spec[2]) + "</span>";
+    } else if (kind === "gag") {
+      oneEl.className = "boot-gag";
+      oneEl.textContent = spec[1];
     } else {
       oneEl.className = "boot-" + kind;
       oneEl.textContent = spec[1];
