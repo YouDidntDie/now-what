@@ -508,8 +508,8 @@ body::after {
 }
 .diff-1 { background: var(--green-pale); color: var(--green-lt); border: 1px solid var(--green); }
 .diff-2 { background: var(--amber-pale); color: var(--amber-lt); border: 1px solid var(--amber-dk); }
-.diff-3 { background: var(--red-pale);   color: var(--red-lt);   border: 1px solid var(--red); }
-.diff-4 { background: var(--red-pale);   color: var(--red-lt);   border: 1px solid var(--red); outline: 1px dashed var(--red); }
+.diff-3 { background: var(--amber-pale); color: var(--amber); border: 1px solid var(--amber); }
+.diff-4 { background: var(--amber); color: #060806; border: 1px solid var(--amber); font-weight: 700; }
 
 /* Empty states */
 .enc-empty, .empty-hint {
@@ -935,7 +935,7 @@ body::after {
 .article-body ol.content-list {
   list-style: none;
   margin: .5em 0 1em;
-  display: flex; flex-direction: column; gap: 4px;
+  display: flex; flex-direction: column; gap: 7px;
 }
 .article-body ol.content-list { counter-reset: content-ol; }
 .article-body ol.content-list > li.content-li { counter-increment: content-ol; }
@@ -1157,9 +1157,9 @@ body::after {
 .scenario-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; text-align: left; width: 100%; transition: background var(--speed), border-color var(--speed); }
 .scenario-row:hover { background: var(--bg3); border-color: var(--amber); }
 .sc-icon-lg { font-size: 26px; flex-shrink: 0; }
-.sr-body { flex: 1; }
+.sr-body { flex: 1; min-width: 0; }
 .sr-title { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
-.sr-meta { font-family: var(--font-m); font-size: 10px; color: var(--text-faint); }
+.sr-meta { font-family: var(--font-m); font-size: 10px; color: var(--text-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sr-arrow { color: var(--text-faint); font-size: 20px; transition: color var(--speed); }
 .scenario-row:hover .sr-arrow { color: var(--amber); }
 .menu-record { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); font-family: var(--font-m); font-size: 11px; color: var(--text-dim); }
@@ -1443,7 +1443,7 @@ body::after {
 .learn-skill-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 24px; }
 .learn-skill-card {
   background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 14px 16px;
+  border-radius: var(--radius); padding: 12px 16px;
   cursor: pointer; transition: all var(--speed) var(--ease);
   display: flex; align-items: center; gap: 14px;
 }
@@ -12465,6 +12465,7 @@ function formatContent(raw) {
   };
 
   let pendingDivider = false; // divider seen; collapses into the heading that follows it
+  let blankGap = false; // blank line(s) while a list is open: the list survives the gap
   let quoteBuf = [];
   const flushQuote = () => {
     if (quoteBuf.length) { out.push("<blockquote>" + inline(quoteBuf.join(" ")) + "</blockquote>"); quoteBuf = []; }
@@ -12472,7 +12473,7 @@ function formatContent(raw) {
 
   for (const rawLine of lines) {
     const t = rawLine.trim();
-    if (t === "") { flushPara(); flushQuote(); closeList(); pendingDivider = false; continue; }
+    if (t === "") { flushPara(); flushQuote(); blankGap = true; continue; }
 
     if (isDivider(t)) { flushPara(); flushQuote(); closeList(); pendingDivider = true; continue; }
 
@@ -12484,6 +12485,7 @@ function formatContent(raw) {
     const n = b ? null : numM(rawLine);
     if (b || n) {
       flushPara();
+      blankGap = false;
       const m = b || n;
       if (pendingDivider) { out.push('<hr class="content-divider">'); pendingDivider = false; }
       addListItem(m[1].length, m[b ? 2 : 3], !b);
@@ -12511,9 +12513,11 @@ function formatContent(raw) {
     if (listRoot && /^\s/.test(rawLine)) {
       // Indented plain line while a list is open: continuation of the current item
       appendContinuation(t);
+      blankGap = false;
       continue;
     }
     closeList();
+    blankGap = false;
     para.push(t);
   }
   flushPara(); flushQuote(); closeList();
@@ -14000,12 +14004,17 @@ function renderMenu(root) {
               <div class="scenario-phase-label">${phaseLabels[phase] || "Phase " + phase}</div>
               ${phaseGroups[phase].sort((a,b) => a.difficulty - b.difficulty).map(s => {
                 const dots = "●".repeat(s.difficulty) + "○".repeat(3 - s.difficulty);
+                const wFull = s.weather || "";
+                const wCut = wFull.slice(0, 45);
+                const wShort = wFull.length > 48
+                  ? (wCut.lastIndexOf(" ") > 20 ? wCut.slice(0, wCut.lastIndexOf(" ")) : wCut) + "…"
+                  : wFull;
                 return `
                   <button class="scenario-row" data-id="${s.id}">
                     <span class="sc-icon-lg">${s.icon}</span>
                     <div class="sr-body">
                       <div class="sr-title">${s.title}</div>
-                      <div class="sr-meta">${dots} · ${s.stages.length} stages · ${s.weather.slice(0,45)}…</div>
+                      <div class="sr-meta">${dots} · ${s.stages.length} stages · ${wShort}</div>
                     </div>
                     <span class="sr-arrow">›</span>
                   </button>`;
@@ -14805,7 +14814,8 @@ function stageBodyHTML() {
           const readiness = statVal + bonus + STEADY_EFFORT;
           const margin = readiness - adjDiff;
           // Cost forecast in plain words — never the formula.
-          const tierInfo = margin >= 2 ? ["You can handle this", "tier-ready"]
+          // "Ready" is the baseline: only flag the exceptions that change the decision.
+          const tierInfo = margin >= 2 ? null
                        : margin >= 0 ? ["This will cost you", "tier-taxing"]
                        : ["Desperate — heavy price", "tier-desperate"];
           return `
@@ -14813,9 +14823,9 @@ function stageBodyHTML() {
               <div class="choice-content">
                 <div class="choice-label">${ch.label}</div>
                 <div class="choice-desc">${ch.desc}</div>
-                <div class="choice-meta">
+                ${tierInfo ? `<div class="choice-meta">
                   <span class="choice-tier ${tierInfo[1]}">${tierInfo[0]}</span>
-                </div>
+                </div>` : ""}
               </div>
               <span class="choice-arrow">›</span>
             </button>`;
@@ -16438,7 +16448,7 @@ function renderStoreGrid(el, view) {
             <span class="store-credits-label">Credits</span>
             <span class="store-credits-amount">${credits}</span>
           </div>
-          <span class="store-credits-hint">+25–65 ◈ per run</span>
+          <span class="store-credits-hint">earn +25–65 ◈ per completed run</span>
         </div>
         ${owned.size ? `<div class="store-owned-line">✓ ${owned.size} item${owned.size === 1 ? "" : "s"} in your gear — available in every run via Custom Kit</div>` : ""}
       ` : `
@@ -18444,7 +18454,7 @@ function renderLearning(root) {
                     <div class="learn-skill-desc">${skill.desc}</div>
                     <div class="learn-skill-meta">
                       <span class="learn-skill-badge ${unlocked ? (skillDone === skillLessons ? 'badge-done' : 'badge-unlocked') : 'badge-locked'}">
-                        ${!unlocked ? '■ Lvl ' + skill.unlock_gate : skillDone === skillLessons ? '✓ Complete' : skillDone + '/' + skillLessons + ' lessons'}
+                        ${!unlocked ? '■ Unlocks at Lvl ' + skill.unlock_gate : skillDone === skillLessons ? '✓ Complete' : skillDone + '/' + skillLessons + ' lessons'}
                       </span>
                       ${skillXp > 0 ? `<span class="learn-skill-xp">+${skillXp} XP</span>` : ''}
                     </div>
