@@ -1637,12 +1637,12 @@ body::after {
 
 /* Tip callout inside step */
 .learn-tip {
-  background: rgba(74,120,66,.1); border: 1px solid var(--green);
+  background: var(--green-pale); border: 1px solid var(--green);
   border-left: 3px solid var(--green); border-radius: var(--radius);
   padding: 10px 14px; margin-top: 12px;
 }
 .learn-tip-lbl { font-family: var(--font-m); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--green-lt); margin-bottom: 4px; }
-.learn-tip-text { font-size: 12px; color: #7ab870; line-height: 1.5; }
+.learn-tip-text { font-size: 12px; color: var(--text); line-height: 1.5; }
 
 /* Nav buttons */
 .learn-step-nav { display: flex; gap: 10px; margin-top: 6px; }
@@ -1997,7 +1997,7 @@ body::after {
   font-family: var(--font-m); font-size: 8px; letter-spacing: .08em;
   text-transform: uppercase; padding: 2px 7px; border-radius: 2px; width: fit-content;
 }
-.bsp-earned { background: rgba(22,90,45,.4); color: #5aaa5a; border: 1px solid rgba(50,120,50,.4); }
+.bsp-earned { background: var(--green-pale); color: var(--green-lt); border: 1px solid var(--green); }
 .bsp-locked { background: var(--bg4); color: var(--text-faint); border: 1px solid var(--border); }
 .badges-empty { font-size: 12px; color: var(--text-faint); padding: 12px 0; }
 .badge-cat-label {
@@ -2180,7 +2180,7 @@ body::after {
 .rp-continent-body { padding: 10px 10px 2px; border-top: 1px solid var(--border); }
 
 /* Regional Intel block in Brief */
-.regional-intel { background: rgba(14,48,26,.25); border: 1px solid var(--green); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+.regional-intel { background: var(--green-pale); border: 1px solid var(--green); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
 .ri-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .ri-icon { font-size: 18px; }
 .ri-title { font-size: 13px; font-weight: 700; color: var(--white); }
@@ -2199,7 +2199,7 @@ body::after {
 .ri-note { font-size: 11px; color: var(--text-dim); line-height: 1.6; font-style: italic; margin-top: 6px; padding-top: 8px; border-top: 1px solid rgba(22,90,45,.3); }
 
 /* Stage region tip chip */
-.region-tip-chip { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-m); font-size: 9px; letter-spacing: .08em; background: rgba(14,48,26,.25); border: 1px solid var(--green); border-radius: 2px; padding: 3px 8px; color: var(--green-lt); margin-bottom: 10px; }
+.region-tip-chip { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-m); font-size: 9px; letter-spacing: .08em; background: var(--green-pale); border: 1px solid var(--green); border-radius: 2px; padding: 3px 8px; color: var(--green-lt); margin-bottom: 10px; }
 
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -2369,7 +2369,7 @@ body::after {
 .tt-node:hover { border-color: var(--border2); background: var(--bg4); }
 .tt-node.tt-complete {
   border-color: var(--green);
-  background: rgba(74,120,66,.10);
+  background: var(--green-pale);
 }
 .tt-node.tt-active {
   border-color: var(--amber-dk);
@@ -18999,7 +18999,7 @@ function renderLesson(lessonView, skill, lesson, state, onBack) {
             const rule = domainRules[Math.floor(lesson.id.length % domainRules.length)] || rules[lesson.id.length % rules.length];
             if (!rule) return '';
             return `
-              <div class="learn-tip" style="border-left:2px solid var(--green-dk);background:rgba(14,48,26,.18);margin-top:12px">
+              <div class="learn-tip" style="border-left:2px solid var(--green);background:var(--green-pale);margin-top:12px">
                 <div class="learn-tip-lbl" style="color:var(--green-lt)">⬡ Protocol Rule — ${rule.title}</div>
                 <div class="learn-tip-text">${rule.rule}</div>
               </div>`;
