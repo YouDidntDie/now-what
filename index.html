@@ -12595,7 +12595,7 @@ const SCENARIOS = [
   {
     id: "the-long-night",
     biomes: ["boreal"],
-    title: "The Long Night",
+    title: "The Longest Night",
     icon: "✖",
     difficulty: 3,
     phase: 8,
@@ -14354,7 +14354,7 @@ function startScenarioById(root, scenarioId) {
     if (scenarioId === FINAL_BOSS_ID) {
       // Final boss answers only to the Boss Rush — biome reads never gate it once unlocked.
       if (!finalBossUnlocked()) {
-        showInfoToast("✖", "Final Boss Locked", "Slay all nine phase bosses to unlock The Long Night.");
+        showInfoToast("✖", "Final Boss Locked", "Slay all nine phase bosses to unlock The Longest Night.");
         return;
       }
     } else {
@@ -14430,7 +14430,7 @@ function renderMenu(root) {
           <span class="boss-rush-count">${bp.defeated}/${bp.total} phase bosses slain</span>
         </div>
         <div class="boss-rush-bar"><div class="boss-rush-fill" style="width:${pct}%"></div></div>
-        <div class="boss-rush-sub">${finalWon ? "The Long Night has fallen. You beat them all." : finalBossUnlocked() ? "All nine phase bosses are down. The final boss is unlocked — The Long Night awaits." : "Each civilisation phase ends in a boss fight. Slay all nine to unlock the final boss: The Long Night."}</div>
+        <div class="boss-rush-sub">${finalWon ? "The Longest Night has fallen. You beat them all." : finalBossUnlocked() ? "All nine phase bosses are down. The final boss is unlocked — The Longest Night awaits." : "Each civilisation phase ends in a boss fight. Slay all nine to unlock the final boss: The Longest Night."}</div>
       </div>`;
       })()}
       <div class="scenario-list">
@@ -14470,11 +14470,12 @@ function renderMenu(root) {
                 const u = scenarioUnlock(s);
                 if (!u.unlocked) {
                   const remaining = u.need - u.have;
+                  const bossL = bossPhaseOf(s.id);
                   return `
-                  <button class="scenario-row scenario-row-locked" data-locked="${s.id}">
+                  <button class="scenario-row scenario-row-locked${bossL ? " scenario-row-boss" : ""}" data-locked="${s.id}">
                     <span class="sc-icon-lg">▣</span>
                     <div class="sr-body">
-                      <div class="sr-title">${s.title}</div>
+                      <div class="sr-title">${s.title}${bossL ? `<span class="sr-boss-tag">${bossL.final ? "FINAL BOSS" : "BOSS"}</span>` : ""}</div>
                       <div class="sr-meta">${dots} · ${s.stages.length} stages · ${wShort}</div>
                       <div class="sr-lock">LOCKED — read ${remaining} more article${remaining === 1 ? "" : "s"} about ${biomeLabel(u.biome)} to unlock <span class="sr-lock-go">→</span></div>
                     </div>
@@ -14547,7 +14548,7 @@ function renderMenu(root) {
     btn.addEventListener("click", () => {
       const sid = btn.dataset.locked;
       if (sid === "__finalboss__") {
-        showInfoToast("✖", "Final Boss Locked", "Slay all nine phase bosses to unlock The Long Night.");
+        showInfoToast("✖", "Final Boss Locked", "Slay all nine phase bosses to unlock The Longest Night.");
         return;
       }
       const sc = (typeof SCENARIOS !== "undefined") ? SCENARIOS.find(s => s.id === sid) : null;
@@ -15759,7 +15760,7 @@ function renderDebrief(root, onOpenArticle) {
           <div class="boss-splash-sub">${RUN._bossSlain.lost
             ? "You didn't make it this time. The boss will still be here — come back stronger."
             : RUN._bossSlain.final
-              ? `The Long Night has fallen. All ten bosses slain${RUN._bossSlain.firstKill ? ` — first-kill bonus <b>+${RUN._bossSlain.bonusXp} XP · +${RUN._bossSlain.bonusCredits} ◈</b>` : " (already slain — no repeat bonus)"}.`
+              ? `The Longest Night has fallen. All ten bosses slain${RUN._bossSlain.firstKill ? ` — first-kill bonus <b>+${RUN._bossSlain.bonusXp} XP · +${RUN._bossSlain.bonusCredits} ◈</b>` : " (already slain — no repeat bonus)"}.`
               : `Phase ${RUN._bossSlain.phaseId} boss defeated${RUN._bossSlain.firstKill ? ` — first-kill bonus <b>+${RUN._bossSlain.bonusXp} XP · +${RUN._bossSlain.bonusCredits} ◈</b>` : " (already slain — no repeat bonus)"}.`}</div>
         </div>` : ""}
 
@@ -16426,7 +16427,7 @@ const BADGES = [
     check: (c, ls) => finalBossUnlocked(),
   },
   {
-    id: "long_night",   icon: "☾", name: "The Long Night",
+    id: "long_night",   icon: "☾", name: "The Longest Night",
     desc: "Slay the final boss.",
     check: (c, ls) => bossDefeated(FINAL_BOSS_ID),
   },
