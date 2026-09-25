@@ -15783,8 +15783,13 @@ function getTrackProgress(phaseId) {
 function goToTrackStop(stop) {
   const meta = PHASE_TRACK_META || { titles: {}, lesson_skill: {} };
   if (stop.type === "lesson") {
-    const skillId = (meta.lesson_skill || {})[stop.id];
+    let skillId = (meta.lesson_skill || {})[stop.id];
+    if (!skillId && typeof LEARN_SKILLS !== "undefined") {
+      const sk = LEARN_SKILLS.find(s => (s.lessons || []).some(l => l.id === stop.id));
+      if (sk) skillId = sk.id;
+    }
     if (skillId) goTo("learning", { skillId, lessonId: stop.id });
+    else showInfoToast("△", "Lesson introuvable", "Le module " + stop.id + " n'est pas rattaché à un skill.", "", 3500);
   } else if (stop.type === "article") {
     goTo("library", { tab: "articles", articleId: stop.id });
   } else if (stop.type === "scenario") {
