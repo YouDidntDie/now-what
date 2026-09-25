@@ -17993,7 +17993,7 @@ function runBootSequence() {
     ["gag", "tuning radio \u2026 ONLY STATIC. HONEST STATIC."],
   ];
   const FULL_TAIL = [
-    ["closer", "CONGRATULATIONS. SOMETHING WENT CATASTROPHICALLY WRONG."],
+    ["closer", "CONGRATULATIONS!", "Something went catastrophically wrong."],
     ["sub", "Here's what you need to do next."]
   ];
   const _j = FULL_JOKES.slice();
@@ -18020,6 +18020,9 @@ function runBootSequence() {
     } else if (kind === "gag") {
       oneEl.className = "boot-gag";
       oneEl.textContent = spec[1];
+    } else if (kind === "closer") {
+      oneEl.className = "boot-closer";
+      oneEl.innerHTML = esc(spec[1]) + "<br>" + esc(spec[2] || "");
     } else {
       oneEl.className = "boot-" + kind;
       oneEl.textContent = spec[1];
@@ -18071,6 +18074,7 @@ function runBootSequence() {
     // Readable pace: dwell scales with line length so a human can read each line
     var spec = seq[idx - 1];
     var txt = (spec && spec[1]) || "";
+    if (spec && spec[0] === "closer" && spec[2]) txt += " " + spec[2];
     var dwell = Math.min(1600, 700 + txt.length * 16);
     timer = setTimeout(step, dwell);
   };
