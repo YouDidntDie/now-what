@@ -180,7 +180,16 @@ body::after {
   background: var(--bg3);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  position: relative;
 }
+#drawer-close {
+  position: absolute; top: 10px; right: 10px;
+  width: 34px; height: 34px;
+  background: transparent; color: var(--phosphor);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  font-family: var(--font-m); font-size: 15px; cursor: pointer;
+}
+#drawer-close:hover { border-color: var(--amber); color: var(--amber); }
 .drawer-logo {
   font-family: var(--font-d);
   font-size: 20px; font-weight: 700;
@@ -2932,6 +2941,7 @@ body::after {
     <div class="drawer-head">
       <div class="drawer-logo"><em>You Didn't Die,</em> Now What?</div>
       <div class="drawer-sub">Survival Training Console</div>
+      <button id="drawer-close" aria-label="Close menu">✕</button>
     </div>
 
     <div class="drawer-body">
@@ -16735,8 +16745,10 @@ const UNLOCK_STARTER_IDS = ["winter-vehicle","lost-trail","desert-breakdown","ur
 const UNLOCK_READS_REQUIRED = 3;
 const HYBRID_RUNS_REQUIRED = 5;
 // Article -> biome affinity, from the article's own title/summary. Reading an
-// article grants one unlock credit toward each of its biomes (max 2), so the
-// lock message "read N more articles about jungles" is literally true.
+// article grants one unlock credit toward each of its biomes, so the lock
+// message "read N more articles about jungles" is literally true. Curated
+// ARTICLE_BIOME_EXTRA entries may extend the list (e.g. the "Reading Biomes"
+// overview legitimately credits all 14 biomes it surveys).
 const BIOME_ARTICLE_HINTS = [
   ["jungle", ["jungle","rainforest","rain forest"]],
   ["highland", ["highland","highlands","terraces","plateau","mountain","mountains"]],
@@ -17932,6 +17944,7 @@ async function init() {
   document.getElementById("menu-btn").addEventListener("click", () => {
     if (store.ui.drawerOpen) closeDrawer(); else openDrawer();
   });
+  document.getElementById("drawer-close")?.addEventListener("click", closeDrawer);
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && store.ui.drawerOpen) closeDrawer();
   });
