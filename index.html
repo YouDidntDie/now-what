@@ -17920,7 +17920,7 @@ function updateHeader() {
 // Absurd-toned loading screen in the guide's survival-corporate voice
 // (bible §13). Full sequence on first visit, short version on repeat
 // visits within the session. Click/keypress skips. Honors
-// prefers-reduced-motion. Never traps the user: hard fallback at 15s.
+// prefers-reduced-motion. Never traps the user: hard fallback at 25s.
 // ── Phosphor: single monochrome hue for the whole terminal, user-chosen ────
 function setPhosphor(hex) {
   document.documentElement.style.setProperty("--phosphor", hex);
@@ -18025,7 +18025,11 @@ function runBootSequence() {
       const n = Math.min(DATA_TOTAL, Math.round(DATA_TOTAL * idx / seq.length) + Math.floor(Math.random() * 1500));
       dataEl.textContent = fmtData(n);
     }
-    timer = setTimeout(step, 140 + Math.random() * 120);
+    // Readable pace: dwell scales with line length so a human can read each line
+    var spec = seq[idx - 1];
+    var txt = (spec && spec[1]) || "";
+    var dwell = Math.min(1600, 700 + txt.length * 16);
+    timer = setTimeout(step, dwell);
   };
 
   overlay.addEventListener("click", () => { finished ? dismiss() : showPrompt(); });
@@ -18034,7 +18038,7 @@ function runBootSequence() {
     finished ? dismiss() : showPrompt();
   });
   // Hard fallback: never trap the user on a loading screen.
-  setTimeout(dismiss, 15000);
+  setTimeout(dismiss, 25000);
 
   if (reduceMotion) {
     let last = null;
