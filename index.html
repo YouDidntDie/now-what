@@ -106,6 +106,46 @@ body::before {
 .phosphor-swatch:hover { transform: scale(1.15); }
 .phosphor-swatch.active { border-color: #fff; }
 
+/* ── Instrument flavor: cyberpunk chrome + steampunk engraving ───────────────
+   Native extensions of the phosphor system — everything derives from the
+   existing tokens (--phosphor, --border2, --text-faint...). No new palette,
+   no restyle of anything already on screen. */
+.screen-title {
+  border-bottom: 3px double var(--border2);
+  padding-bottom: 8px;
+}
+.drawer-section::before {
+  content: "⚙ ";
+  color: var(--text-faint);
+}
+.boot-term { position: relative; }
+.boot-term::before, .boot-term::after {
+  content: ""; position: absolute; width: 14px; height: 14px;
+  border: 1px solid var(--text-dim); opacity: .7; pointer-events: none;
+}
+.boot-term::before { top: -10px; left: -10px; border-right: 0; border-bottom: 0; }
+.boot-term::after { bottom: -10px; right: -10px; border-left: 0; border-top: 0; }
+@keyframes boot-glitch {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(1px); }
+  50% { transform: translateX(-1px); }
+  75% { transform: translateX(0); }
+}
+#boot-lines { animation: boot-glitch 1.2s steps(2, end) 2; }
+@media (prefers-reduced-motion: reduce) {
+  #boot-lines { animation: none; }
+  .boot-term::before, .boot-term::after { display: none; }
+}
+.phosphor-note {
+  font-family: var(--font-m); font-size: 10px; color: var(--text-faint);
+  padding: 0 16px 4px; line-height: 1.5;
+}
+.phosphor-warn {
+  font-family: var(--font-m); font-size: 10px; color: var(--red);
+  padding: 0 16px 12px; line-height: 1.5;
+}
+.phosphor-warn[hidden] { display: none; }
+
 /* ── Reset ──────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -2982,6 +3022,8 @@ body::after {
         <button class="phosphor-swatch" data-color="#ff8c2e" style="--c:#ff8c2e" aria-label="Orange phosphor"></button>
         <button class="phosphor-swatch" data-color="#ff4444" style="--c:#ff4444" aria-label="Red phosphor"></button>
       </div>
+      <div class="phosphor-note">Red is the alert color — ▲ PANIC and errors always render in red.</div>
+      <div class="phosphor-warn" id="phosphor-warn" hidden>▲ Heads up: with red phosphor selected, alerts are harder to tell apart from the rest of the terminal.</div>
 
     </div>
   </nav>
@@ -17840,6 +17882,8 @@ function setPhosphor(hex) {
   try { localStorage.setItem("yddnw_phosphor", hex); } catch (e) {}
   document.querySelectorAll(".phosphor-swatch").forEach(s =>
     s.classList.toggle("active", s.dataset.color.toLowerCase() === hex.toLowerCase()));
+  var warn = document.getElementById("phosphor-warn");
+  if (warn) warn.hidden = hex.toLowerCase() !== "#ff4444";
 }
 function initPhosphor() {
   let p = "#00ff41";
