@@ -179,6 +179,12 @@ body::before {
   font-size: 13px; line-height: 1.9; font-style: italic;
   color: var(--text); text-wrap: balance;
 }
+.boot-closer { text-wrap: balance; }
+@media (max-width: 480px) {
+  .boot-mid { width: 94%; }
+  .boot-gag { font-size: 12px; }
+  #boot-line-one { font-size: 12px; }
+}
 #boot-data {
   font-size: 10px; letter-spacing: .12em; color: var(--text-faint);
   margin-top: 8px; font-family: var(--font-m);
@@ -17958,34 +17964,34 @@ function runBootSequence() {
   // Absurd-toned pool (bible §13): 6 picked at random on every boot.
   // Rendered as centered one-liners, not status rows — the row format kills the joke.
   const FULL_JOKES = [
-    ["gag", "mounting /dev/optimism … NOT FOUND"],
-    ["gag", "calibrating will_to_live … 7%"],
-    ["gag", "brewing coffee … FAILED (no water, no power, no beans)"],
-    ["gag", "locating clean water … you'll learn how. that's the point."],
-    ["gag", "downloading survival instincts … TIMEOUT (never had any)"],
-    ["gag", "charging plot armor … 0%"],
-    ["gag", "updating excuse database … 4,096 excuses installed"],
-    ["gag", "scanning horizon for rescue … no signal. shocking."],
-    ["gag", "reconnecting to reality … CONNECTION REFUSED"],
-    ["gag", "defragmenting common sense … FRAGMENTED BEYOND REPAIR"],
-    ["gag", "installing patience … 97% (stuck since 2024)"],
-    ["gag", "checking fridge … EMPTY. as expected."],
-    ["gag", "measuring hope … trace amounts detected"],
-    ["gag", "dialing emergency services … all lines busy. permanently."],
-    ["gag", "polishing survival badge … participation trophy found"],
-    ["gag", "loading plot twist … it's tuesday. that's the twist."],
-    ["gag", "backing up excuses … backup corrupted. convenient."],
-    ["gag", "warming up hero complex … OVERHEATING"],
-    ["gag", "reheating leftovers … no microwave. no leftovers. no kitchen."],
-    ["gag", "counting blessings … 1 found. it's you. you're alive."],
-    ["gag", "sharpening wit … BLADE NOT FOUND"],
-    ["gag", "loading survival manual … PAGE 1: PANIC. PAGE 2: SEE PAGE 1."],
-    ["gag", "testing smoke signals … NEIGHBORS COMPLAINED"],
-    ["gag", "practicing distress call … VOICEMAIL FULL"],
-    ["gag", "counting rations … MATH CHECKS OUT. BARELY."],
-    ["gag", "winding up courage … SPRING BROKEN"],
-    ["gag", "downloading map … YOU ARE HERE. GOOD LUCK."],
-    ["gag", "tuning survival radio … ONLY STATIC. HONEST STATIC."],
+    ["gag", "mounting /dev/optimism \u2026 NOT FOUND"],
+    ["gag", "calibrating will_to_live \u2026 7%"],
+    ["gag", "brewing coffee \u2026 FAILED (no water, no beans)"],
+    ["gag", "finding clean water \u2026 that's why you're here"],
+    ["gag", "survival instincts \u2026 NOT INSTALLED"],
+    ["gag", "charging plot armor \u2026 0%"],
+    ["gag", "updating excuses \u2026 4,096 installed"],
+    ["gag", "scanning for rescue \u2026 no signal. shocking."],
+    ["gag", "reconnecting to reality \u2026 CONNECTION REFUSED"],
+    ["gag", "defragmenting common sense \u2026 BEYOND REPAIR"],
+    ["gag", "installing patience \u2026 97% (stuck since 2024)"],
+    ["gag", "checking fridge \u2026 EMPTY. as expected."],
+    ["gag", "measuring hope \u2026 trace amounts detected"],
+    ["gag", "dialing emergency \u2026 all lines busy. forever."],
+    ["gag", "polishing badge \u2026 participation trophy found"],
+    ["gag", "loading plot twist \u2026 it's just tuesday."],
+    ["gag", "backing up excuses \u2026 corrupted. convenient."],
+    ["gag", "warming up hero complex \u2026 OVERHEATING"],
+    ["gag", "reheating leftovers \u2026 what leftovers."],
+    ["gag", "counting blessings \u2026 just you. you're alive."],
+    ["gag", "sharpening wit \u2026 BLADE NOT FOUND"],
+    ["gag", "survival manual \u2026 PAGE 1: PANIC."],
+    ["gag", "testing smoke signals \u2026 NEIGHBORS COMPLAINED"],
+    ["gag", "practicing distress call \u2026 VOICEMAIL FULL"],
+    ["gag", "counting rations \u2026 MATH CHECKS OUT. BARELY."],
+    ["gag", "winding up courage \u2026 SPRING BROKEN"],
+    ["gag", "downloading map \u2026 YOU ARE HERE. GOOD LUCK."],
+    ["gag", "tuning radio \u2026 ONLY STATIC. HONEST STATIC."],
   ];
   const FULL_TAIL = [
     ["closer", "CONGRATULATIONS. SOMETHING WENT CATASTROPHICALLY WRONG."],
