@@ -137,14 +137,39 @@ body::before {
   .boot-term::before, .boot-term::after { display: none; }
 }
 .phosphor-note {
-  font-family: var(--font-m); font-size: 10px; color: var(--text-faint);
+  font-family: var(--font-m); font-size: 11px; color: var(--text-dim);
   padding: 0 16px 4px; line-height: 1.5;
 }
 .phosphor-warn {
-  font-family: var(--font-m); font-size: 10px; color: var(--red);
+  font-family: var(--font-m); font-size: 11px; color: var(--red);
   padding: 0 16px 12px; line-height: 1.5;
 }
 .phosphor-warn[hidden] { display: none; }
+
+/* Boot: loading bar + scrollable log region so the sequence stays in frame
+   on mobile. Dotted leaders flex instead of overflowing the viewport. */
+.boot-bar {
+  height: 8px; border: 1px solid var(--border2);
+  margin-bottom: 14px;
+}
+.boot-bar-fill {
+  height: 100%; width: 0%;
+  background: var(--phosphor);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--phosphor) 60%, transparent);
+  transition: width .35s ease;
+}
+#boot-lines {
+  max-height: 52vh; overflow-y: auto;
+  scrollbar-width: none;
+}
+#boot-lines::-webkit-scrollbar { display: none; }
+.boot-line.bl-row { display: flex; align-items: baseline; gap: 6px; white-space: normal; }
+.bl-label { flex: 0 0 auto; }
+.bl-dots {
+  flex: 1 1 12px; border-bottom: 1px dotted var(--text-faint);
+  transform: translateY(-3px); min-width: 12px;
+}
+.bl-status { flex: 0 1 auto; text-align: right; overflow-wrap: break-word; }
 
 /* ── Reset ──────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2947,6 +2972,7 @@ body::after {
   <!-- ── Boot sequence overlay ─────────────────────────────────────────── -->
   <div id="boot-overlay" role="status" aria-label="Loading You Didn't Die, Now What?">
     <div class="boot-term">
+      <div class="boot-bar" aria-hidden="true"><div class="boot-bar-fill" id="boot-bar-fill"></div></div>
       <div id="boot-lines"></div>
       <div id="boot-prompt" class="boot-prompt" hidden>
       <button id="boot-enter" class="boot-enter-btn" type="button">TAP TO ENTER</button>
@@ -17938,9 +17964,10 @@ function runBootSequence() {
     if (kind === "blank") { div.className = "boot-line"; div.innerHTML = "&nbsp;"; }
     else if (kind === "line") {
       const label = spec[1], status = spec[2], cls = spec[3];
-      const dots = ".".repeat(Math.max(2, 42 - label.length));
-      div.className = "boot-line";
-      div.innerHTML = esc("> " + label + " " + dots + " ") + '<span class="st-' + cls + '">' + esc(status) + "</span>";
+      div.className = "boot-line bl-row";
+      div.innerHTML = '<span class="bl-label">' + esc("> " + label) + "</span>" +
+        '<span class="bl-dots" aria-hidden="true"></span>' +
+        '<span class="bl-status st-' + cls + '">' + esc(status) + "</span>";
     } else {
       div.className = "boot-line boot-" + kind;
       div.textContent = spec[1];
@@ -17969,6 +17996,9 @@ function runBootSequence() {
     if (finished) return;
     if (idx >= seq.length) { showPrompt(); return; }
     renderLine(seq[idx++]);
+    var fill = document.getElementById("boot-bar-fill");
+    if (fill) fill.style.width = Math.round(idx / seq.length * 100) + "%";
+    linesEl.scrollTop = linesEl.scrollHeight;
     timer = setTimeout(step, 140 + Math.random() * 120);
   };
 
@@ -17980,7 +18010,7 @@ function runBootSequence() {
   // Hard fallback: never trap the user on a loading screen.
   setTimeout(dismiss, 15000);
 
-  if (reduceMotion) { seq.forEach(renderLine); showPrompt(); }
+  if (reduceMotion) { seq.forEach(renderLine); var rf = document.getElementById("boot-bar-fill"); if (rf) rf.style.width = "100%"; showPrompt(); }
   else step();
 }
 
