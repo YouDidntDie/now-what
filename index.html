@@ -517,6 +517,21 @@ body::after {
   color: var(--text-faint); padding: 40px 20px; text-align: center;
 }
 
+/* Biome suggested-reading panel (locked scenario cards route here) */
+.biome-sugg {
+  border: 1px solid var(--green); border-radius: var(--radius);
+  background: var(--green-pale); padding: 14px 16px; margin-bottom: 18px;
+}
+.biome-sugg-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  font-family: var(--font-m); font-size: 11px; letter-spacing: .12em;
+  color: var(--green-lt); margin-bottom: 6px;
+}
+.biome-sugg-sub {
+  font-size: 12px; color: var(--text-dim); margin-bottom: 12px;
+}
+.biome-sugg .article-grid { margin: 0; }
+
 /* Screen head */
 .screen-head { margin-bottom: 20px; }
 
@@ -12611,6 +12626,29 @@ function renderGrid(root, onOpenArticle) {
         `).join("")}
       </div>
 
+      ${(() => {
+        const br = store.ui.biomeReading;
+        if (!br) return "";
+        const sugg = articlesForBiome(br);
+        const have = biomeReads(br);
+        const need = UNLOCK_READS_REQUIRED;
+        return `
+        <div class="biome-sugg">
+          <div class="biome-sugg-head">
+            <span>▣ SUGGESTED READING — ${biomeLabel(br)}</span>
+            <button class="chip" id="biome-sugg-clear">✕ clear</button>
+          </div>
+          <div class="biome-sugg-sub">${
+            have >= need
+              ? `Unlocked — ${have}/${need} readings banked. Head to SIMULATE to play the ${biomeLabel(br)} scenarios.`
+              : `Each article you finish below counts toward ${biomeLabel(br)} scenarios — ${have}/${need} so far.`
+          }</div>
+          <div class="article-grid">
+            ${sugg.length ? sugg.map(a => articleCardHTML(a)).join("") : `<div class="enc-empty">No articles found</div>`}
+          </div>
+        </div>`;
+      })()}
+
       <div class="article-grid" id="article-grid">
         ${articles.length ? articles.map(a => articleCardHTML(a)).join("") : `
           <div class="enc-empty">No articles found</div>
@@ -12661,6 +12699,11 @@ function bindGridEvents(root, onOpenArticle) {
       if (onOpenArticle) onOpenArticle(card.dataset.articleId);
     })
   );
+
+  root.querySelector("#biome-sugg-clear")?.addEventListener("click", () => {
+    store.ui.biomeReading = null;
+    renderGrid(root, onOpenArticle);
+  });
 }
 
 function refreshGrid(root, onOpenArticle) {
@@ -14097,15 +14140,14 @@ function renderMenu(root) {
 
   root.querySelectorAll(".scenario-row:not(.scenario-row-locked)").forEach(btn =>
     btn.addEventListener("click", () => startScenarioById(root, btn.dataset.id)));
-  // Locked cards route to the Library with a biome-specific reading suggestion:
-  // the search box is pre-filled so the articles that unlock this scenario
-  // are exactly what the user sees first.
+  // Locked cards route to the Library with a biome-specific suggested-reading
+  // panel: exactly the articles whose reading unlocks this scenario's biome.
   root.querySelectorAll(".scenario-row-locked").forEach(btn =>
     btn.addEventListener("click", () => {
       const sid = btn.dataset.locked;
       const sc = (typeof SCENARIOS !== "undefined") ? SCENARIOS.find(s => s.id === sid) : null;
       const biome = sc ? scenarioBiome(sc) : null;
-      goTo("library", { tab: "articles", searchQuery: biome ? (BIOME_SEARCH_TERM[biome] || biome) : "" });
+      goTo("library", { tab: "articles", biomeReading: biome || null });
     }));
 }
 
@@ -16696,20 +16738,33 @@ const HYBRID_RUNS_REQUIRED = 5;
 // lock message "read N more articles about jungles" is literally true.
 const BIOME_ARTICLE_HINTS = [
   ["jungle", ["jungle","rainforest","rain forest"]],
-  ["highland", ["highland","highlands"]],
+  ["highland", ["highland","highlands","terraces","plateau","mountain","mountains"]],
   ["alpine", ["alpine","montane","himalaya","andes","mountain","mountains"]],
   ["desert", ["desert","arid","dune","sahara","sahel","sonoran"]],
   ["coastal", ["coast","coastal","beach","shore","littoral"]],
   ["island", ["island","archipelago"]],
   ["wetland", ["wetland","swamp","marsh","mangrove","bog","everglade"]],
-  ["grassland", ["grassland","steppe","prairie","pampas","veld"]],
+  ["grassland", ["grassland","grasslands","steppe","prairie","pampas","veld"]],
   ["savanna", ["savanna","savannah"]],
-  ["boreal", ["boreal","taiga","conifer"]],
+  ["boreal", ["boreal","taiga"]],
   ["temperate_forest", ["temperate forest","deciduous forest","woodland","deciduous"]],
   ["ocean", ["ocean","pelagic","open sea","offshore"]],
-  ["urban", ["urban","city","suburb","downtown"]],
+  ["urban", [" urban"," city"," cities","suburb","downtown"]],
   ["arctic", ["arctic","tundra","polar"]],
 ];
+// Explicit biome relevance for articles that teach survival IN a biome without
+// naming it — grain fields, hay meadows and grazing land ARE grasslands;
+// pastoralism and wild grains ARE savanna life; terraces were already caught
+// by the highland hints. Every biome with locked scenarios must have 3+.
+const ARTICLE_BIOME_EXTRA = {
+  "ev001": ["jungle","highland","alpine","desert","coastal","island","wetland","grassland","savanna","boreal","temperate_forest","ocean","urban","arctic"],
+  "ag011": ["grassland"], "ag012": ["grassland"], "ag013": ["grassland","savanna"],
+  "d046": ["grassland","savanna"], "f011": ["grassland","savanna"],
+  "f037": ["boreal"], "d042": ["boreal"], "d019": ["boreal"],
+  "d063": ["temperate_forest"], "d016": ["temperate_forest"],
+  "s007": ["temperate_forest"], "d007": ["temperate_forest"],
+  "d025": ["island"], "d047": ["island"], "w028": ["island"], "ev004": ["island"],
+};
 function articleBiomes(articleId) {
   try {
     const a = (typeof store !== "undefined" && store.articlesById) ? store.articlesById[articleId] : null;
@@ -16717,9 +16772,22 @@ function articleBiomes(articleId) {
     const text = ((a.title || "") + " " + (a.summary || "")).toLowerCase();
     const out = [];
     for (const [biome, hints] of BIOME_ARTICLE_HINTS) {
+      if (out.length >= 2) break;
       if (hints.some(h => text.includes(h))) out.push(biome);
     }
-    return out.slice(0, 2);
+    const extra = ARTICLE_BIOME_EXTRA[articleId] || [];
+    for (const b of extra) if (!out.includes(b)) out.push(b);
+    return out;
+  } catch(e){ return []; }
+}
+// Every article whose reading credits a biome — the single source of truth
+// for both unlock crediting and the Library's suggested-reading panel.
+function articlesForBiome(biome) {
+  try {
+    if (!store || !store.articles) return [];
+    const list = store.articles.filter(a => articleBiomes(a.id).includes(biome));
+    list.sort((a, b) => (a.id === "ev001" ? -1 : b.id === "ev001" ? 1 : (a.difficulty - b.difficulty) || String(a.title).localeCompare(String(b.title))));
+    return list;
   } catch(e){ return []; }
 }
 function getBiomeReads() { try { return JSON.parse(localStorage.getItem(BIOME_READS_KEY) || "{}"); } catch(e){ return {}; } }
@@ -16729,13 +16797,6 @@ const BIOME_LABELS = {
   highland: "highlands", island: "islands", jungle: "jungles",
   ocean: "open ocean", savanna: "savannas", temperate_forest: "temperate forests",
   urban: "urban areas", wetland: "wetlands",
-};
-// Search term pre-filled in the Library when a locked card of that biome is clicked.
-const BIOME_SEARCH_TERM = {
-  alpine: "alpine", arctic: "arctic", boreal: "boreal", coastal: "coast",
-  desert: "desert", grassland: "grassland", highland: "highland",
-  island: "island", jungle: "jungle", ocean: "ocean", savanna: "savanna",
-  temperate_forest: "temperate", urban: "urban", wetland: "wetland",
 };
 
 function getReadArticles() { try { return JSON.parse(localStorage.getItem(READ_ARTICLES_KEY) || "{}"); } catch(e){ return {}; } }
@@ -16783,10 +16844,9 @@ function markRegionViewed(regionId) {
 function scenarioBiome(sc) { return (sc.biomes && sc.biomes[0]) || null; }
 function biomeLabel(b) { return BIOME_LABELS[b] || b || "the field"; }
 
-// Total reads for the scenario's primary biome: article credits for that
-// biome plus one credit per viewed Atlas region carrying that biome.
-function scenarioReads(sc) {
-  const biome = scenarioBiome(sc);
+// Total reads for one biome: article credits for that biome plus one credit
+// per viewed Atlas region carrying that biome.
+function biomeReads(biome) {
   if (!biome) return 0;
   let total = 0;
   try { total += (getBiomeReads()[biome] || 0); } catch(e){}
@@ -16796,6 +16856,11 @@ function scenarioReads(sc) {
     if ((rb[id] || []).includes(biome)) total += (rr[id] || 0);
   }
   return total;
+}
+function scenarioReads(sc) {
+  const biome = scenarioBiome(sc);
+  if (!biome) return 0;
+  return biomeReads(biome);
 }
 
 function scenarioUnlock(sc) {
@@ -18455,8 +18520,8 @@ function renderLibraryScreen(root, opts = {}) {
   // previously opened article would reopen when returning to the grid.
   store.ui.currentDomainId  = opts.domainId  || null;
   store.ui.currentArticleId = opts.articleId || null;
-  // A locked scenario card can route here with a biome reading suggestion.
-  if (typeof opts.searchQuery === "string") store.ui.searchQuery = opts.searchQuery;
+  // A locked scenario card can route here with a biome suggested-reading panel.
+  store.ui.biomeReading = opts.biomeReading || null;
   const content = renderHubShell(root, LIBRARY_TABS, tab,
     (t) => goTo("library", { tab: t, replace: true }));
   if (tab === "articles") {
