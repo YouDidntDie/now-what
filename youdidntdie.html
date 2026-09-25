@@ -1432,6 +1432,11 @@ body::after {
 
 /* Queue summary bar */
 .learn-queue-bar { display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
+/* One slim status line — the old 4-stat strip said the same thing with 4x the noise. */
+.learn-status-line {
+  font-family: var(--font-m); font-size: 11px; letter-spacing: .08em;
+  color: var(--text-dim); margin-bottom: 18px;
+}
 .learn-queue-stat { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; flex: 1; min-width: 80px; }
 .learn-queue-num { font-family: var(--font-d); font-size: 22px; font-weight: 700; color: var(--amber); line-height: 1; }
 .learn-queue-lbl { font-family: var(--font-m); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint); margin-top: 2px; }
@@ -2838,6 +2843,20 @@ body::after {
   text-align: left;
   color: var(--text);
 }
+
+/* Slim operator line — replaces the old hero + summary bar + stat strip.
+   One tap target; the details live in PROFILE where they belong. */
+.op-line {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 10px 14px; margin-bottom: 12px;
+  background: transparent; border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; font-family: inherit; text-align: left; color: var(--text);
+}
+.op-line:hover { border-color: var(--border2); background: var(--bg2); }
+.op-line-name { font-weight: 700; font-size: 14px; color: var(--white); }
+.op-line-meta { font-family: var(--font-m); font-size: 11px; color: var(--text-dim); flex: 1; }
+.op-line-pts { color: var(--phosphor); }
+.op-line-arrow { color: var(--text-faint); font-size: 18px; }
 .loadout-strip:active { background: var(--bg3); }
 .loadout-strip-icon { font-size: 22px; color: var(--phosphor); flex-shrink: 0; }
 .loadout-strip-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
@@ -12570,7 +12589,6 @@ function renderGrid(root, onOpenArticle) {
     <div class="enc-page">
       <div class="enc-head">
         <div>
-          <div class="screen-eyebrow">Encyclopedia</div>
           <h2 class="screen-title">${activeDomain ? `${activeDomain.icon} ${activeDomain.name}` : "All Topics"}</h2>
         </div>
         <div class="enc-controls">
@@ -13946,34 +13964,13 @@ function renderSimulator(root, onOpenArticle) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function renderMenu(root) {
-  const pct = xpBarPct(char);
   root.innerHTML = `
     <div class="sim-page">
-      <div class="sim-hero">
-        <div class="sim-eyebrow">Survival Simulator</div>
-        <h1 class="sim-title-lg">You Didn't Die, Now What?</h1>
-      </div>
-
-      <div class="char-summary-bar">
-        <div class="csb-left">
-          <div class="csb-name">${char.name}</div>
-          <div class="csb-level">Level ${char.level} Operator</div>
-        </div>
-        <div class="csb-xp">
-          <div class="csb-xp-label">XP ${char.xp} / ${char.xpToNext}</div>
-          <div class="xp-track"><div class="xp-fill" style="width:${pct}%"></div></div>
-        </div>
-        ${char.statPoints > 0 ? `<div class="csb-points">+${char.statPoints} stat pts available</div>` : ""}
-      </div>
-
-      <div class="stat-strip">
-        ${STAT_DEFS.map(s => `
-          <div class="stat-chip">
-            <span class="sc-icon">${s.icon}</span>
-            <span class="sc-label">${s.short}</span>
-            <span class="sc-val">${char.stats[s.id]}</span>
-          </div>`).join("")}
-      </div>
+      <button class="op-line" id="menu-op">
+        <span class="op-line-name">${char.name}</span>
+        <span class="op-line-meta">Lv ${char.level} · ${char.xp}/${char.level < 10 ? char.xpToNext : "MAX"} XP${char.statPoints > 0 ? ` · <strong class="op-line-pts">+${char.statPoints} pts</strong>` : ""}</span>
+        <span class="op-line-arrow">›</span>
+      </button>
 
       <button class="loadout-strip" id="menu-loadout">
         <span class="loadout-strip-icon">◈</span>
@@ -14046,6 +14043,7 @@ function renderMenu(root) {
   if (lsSub) lsSub.textContent = `${char.credits ?? 0} credits · ${ownedCount} item${ownedCount === 1 ? "" : "s"} owned`;
   root.querySelector("#menu-loadout")?.addEventListener("click", () =>
     goTo("store", { view: "outfit" }));
+  root.querySelector("#menu-op")?.addEventListener("click", () => goTo("profile"));
 
   root.querySelectorAll(".scenario-row").forEach(btn =>
     btn.addEventListener("click", () => startScenarioById(root, btn.dataset.id)));
@@ -15962,16 +15960,6 @@ function renderProfile(root, opts = {}) {
           </div>
         </div>
 
-        <div class="dossier-strip">
-          ${STAT_DEFS.map(s => {
-            const val = char.stats[s.id];
-            return `
-              <div class="dossier-stat" title="${s.label}: ${s.desc}">
-                <div class="ds-short">${s.short}</div>
-                <div class="ds-val">${val}</div>
-                <div class="ds-bar"><div class="ds-bar-fill" style="width:${val * 10}%"></div></div>
-              </div>`;
-          }).join("")}
         </div>
       </div>
 
@@ -16433,7 +16421,6 @@ function renderStoreGrid(el, view) {
     <div class="store-page">
       <div class="store-head">
         <div>
-          <div class="screen-eyebrow">${isSim ? "Simulator Store" : "Real-World Store"}</div>
           <h2 class="screen-title">${isSim ? "Sim Outfit" : "Field Kit"}</h2>
         </div>
         <div class="store-controls">
@@ -18429,12 +18416,7 @@ function renderLearning(root) {
           <div class="learn-sub">Step-by-step skill training. Complete lessons to earn XP and advance your survival competency.</div>
         </div>
 
-        <div class="learn-queue-bar">
-          <div class="learn-queue-stat"><div class="learn-queue-num">${completedCount}</div><div class="learn-queue-lbl">Lessons Done</div></div>
-          <div class="learn-queue-stat"><div class="learn-queue-num">${totalLessons - completedCount}</div><div class="learn-queue-lbl">Remaining</div></div>
-          <div class="learn-queue-stat"><div class="learn-queue-num">${totalXpEarned}</div><div class="learn-queue-lbl">XP Earned</div></div>
-          <div class="learn-queue-stat"><div class="learn-queue-num">${unlockedSkills}</div><div class="learn-queue-lbl">Skills Open</div></div>
-        </div>
+        <div class="learn-status-line">${completedCount}/${totalLessons} lessons · ${totalXpEarned} XP earned · ${unlockedSkills} skills open</div>
 
         ${Object.entries(categories).map(([cat, skills]) => `
           <div class="learn-section-lbl">${cat}</div>
@@ -18451,7 +18433,6 @@ function renderLearning(root) {
                   <div class="learn-skill-icon">${skill.icon}</div>
                   <div class="learn-skill-body">
                     <div class="learn-skill-name">${skill.name}</div>
-                    <div class="learn-skill-desc">${skill.desc}</div>
                     <div class="learn-skill-meta">
                       <span class="learn-skill-badge ${unlocked ? (skillDone === skillLessons ? 'badge-done' : 'badge-unlocked') : 'badge-locked'}">
                         ${!unlocked ? '■ Unlocks at Lvl ' + skill.unlock_gate : skillDone === skillLessons ? '✓ Complete' : skillDone + '/' + skillLessons + ' lessons'}
