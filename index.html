@@ -17921,8 +17921,8 @@ function updateHeader() {
 
 // ── Boot sequence ─────────────────────────────────────────────────────────
 // Absurd-toned loading screen in the guide's survival-corporate voice
-// (bible §13). Full sequence on first visit, short version on repeat
-// visits within the session. Click/keypress skips. Honors
+// (bible §13). One gag bank, every boot: 6 punchlines picked at random
+// from the pool. Click/keypress skips. Honors
 // prefers-reduced-motion. Never traps the user: hard fallback at 25s.
 // ── Phosphor: single monochrome hue for the whole terminal, user-chosen ────
 function setPhosphor(hex) {
@@ -17984,6 +17984,14 @@ function runBootSequence() {
     ["gag", "warming up hero complex … OVERHEATING"],
     ["gag", "reheating leftovers … no microwave. no leftovers. no kitchen."],
     ["gag", "counting blessings … 1 found. it's you. you're alive."],
+    ["gag", "sharpening wit … BLADE NOT FOUND"],
+    ["gag", "loading survival manual … PAGE 1: PANIC. PAGE 2: SEE PAGE 1."],
+    ["gag", "testing smoke signals … NEIGHBORS COMPLAINED"],
+    ["gag", "practicing distress call … VOICEMAIL FULL"],
+    ["gag", "counting rations … MATH CHECKS OUT. BARELY."],
+    ["gag", "winding up courage … SPRING BROKEN"],
+    ["gag", "downloading map … YOU ARE HERE. GOOD LUCK."],
+    ["gag", "tuning survival radio … ONLY STATIC. HONEST STATIC."],
   ];
   const FULL_TAIL = [
     ["closer", "CONGRATULATIONS. SOMETHING WENT CATASTROPHICALLY WRONG."],
@@ -17995,19 +18003,8 @@ function runBootSequence() {
     const t = _j[i]; _j[i] = _j[k]; _j[k] = t;
   }
   const FULL = FULL_HEAD.concat(FULL_INFO, _j.slice(0, 6), FULL_TAIL);
-  const QUICK = [
-    ["head", "YDDNW FIELD OS v2.7.0 \u2014 welcome back"],
-    ["blank"],
-    ["line", "resuming denial", "OK", "ok"],
-    ["line", "will_to_live", "still 7%", "warn"],
-    ["line", "coffee", "still none", "fail"],
-    ["blank"],
-    ["closer", "BACK AGAIN, HUH. GOOD. YOU'LL NEED IT."]
-  ];
-
-  let seq;
-  try { seq = sessionStorage.getItem("yddnw_booted") ? QUICK : FULL; }
-  catch (e) { seq = FULL; }
+  // One bank, every boot: no separate "welcome back" sequence.
+  const seq = FULL;
 
   const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const DATA_TOTAL = 668130;
@@ -18057,7 +18054,6 @@ function runBootSequence() {
     if (timer) clearTimeout(timer);
     setBar(100);
     promptEl.hidden = false;
-    try { sessionStorage.setItem("yddnw_booted", "1"); } catch (e) {}
   };
   const dismiss = () => {
     if (!overlay.parentNode) return;
