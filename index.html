@@ -2459,6 +2459,9 @@ body::after {
 .atlas-section-toggle { margin-left: auto; font-family: var(--font-m); font-size: 12px; color: var(--text-faint); }
 .atlas-section-body { display: block; }
 .atlas-section-body.collapsed { display: none; }
+.atlas-sub-label { font-family: var(--font-m); font-size: 10px; letter-spacing: .18em; color: var(--text-faint); margin: 14px 0 8px; }
+.atlas-sub-label:first-child { margin-top: 2px; }
+.atlas-count { color: var(--text-faint); font-weight: 400; }
 
 /* Fauna/flora entries */
 .atlas-species-list { display: flex; flex-direction: column; gap: 9px; }
@@ -17186,37 +17189,47 @@ function renderRegionDetail(root) {
           ${region.survival_notes}
         </div>` : ""}
 
-      ${dangerFauna.length ? atlasSection("✹ Dangerous Fauna", dangerFauna.map(f => `
+      ${(() => {
+        const dangerFaunaHTML = dangerFauna.map(f => `
         <div class="atlas-species-item">
           <div class="atlas-species-name">${f.name}</div>
           <span class="atlas-species-risk">${f.risk}</span>
           <div class="atlas-species-notes">${f.notes || ""}</div>
-        </div>`).join(""), "danger-fauna") : ""}
-
-      ${edibleFauna.length ? atlasSection("● Edible Fauna", edibleFauna.map(f => `
+        </div>`).join("");
+        const edibleFaunaHTML = edibleFauna.map(f => `
         <div class="atlas-species-item">
           <div class="atlas-species-name">${f.name}</div>
           <span class="atlas-species-edible-tag">Edible</span>
           ${f.season ? `<span class="atlas-species-season">○ ${f.season}</span>` : ""}
           <div class="atlas-species-method">${f.method || ""}</div>
-        </div>`).join(""), "edible-fauna") : ""}
-
-      ${dangerFlora.length ? atlasSection("✹ Dangerous Flora", dangerFlora.map(f => `
+        </div>`).join("");
+        const dangerFloraHTML = dangerFlora.map(f => `
         <div class="atlas-species-item">
           <div class="atlas-species-name">${f.name}</div>
           <span class="atlas-species-risk">${f.risk}</span>
           <div class="atlas-species-notes">${f.notes || ""}</div>
-        </div>`).join(""), "danger-flora") : ""}
-
-      ${edibleFlora.length ? atlasSection("❧ Edible Flora", edibleFlora.map(f => `
+        </div>`).join("");
+        const edibleFloraHTML = edibleFlora.map(f => `
         <div class="atlas-species-item">
           <div class="atlas-species-name">${f.name}</div>
           <span class="atlas-species-edible-tag">Edible${f.part ? " — " + f.part : ""}</span>
           ${f.season ? `<span class="atlas-species-season">○ ${f.season}</span>` : ""}
           <div class="atlas-species-method">${f.method || ""}</div>
-        </div>`).join(""), "edible-flora") : ""}
+        </div>`).join("");
+        const faunaCount = dangerFauna.length + edibleFauna.length;
+        const floraCount = dangerFlora.length + edibleFlora.length;
+        return `
+      ${faunaCount ? atlasSection(`✹ Fauna <span class="atlas-count">· ${faunaCount}</span>`,
+        (dangerFauna.length ? `<div class="atlas-sub-label">Dangerous</div>${dangerFaunaHTML}` : "") +
+        (edibleFauna.length ? `<div class="atlas-sub-label">Edible</div>${edibleFaunaHTML}` : ""),
+        "fauna", true) : ""}
 
-      ${atlasSection("≈ Water Sources",
+      ${floraCount ? atlasSection(`❧ Flora <span class="atlas-count">· ${floraCount}</span>`,
+        (dangerFlora.length ? `<div class="atlas-sub-label">Dangerous</div>${dangerFloraHTML}` : "") +
+        (edibleFlora.length ? `<div class="atlas-sub-label">Edible</div>${edibleFloraHTML}` : ""),
+        "flora", true) : ""}
+
+      ${atlasSection("≈ Water & Shelter",
         `<div class="atlas-quality-badge">${region.water?.quality || "Unknown water quality"}</div>
          <div class="atlas-water-sources">
            ${(region.water?.sources || []).map(s => `<div class="atlas-water-source">${s}</div>`).join("")}
@@ -17224,11 +17237,11 @@ function renderRegionDetail(root) {
          ${region.water?.purification?.length ? `
            <div class="card-label" style="margin-top:10px;margin-bottom:5px">Purification</div>
            ${region.water.purification.map(p => `<div class="atlas-water-source">${p}</div>`).join("")}
-         ` : ""}`,
-        "water")}
-
-      ${atlasSection("⌂ Shelter & Terrain",
-        `<div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:10px">${region.shelter?.notes || ""}</div>
+         ` : ""}
+         ${region.shelter?.notes ? `
+           <div class="card-label" style="margin-top:14px;margin-bottom:5px">Shelter</div>
+           <div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:10px">${region.shelter.notes}</div>
+         ` : ""}
          ${region.shelter?.materials?.length ? `
            <div class="card-label" style="margin-bottom:5px">Materials</div>
            <div class="atlas-water-sources">
@@ -17239,24 +17252,25 @@ function renderRegionDetail(root) {
            <div class="atlas-water-sources">
              ${region.shelter.terrain_features.map(f => `<div class="atlas-water-source" style="padding-left:0">&mdash; ${f}</div>`).join("")}
            </div>` : ""}`,
-        "shelter")}
+        "water-shelter")}
 
-      ${cities.length ? `
-        <div class="atlas-section">
-          <div class="card-label" style="margin-bottom:12px">Cities & Settlements</div>
-          <div class="atlas-cities-list">
-            ${cities.map(city => `
-              <div class="atlas-city-item">
-                <div class="atlas-city-name">➤ ${city.name}${city.elevation ? ` <span style="font-weight:400;font-size:11px;color:var(--text-faint)">· ${city.elevation}</span>` : ""}</div>
-                <div class="atlas-city-notes">${city.notes || ""}</div>
-                ${city.hazards?.length ? `
-                  <div class="atlas-city-hazards">
-                    ${city.hazards.map(h => `<span class="atlas-city-hazard">${h}</span>`).join("")}
-                  </div>` : ""}
-              </div>`).join("")}
-          </div>
-        </div>` : ""}
-      ${atlasRelatedHTML(region)}
+      ${cities.length ? atlasSection(`➤ Settlements <span class="atlas-count">· ${cities.length}</span>`,
+        `<div class="atlas-cities-list">
+          ${cities.map(city => `
+            <div class="atlas-city-item">
+              <div class="atlas-city-name">➤ ${city.name}${city.elevation ? ` <span style="font-weight:400;font-size:11px;color:var(--text-faint)">· ${city.elevation}</span>` : ""}</div>
+              <div class="atlas-city-notes">${city.notes || ""}</div>
+              ${city.hazards?.length ? `
+                <div class="atlas-city-hazards">
+                  ${city.hazards.map(h => `<span class="atlas-city-hazard">${h}</span>`).join("")}
+                </div>` : ""}
+            </div>`).join("")}
+        </div>`,
+        "settlements", true) : ""}
+      `;
+      })()}
+
+            ${atlasRelatedHTML(region)}
     </div>`;
 
   bindBreadcrumb(root);
@@ -17268,14 +17282,14 @@ function renderRegionDetail(root) {
 
 // ── Section helper ──────────────────────────────────────────────────────────
 
-function atlasSection(title, bodyHTML, key) {
+function atlasSection(title, bodyHTML, key, startCollapsed = false) {
   return `
     <div class="atlas-section">
       <div class="atlas-section-title" data-section-key="${key}">
         <span class="card-label">${title}</span>
-        <span class="atlas-section-toggle" id="tog-${key}">▾</span>
+        <span class="atlas-section-toggle" id="tog-${key}">${startCollapsed ? "▸" : "▾"}</span>
       </div>
-      <div class="atlas-section-body" id="body-${key}">
+      <div class="atlas-section-body${startCollapsed ? " collapsed" : ""}" id="body-${key}">
         <div class="atlas-species-list">${bodyHTML}</div>
       </div>
     </div>`;
