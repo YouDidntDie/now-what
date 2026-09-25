@@ -170,6 +170,14 @@ body::before {
   transform: translateY(-3px); min-width: 12px;
 }
 .bl-status { flex: 0 1 auto; text-align: right; overflow-wrap: break-word; }
+/* Fixed frame: the bar never rides up as lines append; log text centered */
+.boot-term {
+  display: flex; flex-direction: column;
+  height: min(64vh, 460px);
+}
+.boot-bar { flex: 0 0 auto; }
+#boot-lines { flex: 1 1 auto; max-height: none; text-align: center; }
+.boot-prompt { flex: 0 0 auto; }
 
 /* ── Reset ──────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
