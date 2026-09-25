@@ -16691,7 +16691,16 @@ const BIOME_LABELS = {
 };
 
 function getReadArticles() { try { return JSON.parse(localStorage.getItem(READ_ARTICLES_KEY) || "{}"); } catch(e){ return {}; } }
-function getRegionReads()  { try { return JSON.parse(localStorage.getItem(REGION_READS_KEY)  || "{}"); } catch(e){ return {}; } }
+function getRegionReads()  {
+  try {
+    const rr = JSON.parse(localStorage.getItem(REGION_READS_KEY)  || "{}");
+    // One credit per region, first view only — clamp any legacy inflated counts.
+    let dirty = false;
+    for (const k of Object.keys(rr)) { if (rr[k] !== 1) { rr[k] = 1; dirty = true; } }
+    if (dirty) { try { localStorage.setItem(REGION_READS_KEY, JSON.stringify(rr)); } catch(e){} }
+    return rr;
+  } catch(e){ return {}; }
+}
 
 // One credit per article. Each credited article fans out to the Atlas regions
 // its keywords match, so reading about Laos feeds highland + jungle scenarios.
@@ -16711,12 +16720,13 @@ function markArticleRead(articleId) {
   } catch(e){}
 }
 
-// Viewing an Atlas region counts directly toward its biomes.
+// Viewing an Atlas region counts directly toward its biomes — once per region.
 function markRegionViewed(regionId) {
   if (!regionId) return;
   try {
     const rr = getRegionReads();
-    rr[regionId] = (rr[regionId] || 0) + 1;
+    if (rr[regionId]) return; // already credited
+    rr[regionId] = 1;
     localStorage.setItem(REGION_READS_KEY, JSON.stringify(rr));
   } catch(e){}
 }
