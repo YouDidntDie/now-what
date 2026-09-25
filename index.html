@@ -17951,15 +17951,9 @@ function runBootSequence() {
   const fillEl = document.getElementById("boot-bar-fill");
   const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const scenCount = (typeof SCENARIOS !== "undefined" && SCENARIOS.length) ? SCENARIOS.length : 64;
   const FULL_HEAD = [
     ["head", "YDDNW FIELD OS v2.7.0 \u2014 \u201cmorning after\u201d build"],
     ["head", "(c) You Didn't Die Systems \u00b7 all rights reserved \u00b7 most of them"],
-  ];
-  const FULL_INFO = [
-    ["line", "encyclopedia", "605 articles \u00b7 32 domains", "ok"],
-    ["line", "simulator", scenCount + " scenarios + hybrid procedural", "ok"],
-    ["line", "atlas", "200 regions mapped", "ok"],
   ];
   // Absurd-toned pool (bible §13): 6 picked at random on every boot.
   // Rendered as centered one-liners, not status rows — the row format kills the joke.
@@ -18002,7 +17996,7 @@ function runBootSequence() {
     const k = Math.floor(Math.random() * (i + 1));
     const t = _j[i]; _j[i] = _j[k]; _j[k] = t;
   }
-  const FULL = FULL_HEAD.concat(FULL_INFO, _j.slice(0, 6), FULL_TAIL);
+  const FULL = FULL_HEAD.concat(_j.slice(0, 6), FULL_TAIL);
   // One bank, every boot: no separate "welcome back" sequence.
   const seq = FULL;
 
