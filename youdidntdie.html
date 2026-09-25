@@ -2152,6 +2152,33 @@ body::after {
 .pt-kind { font-size: 10px; letter-spacing: 1px; color: var(--text-faint); border: 1px solid var(--border); padding: 1px 5px; flex-shrink: 0; }
 .pt-name { flex: 1; }
 .pt-why { font-size: 11.5px; color: var(--text-dim); padding: 0 2px 7px 22px; line-height: 1.5; }
+/* ── BOSS FIGHTS ── */
+.sr-boss-tag { font-size: 9px; letter-spacing: 2px; color: var(--red); border: 1px solid var(--red); padding: 1px 6px; margin-left: 8px; vertical-align: 2px; }
+.scenario-row-boss { border-left: 2px solid var(--red); }
+.boss-rush { border: 1px solid var(--red); padding: 12px 14px; margin-bottom: 14px; background: color-mix(in srgb, var(--red) 6%, transparent); }
+.boss-rush-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.boss-rush-title { font-size: 12px; letter-spacing: 2px; color: var(--red); }
+.boss-rush-count { font-size: 12px; color: var(--text-dim); }
+.boss-rush-bar { height: 5px; background: var(--bg3); border: 1px solid var(--border); margin-bottom: 8px; }
+.boss-rush-fill { height: 100%; background: var(--red); opacity: .85; }
+.boss-rush-sub { font-size: 11.5px; color: var(--text-dim); line-height: 1.5; }
+.boss-splash { border: 1px solid var(--red); padding: 26px 20px; margin: 18px 0; background: color-mix(in srgb, var(--red) 5%, transparent); text-align: center; }
+.boss-splash-kicker { font-size: 13px; letter-spacing: 4px; color: var(--red); margin-bottom: 10px; }
+.boss-splash-phase { font-size: 11px; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 6px; }
+.boss-splash-title { font-size: 24px; color: var(--text); margin-bottom: 12px; letter-spacing: 1px; }
+.boss-splash-intro { font-size: 13.5px; color: var(--text-dim); line-height: 1.7; text-align: left; margin: 0 auto 14px; max-width: 560px; }
+.boss-splash-stakes { font-size: 12px; color: var(--text-dim); border-top: 1px dashed var(--border); border-bottom: 1px dashed var(--border); padding: 10px 4px; margin-bottom: 16px; line-height: 1.7; text-align: left; max-width: 560px; margin-left: auto; margin-right: auto; }
+.boss-splash-stakes b { color: var(--red); }
+.boss-splash-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.boss-fight-btn { background: var(--red); color: #0a0a0a; border: none; font-size: 14px; letter-spacing: 1px; padding: 12px 26px; cursor: pointer; font-weight: bold; }
+.boss-fight-btn:hover { filter: brightness(1.15); }
+.boss-ribbon { display: inline-block; font-size: 10px; letter-spacing: 2px; color: var(--red); border: 1px solid var(--red); padding: 2px 8px; margin-left: 10px; vertical-align: 2px; }
+.phase-boss-tag { font-size: 9px; letter-spacing: 1.5px; color: var(--red); border: 1px solid var(--red); padding: 1px 6px; margin-left: 6px; }
+.dh-boss { margin-bottom: 16px; padding: 20px 16px; }
+.dh-boss .boss-splash-title { font-size: 19px; margin-bottom: 8px; }
+.dh-boss .boss-splash-sub { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+.dh-boss .boss-splash-sub b { color: var(--red); }
+.dh-boss { border-color: var(--red); }
 .phase-detail-body { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
 .phase-detail-body ul { padding-left: 16px; margin-top: 6px; }
 .phase-detail-body li { margin-bottom: 3px; }
@@ -12565,6 +12592,134 @@ const SCENARIOS = [
       },
     ],
   },
+  {
+    id: "the-long-night",
+    biomes: ["boreal"],
+    title: "The Long Night",
+    icon: "✖",
+    difficulty: 3,
+    phase: 8,
+    gear: "kit",
+    timeOfDay: "17:20",
+    environment: "Deep winter, six weeks into a grid-down collapse. Your group — eleven people — holds a farmhouse compound: house, barn, woodpile, a hand pump. Dusk is falling and the sky has gone iron-grey.",
+    weather: "Blizzard inbound. Wind already 50 km/h gusting 80. Temp −14°C falling to −25°C overnight. Whiteout by 20:00.",
+    relatedDomain: "emergency_planning",
+    intro: "This is the exam everything else was preparing you for. One night. Eleven people. A blizzard, dwindling fuel, one old stove, and whatever judgment you have left when you're exhausted. Hold the compound together until dawn — buildings sealed, people warm, fire alive, water liquid, everyone accounted for. The night doesn't grade on effort.",
+    stages: [
+      {
+        id: "s1", title: "Stage 1 — Seal It Before Dark",
+        situation: "17:20. Usable light: forty minutes, maybe. The wind is already yanking at the barn doors, a farmhouse shutter bangs loose upstairs, and the firewood — two cords — sits under a tarp that's starting to lift at the corners. The animals are restless in the barn. You can't do everything before dark. What gets your hands first?",
+        check: { stat: "knowledge", difficulty: 12, tag: "shelter", label: "Storm Triage" },
+        randomEvents: [
+          { chance: 0.2, text: "A gust tears the tarp half off the woodpile — ten minutes lost re-securing it.", effect: { moraleMod: -6 } },
+          { chance: 0.15, text: "You find the barn's leeward door latch is broken — a good catch before dark.", effect: { moraleMod: 5, conditionAdd: "barn_latch_fixed" } },
+        ],
+        choices: [
+          { id: "seal", label: "Seal the buildings first", desc: "Shutters, doors, drafts — stop the wind getting inside.", statHint: "knowledge", tag: "shelter" },
+          { id: "wood", label: "Secure the firewood", desc: "Re-anchor the tarp and move a night's worth of wood inside now.", statHint: "endurance", tag: "shelter" },
+          { id: "barn", label: "Settle the barn and animals", desc: "Calm the livestock, latch everything, check feed and water.", statHint: "composure", tag: "community" },
+        ],
+        outcomes: {
+          seal: {
+            success: { narrative: "Shutters dogged, doors wedged, rags stuffed into the worst drafts. Inside, the wind drops to a whistle. The house will hold its heat tonight.", effects: { conditionAdd: "sealed", xpBonus: 10 }, tip: "In a blizzard, air infiltration is the silent heat thief — sealing drafts can matter as much as insulation. Work top-down: roof and upper windows first, since warm air escapes upward.", learnMore: ["s001", "ep002"] },
+            failure: { narrative: "You get the shutters but miss the cellar vent — all night it howls and bleeds heat through the floorboards. The stove works overtime for nothing.", effects: { conditionAdd: "drafty", moraleMod: -10 }, tip: "Check low as well as high: vents, cellar doors and crawlspaces leak heat all night. A five-minute perimeter walk in daylight catches what panic misses.", learnMore: ["s001"] },
+          },
+          wood: {
+            success: { narrative: "Tarp re-anchored with rope, not hope — and a full night's wood stacked by the stove before dark. Whatever the storm does, the fire won't starve.", effects: { conditionAdd: "fuel_secure", xpBonus: 10 }, tip: "Stage fuel before you need it: a night's wood indoors, dry and within arm's reach. Digging a woodpile out of a drift at 3 AM is how frostbite happens.", learnMore: ["f001", "s003"] },
+            failure: { narrative: "The tarp holds, barely — but you run out of light with half the wood still outside. Every trip into the storm tonight will cost heat and skin.", effects: { conditionAdd: "fuel_exposed", moraleMod: -10 }, tip: "Fuel logistics win winter nights: one indoor stack for the night, the main pile tarped and roped. Wind gets under loose tarps — anchor the edges with rope, don't just weight them.", learnMore: ["f001"] },
+          },
+          barn: {
+            success: { narrative: "Animals watered, fed and calmed; every latch checked twice. Livestock that panics in a storm injures itself and wrecks the barn — yours won't.", effects: { conditionAdd: "barn_secure", moraleMod: 8, xpBonus: 10 }, tip: "Animals are infrastructure: calm livestock stays healthy and the barn stays intact. Secure water and feed first — thirsty animals panic first.", learnMore: ["ep001"] },
+            failure: { narrative: "A goat bolts through the half-latched door into the dark. Two of you spend an hour getting it back, soaked and shaking. The barn is secured — eventually.", effects: { conditionAdd: "chilled", moraleMod: -12 }, tip: "Latches before livestock: always secure the doors before moving animals. One loose latch in a storm costs more time than checking every latch twice.", learnMore: ["ep001"] },
+          },
+        },
+      },
+      {
+        id: "s2", title: "Stage 2 — Cold Finds the Weak",
+        situation: "21:00. The house is holding at a bearable chill. But old Tomas sat too long by the drafty window — he's slurring his words, fumbling his cup, and his hands are white and clumsy. Nobody wants to say it. You have to.",
+        check: { stat: "knowledge", difficulty: 12, tag: "medical", label: "Hypothermia Response" },
+        randomEvents: [
+          { chance: 0.2, text: "A child spikes a fever from the day's chill — warm bed, fluids, monitored through the night.", effect: { moraleMod: -6 } },
+          { chance: 0.15, text: "Someone produces a hidden flask — confiscated before it does harm.", effect: { moraleMod: 4, conditionAdd: "flask_confiscated" } },
+        ],
+        choices: [
+          { id: "rewarm", label: "Active rewarming, by the book", desc: "Dry clothes, warm sweet drinks, skin-to-skin in blankets. No alcohol.", statHint: "knowledge", tag: "medical" },
+          { id: "stove", label: "Park him by the stove", desc: "Radiant heat and blankets — the fastest warmth available.", statHint: "endurance", tag: "medical" },
+          { id: "bed", label: "Bed rest with hot bricks", desc: "Bricks heated and wrapped in cloth, bed, sleep it off.", statHint: "composure", tag: "medical" },
+        ],
+        outcomes: {
+          rewarm: {
+            success: { narrative: "Dry base layer, warm sweet tea sipped slowly, a younger cousin zipped into the blankets beside him sharing body heat. By 23:00 his speech is clear and his hands are pink. Textbook.", effects: { conditionAdd: "tomas_stable", moraleMod: 12, xpBonus: 10 }, tip: "Hypothermia rewarming: dry first, then warm — wet clothes keep stealing heat. Warm (not hot) sweet drinks, skin-to-skin contact in blankets, and no alcohol — it dilates blood vessels and accelerates heat loss.", learnMore: ["m001", "m003"] },
+            failure: { narrative: "You get him dry and warming, but too slowly — he spends hours in the grey zone, confused and shivering. He stabilises near midnight, but the night's margin is gone.", effects: { conditionAdd: "tomas_weak", moraleMod: -10 }, tip: "Speed matters with hypothermia: begin rewarming the moment you recognise it — slurred speech, clumsiness, apathy. Passive blankets alone are slow; add active measures: warm drinks, body heat, dry insulation.", learnMore: ["m001"] },
+          },
+          stove: {
+            success: { narrative: "The stove's radiant heat plus blankets brings him around steadily. You rotate him, check his skin, keep him sipping warm tea. By 23:30 he's complaining about the fuss — the best possible sign.", effects: { conditionAdd: "tomas_stable", moraleMod: 8, xpBonus: 10 }, tip: "Radiant heat works for mild hypothermia — but check numb skin often: frostbitten tissue burns before it feels heat. Keep the person dry, keep fluids warm and sweet, and watch for the afterdrop as cold blood recirculates.", learnMore: ["m001", "m002"] },
+            failure: { narrative: "He warms on the stove side and stays cold on the other — and a blister rises on one numb shin where he sat too close. You've traded hypothermia for a burn to dress.", effects: { conditionAdd: "tomas_burned", moraleMod: -12 }, tip: "Never apply direct high heat to numb skin — burns happen painlessly on frostbitten tissue. Warm the core first (drinks, blankets, body heat); extremities rewarm last.", learnMore: ["m002"] },
+          },
+          bed: {
+            success: { narrative: "Hot bricks wrapped in towels, layered blankets, warm tea before sleep. Slow but steady — he sleeps warm and wakes clear-headed.", effects: { conditionAdd: "tomas_stable", xpBonus: 5 }, tip: "For mild hypothermia, warm dry bedding plus heated objects (bricks, water bottles wrapped in cloth) is a solid field method — as long as the person is dry, conscious, and monitored.", learnMore: ["m001"] },
+            failure: { narrative: "The bricks cool by midnight and nobody checks. He sleeps cold, wakes colder — grey, slow, barely shivering. Shivering stopping is the warning, not the recovery.", effects: { conditionAdd: "tomas_critical", moraleMod: -18 }, tip: "When shivering stops in a cold person, that's deterioration, not improvement — the body is giving up on rewarming itself. That's the moment for active measures, not more blankets.", learnMore: ["m003"] },
+          },
+        },
+      },
+      {
+        id: "s3", title: "Stage 3 — Fire and Water",
+        situation: "01:00. The stove is eating wood faster than planned and the indoor stack is half gone. The flue has been sticking — twice tonight the damper nearly closed itself, and the room smelled sharp for a minute. Meanwhile the water bucket is nearly empty: the hand pump froze at midnight, so every litre from here is melted snow. The fire can't do both jobs forever. You set the night's fuel doctrine.",
+        check: { stat: "knowledge", difficulty: 13, tag: "fire", label: "Fuel Doctrine" },
+        randomEvents: [
+          { chance: 0.2, text: "Wind finds a gap in the barn roof — a night repair with a tarp, in the storm, by lamplight.", effect: { moraleMod: -8 } },
+          { chance: 0.15, text: "The snowmelt pot boils dry once — caught in time, lesson learned.", effect: { moraleMod: -4 } },
+        ],
+        choices: [
+          { id: "ration", label: "Ration the burn, melt in batches", desc: "Bank the stove low, melt snow in small batches through the night.", statHint: "knowledge", tag: "fire" },
+          { id: "stoke", label: "Keep it roaring", desc: "Comfort and speed tonight; deal with the woodpile at dawn.", statHint: "endurance", tag: "fire" },
+          { id: "damper", label: "Choke the damper and sleep", desc: "A nearly-closed damper stretches the wood for hours. Everyone sleeps warm.", statHint: "composure", tag: "fire" },
+        ],
+        outcomes: {
+          ration: {
+            success: { narrative: "Low steady burn, a pot of snow always melting at the back of the stove, water bottles filled through the night. Dawn finds wood to spare and water to drink. Discipline paid.", effects: { conditionAdd: "fuel_held", conditionAdd2: "water_secure", moraleMod: 10, xpBonus: 15 }, tip: "Winter fuel doctrine: bank the stove to a low steady burn and batch your snowmelt — a pot at the back of the stove turns waste heat into water. Melted snow needs heating through, not a rolling boil, unless contamination is suspected.", learnMore: ["f001", "w001"] },
+            failure: { narrative: "The batches slip — the pot boils dry twice, and gusts down the flue keep puffing the low fire out. You spend the night relighting instead of sleeping.", effects: { conditionAdd: "sleepless", moraleMod: -12 }, tip: "A banked stove still needs watching: gusting wind can puff a low fire out or push smoke back down the flue. Make the burn check part of every watch rotation — routine, not afterthought.", learnMore: ["f001"] },
+          },
+          stoke: {
+            success: { narrative: "The house stays genuinely warm all night and water flows freely. But at 05:00 the indoor stack is gone, and someone is dressing for the woodpile in a whiteout.", effects: { conditionAdd: "warm_night", conditionAdd2: "fuel_gone", moraleMod: 6, xpBonus: 5 }, tip: "Comfort has a fuel price: a roaring stove can burn a night's wood by 3 AM. If you choose warmth, pre-position the resupply — wood staged indoors before dark, path marked, never improvised in a whiteout.", learnMore: ["f003"] },
+            failure: { narrative: "Roaring burn, empty stack by 03:00, and the whiteout at its worst. The woodpile might as well be on the moon. The stove dies by four and the house starts losing degrees it won't get back.", effects: { conditionAdd: "freezing_house", moraleMod: -20 }, tip: "Never let the fire outpace the fuel plan: know your burn rate — roughly how long a full stove lasts — and never start a burn you can't feed until morning.", learnMore: ["f003"] },
+          },
+          damper: {
+            success: { narrative: "At 03:40 you wake with a splitting headache and the room smelling wrong — sharp, acrid. The damper has crept fully shut and the stove is smouldering. You throw the damper open, crack a window to the storm, and sit shaking while the room clears. Nobody sleeps near that stove again without a watch.", effects: { conditionAdd: "co_scare", moraleMod: -15, xpBonus: 5 }, tip: "Headache plus a fuel-burning stove plus a closed damper means carbon monoxide until proven otherwise. CO itself is odourless — any smell is other smoke gases. Never sleep on a choked stove, and a sticking damper gets fixed in daylight, not trusted overnight.", learnMore: ["f001", "ep004"] },
+            failure: { narrative: "Nobody wakes. The damper creeps shut, the flue sticks, and the smouldering stove fills the sealed house with carbon monoxide — invisible, odourless, patient. The storm buries the compound by morning. All of it.", effects: { fatal: true }, tip: "A choked stove in a sealed house is a gas chamber: incomplete combustion makes carbon monoxide, which binds to blood far more readily than oxygen. Drowsiness, headache, then nothing. Stoves sleep banked and watched, or they sleep cold — never choked and trusted.", learnMore: ["f001", "ep004"] },
+          },
+        },
+      },
+      {
+        id: "s4", title: "Stage 4 — Hold the Night",
+        situation: "03:30. You're on watch — everyone else finally asleep. Then it comes: a ripping crack from the woodpile, then dragging sounds. The tarp? An animal? Someone on foot? You're exhausted, the storm is still screaming, and waking the house for nothing costs everyone sleep they won't get back. Ignoring it could cost the fuel. Going alone could cost you.",
+        check: { stat: "perception", difficulty: 13, tag: "security", label: "Night Watch Decision" },
+        randomEvents: [
+          { chance: 0.2, text: "The lamp gutters — trimming the wick by feel, in the dark, while listening.", effect: { moraleMod: -4 } },
+          { chance: 0.15, text: "A child cries out from a bad dream — settled with a hand on the shoulder, back under.", effect: { moraleMod: 3 } },
+        ],
+        choices: [
+          { id: "wake", label: "Wake two for a proper check", desc: "Two rested enough, lamps lit, approach together and loud.", statHint: "composure", tag: "security" },
+          { id: "alone", label: "Check it alone and quiet", desc: "Lamp low, move careful — don't wake the house for a tarp.", statHint: "perception", tag: "security" },
+          { id: "ignore", label: "Hold the stove, ignore it", desc: "It's the wind. The watch stays at the fire.", statHint: "knowledge", tag: "community" },
+        ],
+        outcomes: {
+          wake: {
+            success: { narrative: "Three lamps, three people, noise on purpose. It's the tarp — half ripped, wood scattering into the drift. Six hands re-secure it in minutes, and the noise tells anything with teeth to try elsewhere. Textbook watch response.", effects: { conditionAdd: "watch_held", moraleMod: 10, xpBonus: 15 }, tip: "Night disturbances get the buddy system: never investigate alone — go lit and loud. Most threats, animal or human, want easy and quiet; a group with lamps is neither.", learnMore: ["sc001", "sc002"] },
+            failure: { narrative: "You wake two — and it's just the tarp, flapping. Grumbles all around, sleep broken. But the tarp IS failing, and three people fix it before it matters. An expensive false alarm that wasn't false.", effects: { conditionAdd: "watch_held", moraleMod: -8, xpBonus: 5 }, tip: "False alarms are part of watch duty, not failures of it — the watch that stops answering noises stops being a watch. Log it, fix what's fixable, rotate the sleep debt fairly.", learnMore: ["sc001"] },
+          },
+          alone: {
+            success: { narrative: "Low lamp, careful steps — the tarp's torn corner whipping in the wind. You wrestle it down solo and re-anchor it before it takes the whole cover. Back inside in ten minutes, house still asleep.", effects: { conditionAdd: "tarp_fixed", xpBonus: 10 }, tip: "If you must go alone: tell someone where you're going first — even waking one person to hold the door counts. Solo and silent with no one knowing is how people vanish twenty metres from safety.", learnMore: ["sc001", "p003"] },
+            failure: { narrative: "Halfway to the woodpile the wind takes your lamp and your footing — you go down hard on ice, lamp smashed, ankle turning. You crawl back. The tarp keeps ripping all night, and now the watch is injured too.", effects: { conditionAdd: "injured_watch", moraleMod: -15 }, tip: "Dark, ice, storm, alone: every risk factor stacked. The watch's first duty is to remain capable — an injured watcher protects no one. Capability before curiosity, always.", learnMore: ["sc001", "m001"] },
+          },
+          ignore: {
+            success: { narrative: "Dawn comes. The noise was the tarp's loose corner — it held, barely, and the woodpile is half-buried but recoverable. You got lucky, and luck isn't a watch doctrine.", effects: { conditionAdd: "lucky", moraleMod: -5, xpBonus: 5 }, tip: "Unexplained night noises get checked — that is the entire job of a watch. 'Probably nothing' is right until the night it's wrong, and the cost of checking is always smaller than the cost of the thing you didn't check.", learnMore: ["sc001"] },
+            failure: { narrative: "By dawn the tarp is gone — somewhere downwind — and the woodpile is a white mound. Two cords of fuel, buried. Digging it out will take the whole group all day, in the storm's aftermath, with the house already cooling.", effects: { conditionAdd: "fuel_lost", moraleMod: -20 }, tip: "Fuel security is night-watch business: a ten-minute check at 03:30 saves a ten-hour dig at dawn. The watch protects the group's tomorrow, not just its tonight.", learnMore: ["sc001", "f003"] },
+          },
+        },
+      },
+    ],
+  },
 ];
 
 
@@ -14196,12 +14351,20 @@ function startScenarioById(root, scenarioId) {
   } else {
     const sc = SCENARIOS.find(s => s.id === scenarioId);
     if (!sc) return;
-    const u = scenarioUnlock(sc);
-    if (!u.unlocked) {
-      const remaining = u.need - u.have;
-      showInfoToast("▣", "Scenario Locked", `Read ${remaining} more article${remaining === 1 ? "" : "s"} about ${biomeLabel(u.biome)} to unlock "${sc.title}".`);
-      goTo("library");
-      return;
+    if (scenarioId === FINAL_BOSS_ID) {
+      // Final boss answers only to the Boss Rush — biome reads never gate it once unlocked.
+      if (!finalBossUnlocked()) {
+        showInfoToast("✖", "Final Boss Locked", "Slay all nine phase bosses to unlock The Long Night.");
+        return;
+      }
+    } else {
+      const u = scenarioUnlock(sc);
+      if (!u.unlocked) {
+        const remaining = u.need - u.have;
+        showInfoToast("▣", "Scenario Locked", `Read ${remaining} more article${remaining === 1 ? "" : "s"} about ${biomeLabel(u.biome)} to unlock "${sc.title}".`);
+        goTo("library");
+        return;
+      }
     }
   }
   resetRun();
@@ -14214,7 +14377,7 @@ function startScenarioById(root, scenarioId) {
     if (!RUN.scenario) return;
     RUN.env = buildLegacyEnv(RUN.scenario);
   }
-  RUN.phase = "setup";
+  RUN.phase = isBossScenario(scenarioId) ? "bossintro" : "setup";
   renderSimulator(root);
   root.scrollTop = 0;
 }
@@ -14225,6 +14388,7 @@ function renderSimulator(root, onOpenArticle) {
   root.innerHTML = "";
   switch (RUN.phase) {
     case "menu":    renderMenu(root);                   break;
+    case "bossintro": renderBossIntro(root);             break;
     case "setup":   renderSetup(root);                  break;
     case "run":     renderRun(root, openArticle);       break;
     case "debrief": renderDebrief(root, openArticle); break;
@@ -14255,6 +14419,20 @@ function renderMenu(root) {
       </button>
 
       <div class="menu-section-label"><span class="card-label">Choose Scenario</span></div>
+      ${(() => {
+        const bp = bossRushProgress();
+        const finalWon = bossDefeated(FINAL_BOSS_ID);
+        const pct = Math.round(bp.defeated / bp.total * 100);
+        return `
+      <div class="boss-rush">
+        <div class="boss-rush-head">
+          <span class="boss-rush-title">BOSS RUSH</span>
+          <span class="boss-rush-count">${bp.defeated}/${bp.total} phase bosses slain</span>
+        </div>
+        <div class="boss-rush-bar"><div class="boss-rush-fill" style="width:${pct}%"></div></div>
+        <div class="boss-rush-sub">${finalWon ? "The Long Night has fallen. You beat them all." : finalBossUnlocked() ? "All nine phase bosses are down. The final boss is unlocked — The Long Night awaits." : "Each civilisation phase ends in a boss fight. Slay all nine to unlock the final boss: The Long Night."}</div>
+      </div>`;
+      })()}
       <div class="scenario-list">
         ${(() => {
           const phaseGroups = {};
@@ -14263,12 +14441,9 @@ function renderMenu(root) {
             if (!phaseGroups[p]) phaseGroups[p] = [];
             phaseGroups[p].push(s);
           }
-          const phaseLabels = {
-            0: "Phase 0 — Immediate Survival",
-            1: "Phase 1 — Stability",
-            2: "Phase 2 — Material & Community",
-            3: "Phase 3 — Rebuild",
-          };
+          const phaseLabels = {};
+          for (const ph of (typeof PHASES !== "undefined" ? PHASES : []))
+            phaseLabels[ph.id] = `Phase ${ph.id} — ${ph.name}`;
           return Object.keys(phaseGroups).sort((a,b) => a-b).map(phase => `
             <div class="scenario-phase-group">
               <div class="scenario-phase-label">${phaseLabels[phase] || "Phase " + phase}</div>
@@ -14279,6 +14454,19 @@ function renderMenu(root) {
                 const wShort = wFull.length > 48
                   ? (wCut.lastIndexOf(" ") > 20 ? wCut.slice(0, wCut.lastIndexOf(" ")) : wCut) + "…"
                   : wFull;
+                if (s.id === FINAL_BOSS_ID && !finalBossUnlocked()) {
+                  const bp2 = bossRushProgress();
+                  const rem = bp2.total - bp2.defeated;
+                  return `
+                  <button class="scenario-row scenario-row-boss scenario-row-locked" data-locked="__finalboss__">
+                    <span class="sc-icon-lg">▣</span>
+                    <div class="sr-body">
+                      <div class="sr-title">${s.title}<span class="sr-boss-tag">FINAL BOSS</span></div>
+                      <div class="sr-meta">${dots} · ${s.stages.length} stages · ${wShort}</div>
+                      <div class="sr-lock">LOCKED — slay ${rem} more phase boss${rem === 1 ? "" : "es"} to unlock <span class="sr-lock-go">→</span></div>
+                    </div>
+                  </button>`;
+                }
                 const u = scenarioUnlock(s);
                 if (!u.unlocked) {
                   const remaining = u.need - u.have;
@@ -14292,11 +14480,13 @@ function renderMenu(root) {
                     </div>
                   </button>`;
                 }
+                const boss = bossPhaseOf(s.id);
+                const slain = boss && bossDefeated(s.id);
                 return `
-                  <button class="scenario-row" data-id="${s.id}">
+                  <button class="scenario-row${boss ? " scenario-row-boss" : ""}" data-id="${s.id}">
                     <span class="sc-icon-lg">${s.icon}</span>
                     <div class="sr-body">
-                      <div class="sr-title">${s.title}</div>
+                      <div class="sr-title">${s.title}${boss ? `<span class="sr-boss-tag">${boss.final ? "FINAL BOSS" : "BOSS"}${slain ? " · SLAIN" : ""}</span>` : ""}</div>
                       <div class="sr-meta">${dots} · ${s.stages.length} stages · ${wShort}</div>
                     </div>
                     <span class="sr-arrow">›</span>
@@ -14356,6 +14546,10 @@ function renderMenu(root) {
   root.querySelectorAll(".scenario-row-locked").forEach(btn =>
     btn.addEventListener("click", () => {
       const sid = btn.dataset.locked;
+      if (sid === "__finalboss__") {
+        showInfoToast("✖", "Final Boss Locked", "Slay all nine phase bosses to unlock The Long Night.");
+        return;
+      }
       const sc = (typeof SCENARIOS !== "undefined") ? SCENARIOS.find(s => s.id === sid) : null;
       const biome = sc ? scenarioBiome(sc) : null;
       goTo("library", { tab: "articles", biomeReading: biome || null });
@@ -14736,6 +14930,36 @@ function buildRegionalIntelBlock(atlasRegion) {
 
 // ── Setup screen ───────────────────────────────────────────────────────────────
 
+// ── BOSS INTRO ───────────────────────────────────────────────────────────────
+// The splash screen before a boss fight's setup: stakes, rewards, one way in.
+function renderBossIntro(root) {
+  const s = RUN.scenario;
+  if (!s || !isBossScenario(s.id)) { RUN.phase = "setup"; renderSimulator(root); root.scrollTop = 0; return; }
+  const boss = bossPhaseOf(s.id);
+  const dots = "●".repeat(s.difficulty) + "○".repeat(3 - s.difficulty);
+  const slain = bossDefeated(s.id);
+  root.innerHTML = `
+    <div class="sim-page">
+      <button class="back-btn" id="boss-back">← Scenarios</button>
+      <div class="boss-splash">
+        <div class="boss-splash-kicker">${boss.final ? "⚠ FINAL BOSS" : "⚠ PHASE BOSS"}</div>
+        <div class="boss-splash-phase">${boss.final ? "All nine phase bosses defeated — this is what's left" : `Phase ${boss.phaseId} — ${boss.phaseName} · Final Exam`}</div>
+        <div class="boss-splash-title">${s.icon} ${s.title}</div>
+        ${s.intro ? `<div class="boss-splash-intro">${s.intro}</div>` : ""}
+        <div class="boss-splash-stakes">
+          <b>${dots}</b> difficulty · <b>${s.stages.length}</b> stages — survive them all to slay this boss.<br>
+          First victory pays a boss bonus: <b>${boss.final ? "+300 XP · +500 ◈" : "+100 XP · +150 ◈"}</b>${slain ? " <i>(already slain — no bonus on repeat kills)</i>" : ""}<br>
+          Losing costs you nothing but the run — the boss will still be here.
+        </div>
+        <div class="boss-splash-btns">
+          <button class="boss-fight-btn" id="boss-fight">ENTER THE FIGHT →</button>
+        </div>
+      </div>
+    </div>`;
+  root.querySelector("#boss-back").addEventListener("click", () => { resetRun(); renderSimulator(root); root.scrollTop = 0; });
+  root.querySelector("#boss-fight").addEventListener("click", () => { RUN.phase = "setup"; renderSimulator(root); root.scrollTop = 0; });
+}
+
 function renderSetup(root) {
   const s = RUN.scenario;
   if (!s) { RUN.phase = "menu"; renderSimulator(root); root.scrollTop = 0; return; }
@@ -14752,7 +14976,7 @@ function renderSetup(root) {
   root.innerHTML = `
     <div class="sim-page">
       <button class="back-btn" id="setup-back">← Scenarios</button>
-      <div class="sim-eyebrow">${s.icon} ${s.title}</div>
+      <div class="sim-eyebrow">${s.icon} ${s.title}${isBossScenario(s.id) ? '<span class="boss-ribbon">BOSS</span>' : ""}</div>
       <h2 class="sim-title">Mission Setup</h2>
 
       <div class="setup-section" id="setup-region-section">
@@ -15415,7 +15639,7 @@ function renderRun(root, onOpenArticle) {
   root.innerHTML = `
     <div class="sim-page">
       <details class="brief-details">
-        <summary>MISSION BRIEF — ${RUN.scenario.icon} ${RUN.scenario.title}</summary>
+        <summary>MISSION BRIEF — ${RUN.scenario.icon} ${RUN.scenario.title}${isBossScenario(RUN.scenario.id) ? '<span class="boss-ribbon">BOSS</span>' : ""}</summary>
         <div class="brief-details-body">${briefDetailsHTML()}</div>
       </details>
 
@@ -15453,13 +15677,29 @@ function finaliseRun(survived) {
   const raw         = healthScore + moraleScore + stageScore + xpScore;
   const score       = survived ? raw : Math.round(raw * 0.4);
 
+  // ── Boss fights: persist the victory, pay the first-kill bonus once ──
+  const bossInfo = bossPhaseOf(RUN.scenario.id);
+  let bossBonusXp = 0, bossBonusCredits = 0, bossFirstKill = false;
+  if (bossInfo && survived) {
+    const defeats = loadBossDefeats();
+    bossFirstKill = !defeats[RUN.scenario.id];
+    defeats[RUN.scenario.id] = Date.now();
+    saveBossDefeats(defeats);
+    if (bossFirstKill) {
+      bossBonusXp      = bossInfo.final ? 300 : 100;
+      bossBonusCredits = bossInfo.final ? 500 : 150;
+      RUN.xpEarned    += bossBonusXp;
+    }
+  }
+  RUN._bossSlain = bossInfo ? { ...bossInfo, firstKill: bossFirstKill, bonusXp: bossBonusXp, bonusCredits: bossBonusCredits, lost: !survived } : null;
+
   const { char: newChar, leveled } = awardXP(char, RUN.xpEarned);
   newChar.runsCompleted++;
   if (survived) newChar.runsSucceeded++;
   newChar.totalScore = (newChar.totalScore || 0) + score;
 
   // Award credits: base 25 per run + 15 bonus for survival + stage bonuses
-  const creditsEarned = 25 + (survived ? 15 : 0) + RUN.stageLog.filter(s => s.success).length * 5;
+  const creditsEarned = 25 + (survived ? 15 : 0) + RUN.stageLog.filter(s => s.success).length * 5 + bossBonusCredits;
   newChar.credits = (newChar.credits ?? 150) + creditsEarned;
   RUN._creditsEarned = creditsEarned;
 
@@ -15511,6 +15751,17 @@ function renderDebrief(root, onOpenArticle) {
           </div>
         </div>
       </div>
+
+      ${RUN._bossSlain ? `
+        <div class="boss-splash dh-boss">
+          <div class="boss-splash-kicker">${RUN._bossSlain.lost ? "THE BOSS STANDS" : "⚠ BOSS SLAIN"}</div>
+          <div class="boss-splash-title">${s.title}</div>
+          <div class="boss-splash-sub">${RUN._bossSlain.lost
+            ? "You didn't make it this time. The boss will still be here — come back stronger."
+            : RUN._bossSlain.final
+              ? `The Long Night has fallen. All ten bosses slain${RUN._bossSlain.firstKill ? ` — first-kill bonus <b>+${RUN._bossSlain.bonusXp} XP · +${RUN._bossSlain.bonusCredits} ◈</b>` : " (already slain — no repeat bonus)"}.`
+              : `Phase ${RUN._bossSlain.phaseId} boss defeated${RUN._bossSlain.firstKill ? ` — first-kill bonus <b>+${RUN._bossSlain.bonusXp} XP · +${RUN._bossSlain.bonusCredits} ◈</b>` : " (already slain — no repeat bonus)"}.`}</div>
+        </div>` : ""}
 
       ${RUN.atlasRegion ? `
         <div class="regional-intel" style="margin-bottom:16px">
@@ -15812,8 +16063,49 @@ function checkPhaseMastery(phaseId, phaseName) {
     showInfoToast("◈", "Phase Mastered", "Day After track complete: " + phaseName + ".", "+100 credits.", 5000);
   } catch(e){}
 }
-function hydratePhaseTracks(root) {
-  loadPhaseTracks().then(() => {
+// ── BOSS FIGHTS ─────────────────────────────────────────────────────────────
+// The 9 phase-exam scenarios are bosses (source of truth for the exam ids is
+// data/phase_tracks.json — the last stop of each phase). Plus one final boss.
+const BOSS_SCENARIOS = {
+  "forest-injury": 0, "highland-camp-week2": 1, "food-security-push": 2,
+  "the-forge": 3, "light-again": 4, "night-watch": 5,
+  "fever-season": 6, "well-project": 7, "library-ash": 8,
+};
+const FINAL_BOSS_ID = "the-long-night";
+const BOSS_DEFEATS_KEY = "yddnw_boss_defeats";
+function loadBossDefeats() {
+  try { return JSON.parse(localStorage.getItem(BOSS_DEFEATS_KEY) || "{}"); }
+  catch(e){ return {}; }
+}
+function saveBossDefeats(m) {
+  try { localStorage.setItem(BOSS_DEFEATS_KEY, JSON.stringify(m)); } catch(e){}
+}
+// Returns { phaseId, phaseName, final } or null.
+function bossPhaseOf(scenarioId) {
+  if (scenarioId === FINAL_BOSS_ID) return { phaseId: 8, phaseName: "Final Exam", final: true };
+  if (Object.prototype.hasOwnProperty.call(BOSS_SCENARIOS, scenarioId)) {
+    const pid = BOSS_SCENARIOS[scenarioId];
+    const ph = (typeof PHASES !== "undefined" ? PHASES : []).find(p => p.id === pid);
+    return { phaseId: pid, phaseName: ph ? ph.name : ("Phase " + pid), final: false };
+  }
+  return null;
+}
+function isBossScenario(scenarioId) { return !!bossPhaseOf(scenarioId); }
+function bossDefeated(scenarioId) { return !!loadBossDefeats()[scenarioId]; }
+function bossRushProgress() {
+  const d = loadBossDefeats();
+  const ids = Object.keys(BOSS_SCENARIOS);
+  const defeated = ids.filter(id => d[id]).length;
+  return { defeated, total: ids.length };
+}
+function finalBossUnlocked() { return bossRushProgress().defeated >= bossRushProgress().total; }
+function bossExamIdForPhase(phaseId) {
+  for (const [sid, pid] of Object.entries(BOSS_SCENARIOS))
+    if (pid === phaseId) return sid;
+  return null;
+}
+
+function hydratePhaseTracks(root) {  loadPhaseTracks().then(() => {
     root.querySelectorAll("[data-phase-track]").forEach(box => {
       const phaseId = box.dataset.phaseTrack;
       const phase = (typeof PHASES !== "undefined" ? PHASES : [])
@@ -15913,6 +16205,7 @@ function renderPhaseTracker(char) {
                   <span class="phase-num">Phase ${phase.id}</span>
                   <span class="phase-name ${nameClass}">${phase.name}</span>
                   <span class="phase-status-tag ${tagClass}">${tagText}</span>
+                  ${(() => { const exam = bossExamIdForPhase(phase.id); return exam && bossDefeated(exam) ? '<span class="phase-boss-tag">BOSS SLAIN</span>' : ""; })()}
                 </div>
                 <div class="phase-scope">${phase.scope}</div>
                 ${chips.length ? `
@@ -16119,6 +16412,23 @@ const BADGES = [
     id: "hybrid_complete",icon: "⌁", name: "Multi-Vector",
     desc: "Survive a hybrid (2+ threat) scenario.",
     check: (c, ls) => (c.history || []).some(h => h.survived && h.scenarioId?.startsWith("hybrid_")),
+  },
+
+  // ── Boss fights ───────────────────────────────────────────────────────────
+  {
+    id: "boss_slayer",  icon: "✕", name: "Boss Slayer",
+    desc: "Slay a phase boss.",
+    check: (c, ls) => Object.keys(BOSS_SCENARIOS).some(id => bossDefeated(id)),
+  },
+  {
+    id: "boss_rush",    icon: "✖", name: "Boss Rush",
+    desc: "Slay all nine phase bosses.",
+    check: (c, ls) => finalBossUnlocked(),
+  },
+  {
+    id: "long_night",   icon: "☾", name: "The Long Night",
+    desc: "Slay the final boss.",
+    check: (c, ls) => bossDefeated(FINAL_BOSS_ID),
   },
 
   // ── Levels ────────────────────────────────────────────────────────────────
@@ -19225,6 +19535,7 @@ function renderPhasesTab(el) {
                   <span class="phase-num">Phase ${phase.id}</span>
                   <span class="phase-name ${isLocked ? "phase-name-locked" : ""}">${phase.name}</span>
                   <span class="phase-status-tag ${tagClass}">${tagText}</span>
+                  ${(() => { const exam = bossExamIdForPhase(phase.id); return exam && bossDefeated(exam) ? '<span class="phase-boss-tag">BOSS SLAIN</span>' : ""; })()}
                 </div>
                 <div class="phase-scope">${phase.scope}</div>
                 ${chips.length ? `<div class="phase-reqs">${chips.map(c => `<span class="phase-req-chip ${c.met ? "prc-met" : "prc-unmet"}">${c.met ? "✓" : "○"} ${c.label}</span>`).join("")}</div>` : ""}
