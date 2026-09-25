@@ -172,7 +172,6 @@ body::before {
   height: 100%; width: 0%;
   background: var(--phosphor);
   box-shadow: 0 0 8px color-mix(in srgb, var(--phosphor) 60%, transparent);
-  transition: width .35s ease;
 }
 .boot-status { min-height: 64px; }
 #boot-line-one { font-size: 13px; line-height: 1.9; }
@@ -17949,21 +17948,48 @@ function runBootSequence() {
   const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const scenCount = (typeof SCENARIOS !== "undefined" && SCENARIOS.length) ? SCENARIOS.length : 64;
-  const FULL = [
+  const FULL_HEAD = [
     ["head", "YDDNW FIELD OS v2.7.0 \u2014 \u201cmorning after\u201d build"],
     ["head", "(c) You Didn't Die Systems \u00b7 all rights reserved \u00b7 most of them"],
-    ["blank"],
-    ["line", "mounting /dev/optimism", "NOT FOUND", "fail"],
+  ];
+  const FULL_INFO = [
     ["line", "encyclopedia", "605 articles \u00b7 32 domains", "ok"],
     ["line", "simulator", scenCount + " scenarios + hybrid procedural", "ok"],
     ["line", "atlas", "200 regions mapped", "ok"],
+  ];
+  // Absurd-toned pool (bible §13): 6 picked at random on every boot
+  const FULL_JOKES = [
+    ["line", "mounting /dev/optimism", "NOT FOUND", "fail"],
     ["line", "calibrating will_to_live", "7%", "warn"],
     ["line", "brewing coffee", "FAILED (no water, no power, no beans)", "fail"],
     ["line", "locating clean water", "you'll learn how. that's the point.", "ok"],
-    ["blank"],
+    ["line", "downloading survival instincts", "TIMEOUT (never had any)", "fail"],
+    ["line", "charging plot armor", "0%", "warn"],
+    ["line", "updating excuse database", "4,096 excuses installed", "ok"],
+    ["line", "scanning horizon for rescue", "no signal. shocking.", "warn"],
+    ["line", "inflating ego", "already at maximum", "ok"],
+    ["line", "defragmenting common sense", "FRAGMENTED BEYOND REPAIR", "fail"],
+    ["line", "installing patience", "97% (stuck since 2024)", "warn"],
+    ["line", "checking fridge", "EMPTY. as expected.", "fail"],
+    ["line", "measuring hope", "trace amounts detected", "warn"],
+    ["line", "dialing emergency services", "all lines busy. permanently.", "fail"],
+    ["line", "polishing survival badge", "participation trophy found", "warn"],
+    ["line", "loading plot twist", "it's tuesday. that's the twist.", "ok"],
+    ["line", "backing up excuses", "backup corrupted. convenient.", "fail"],
+    ["line", "warming up hero complex", "OVERHEATING", "warn"],
+    ["line", "reheating leftovers", "no microwave. no leftovers. no kitchen.", "fail"],
+    ["line", "counting blessings", "1 found. it's you. you're alive.", "ok"],
+  ];
+  const FULL_TAIL = [
     ["closer", "CONGRATULATIONS. SOMETHING WENT CATASTROPHICALLY WRONG."],
     ["sub", "Here's what you need to do next."]
   ];
+  const _j = FULL_JOKES.slice();
+  for (let i = _j.length - 1; i > 0; i--) {
+    const k = Math.floor(Math.random() * (i + 1));
+    const t = _j[i]; _j[i] = _j[k]; _j[k] = t;
+  }
+  const FULL = FULL_HEAD.concat(FULL_INFO, _j.slice(0, 6), FULL_TAIL);
   const QUICK = [
     ["head", "YDDNW FIELD OS v2.7.0 \u2014 welcome back"],
     ["blank"],
@@ -17999,18 +18025,36 @@ function runBootSequence() {
   let idx = 0, finished = false, timer = null;
   document.body.style.overflow = "hidden";
 
+  // Smooth bar: eased in continuous frames instead of jumping per line.
+  // The archive counter glides with it.
+  let barTarget = 0, barShown = 0, barRaf = null;
+  const paintBar = () => {
+    if (fillEl) fillEl.style.width = barShown + "%";
+    if (dataEl) dataEl.textContent = fmtData(Math.round(DATA_TOTAL * barShown / 100));
+  };
+  const smoothTick = () => {
+    barShown += (barTarget - barShown) * 0.12;
+    if (Math.abs(barTarget - barShown) < 0.4) barShown = barTarget;
+    paintBar();
+    barRaf = (barShown === barTarget) ? null : requestAnimationFrame(smoothTick);
+  };
+  const setBar = (pct) => {
+    if (reduceMotion) { barShown = barTarget = pct; paintBar(); return; }
+    barTarget = pct;
+    if (!barRaf) barRaf = requestAnimationFrame(smoothTick);
+  };
   const showPrompt = () => {
     if (finished) return;
     finished = true;
     if (timer) clearTimeout(timer);
-    if (fillEl) fillEl.style.width = "100%";
-    if (dataEl) dataEl.textContent = fmtData(DATA_TOTAL);
+    setBar(100);
     promptEl.hidden = false;
     try { sessionStorage.setItem("yddnw_booted", "1"); } catch (e) {}
   };
   const dismiss = () => {
     if (!overlay.parentNode) return;
     if (timer) clearTimeout(timer);
+    if (barRaf) cancelAnimationFrame(barRaf);
     overlay.classList.add(reduceMotion ? "boot-done" : "boot-off");
     document.body.style.overflow = "";
     setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, reduceMotion ? 700 : 420);
@@ -18020,11 +18064,7 @@ function runBootSequence() {
     while (idx < seq.length && seq[idx][0] === "blank") idx++;
     if (idx >= seq.length) { showPrompt(); return; }
     renderSingle(seq[idx++]);
-    if (fillEl) fillEl.style.width = Math.round(idx / seq.length * 100) + "%";
-    if (dataEl) {
-      const n = Math.min(DATA_TOTAL, Math.round(DATA_TOTAL * idx / seq.length) + Math.floor(Math.random() * 1500));
-      dataEl.textContent = fmtData(n);
-    }
+    setBar(Math.round(idx / seq.length * 100));
     // Readable pace: dwell scales with line length so a human can read each line
     var spec = seq[idx - 1];
     var txt = (spec && spec[1]) || "";
