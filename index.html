@@ -4036,7 +4036,7 @@ const SCENARIOS = [
             failure: { narrative: "The ration was too severe — you misjudged your baseline need. By hour 20, cognitive impairment is clear.", effects: { conditionAdd: "dehydrated", moraleMod: -20 }, tip: "Ration against your body's signals, not a fixed number: dark urine, headache, confusion mean drink more now. Fixed millilitre rules don't survive contact with real heat.", learnMore: ["w019"] },
           },
           nocturnal: {
-            success: { narrative: "Diurnal rest, nocturnal activity. Water lasts 40 hours. Every desert culture in history adopted this rhythm for a reason.", effects: { conditionAdd: "shaded" }, tip: "Desert operating rhythm: nocturnal activity, diurnal rest. Reduces water need by up to 60%.", learnMore: ["w043", "d022"] },
+            success: { narrative: "Diurnal rest, nocturnal activity. Water lasts 40 hours. Every desert culture in history adopted this rhythm for a reason.", effects: { conditionAdd: "shaded" }, tip: "Desert operating rhythm: nocturnal activity, diurnal rest. Resting in shade by day and working by night substantially cuts water loss — shade, stillness and covered skin keep the body's water inside the body.", learnMore: ["w043", "d022"] },
             failure: { narrative: "Night drops to 10°C — colder than expected. Underdressed, you drink more to maintain warmth. Plan unravels.", effects: { conditionAdd: "cold_stressed", moraleMod: -15 }, tip: "Desert nights can drop 30°C from the day peak. Always carry insulation even in summer desert.", learnMore: ["eq001", "s006"] },
           },
           search: {
@@ -4456,8 +4456,8 @@ const SCENARIOS = [
             failure: { narrative: "No response on three frequencies. Battery at 20%. You stop transmitting to preserve it for later.", effects: { conditionAdd: "radio_low", moraleMod: -10 }, tip: "Transmit in short bursts and wait. Continuous transmission depletes batteries without increasing reception probability.", learnMore: ["n019"] },
           },
           runner: {
-            success: { narrative: "Two fit group members reach a police checkpoint 800m away in 25 minutes. Rescue team mobilises to your position within an hour.", effects: { conditionAdd: "rescue_alerted", xpBonus: 15 }, tip: "If rescue is likely to be nearby, active contact by runners is faster than passive signalling. Always send two — one for safety.", learnMore: ["lc001", "tr015"] },
-            failure: { narrative: "The two runners don't return for 4 hours. The group's morale collapses. They got lost in the rubble field and took longer to reach help.", effects: { moraleMod: -20 }, tip: "Give runners precise landmarks, a time limit, and a fallback protocol. 'Go, find help' is not enough guidance.", learnMore: ["lc001"] },
+            success: { narrative: "Two fit group members reach a police checkpoint 800m away in 25 minutes. Rescue team mobilises to your position within an hour.", effects: { conditionAdd: "rescue_alerted", xpBonus: 15 }, tip: "If rescue is likely to be nearby, active contact by runners is faster than passive signalling. Always send two — one for safety.", learnMore: ["n021", "tr015"] },
+            failure: { narrative: "The two runners don't return for 4 hours. The group's morale collapses. They got lost in the rubble field and took longer to reach help.", effects: { moraleMod: -20 }, tip: "Give runners precise landmarks, a time limit, and a fallback protocol. 'Go, find help' is not enough guidance.", learnMore: ["tr015"] },
           },
         },
       },
@@ -4726,8 +4726,8 @@ const SCENARIOS = [
         ],
         outcomes: {
           send: {
-            success: { narrative: "Your partner follows the trail markers and reaches the village on day 3 of travel. Medical team arrives by helicopter on day 5. Patient survives.", effects: { conditionAdd: "rescue_alerted", xpBonus: 20 }, tip: "Sending a single fit runner for help is often the fastest evacuation path in jungle environments. Ensure they have food, water, and a clear route description.", learnMore: ["lc001", "tr015"] },
-            failure: { narrative: "Runner gets off-trail at day 2. Reaches village on day 4. Patient's condition deteriorates before rescue arrives.", effects: { conditionAdd: "deteriorated", moraleMod: -20 }, tip: "Give a runner written route notes, landmarks, and an expected timeline. Verbal instructions degrade under fatigue and stress.", learnMore: ["lc001"] },
+            success: { narrative: "Your partner follows the trail markers and reaches the village on day 3 of travel. Medical team arrives by helicopter on day 5. Patient survives.", effects: { conditionAdd: "rescue_alerted", xpBonus: 20 }, tip: "Sending a single fit runner for help is often the fastest evacuation path in jungle environments. Ensure they have food, water, and a clear route description.", learnMore: ["tr015"] },
+            failure: { narrative: "Runner gets off-trail at day 2. Reaches village on day 4. Patient's condition deteriorates before rescue arrives.", effects: { conditionAdd: "deteriorated", moraleMod: -20 }, tip: "Give a runner written route notes, landmarks, and an expected timeline. Verbal instructions degrade under fatigue and stress.", learnMore: ["tr015"] },
           },
           carry: {
             success: { narrative: "Bamboo litter, 4 carrying poles. 3km per day through muddy trail. Day 6, you reach a logging road. Flag a truck.", effects: { conditionAdd: "group_moving", xpBonus: 15 }, tip: "A jungle litter built from bamboo and paracord supports adult weight. Slow, exhausting work — rotate carriers often.", learnMore: ["tr002", "k005"] },
@@ -7096,7 +7096,7 @@ const SCENARIOS = [
         ],
         outcomes: {
           evac_upwind: {
-            success: { narrative: "Crosswind first, then upwind, walking briskly with damp cloths over mouths. In twenty minutes you are breathing clean air and watching the cloud from a hill.", effects: { conditionAdd: "evacuated_clean" }, tip: "Evacuate crosswind first, then upwind — never downwind, never through the visible cloud. Uphill and upstream follow the same logic: contamination flows downhill.", learnMore: ["ds013"] },
+            success: { narrative: "Crosswind first, then upwind, walking briskly — distance is the only respirator you have. A damp cloth does not stop chemical vapors; it only buys false confidence. Move farther and faster instead of masking.", effects: { conditionAdd: "evacuated_clean" }, tip: "Evacuate crosswind first, then upwind — never downwind, never through the visible cloud. Uphill and upstream follow the same logic: contamination flows downhill.", learnMore: ["ds013"] },
             failure: { narrative: "The wind shifts mid-evacuation and the plume edge catches you in the open. You keep moving and get clear, but everyone is coughing.", effects: { conditionAdd: "exposed", moraleMod: -12 }, tip: "Wind shifts are why evacuation routes need a backup direction. If the plume turns toward you, change course — do not outrun it in a straight line.", learnMore: ["ds013"] },
           },
           seal_inside: {
@@ -7640,7 +7640,7 @@ const SCENARIOS = [
             failure: { narrative: "The layers are right but the sand was dug too fine and too dirty. Flow chokes to a trickle within days, and cleaning it means rebuilding it. Clear water, no water.", effects: { conditionAdd: "filter_choked", moraleMod: -10 }, tip: "Filter media must be washed clean before loading, and graded — dirty or single-grade sand blinds fast. A filter you cannot maintain is a filter you do not have.", learnMore: ["w012", "w029"] },
           },
           settle_boil: {
-            success: { narrative: "Three barrels in rotation: fill, settle overnight, decant, boil. It is labour-heavy and wood-hungry, but every cup is safe and the system is understandable by a child. It works from day one.", effects: { conditionAdd: "boil_system", moraleMod: 6 }, tip: "Settling first substantially cuts the fuel cost — boiling clear water takes less time and less wood than boiling mud. Never skip the settle step to save an hour.", learnMore: ["w011", "w015"] },
+            success: { narrative: "Three barrels in rotation: fill, settle overnight, decant, boil. It is labour-heavy and wood-hungry, but every cup is safe and the system is understandable by a child. It works from day one.", effects: { conditionAdd: "boil_system", moraleMod: 6 }, tip: "Settling first is about clarity and treatment, not fuel: clear water filters and disinfects far more reliably than muddy water. The fuel cost is driven by volume, not turbidity — but settled water needs no re-boiling, and that's where the savings are.", learnMore: ["w011", "w015"] },
             failure: { narrative: "The boiling never stops, and neither does the woodcutting. Within a month the fuel demand is eating the camp's labour whole. Safe water, at the price of everything else.", effects: { conditionAdd: "fuel_drain", moraleMod: -12 }, tip: "Boiling everything is the most reliable and the most expensive purification there is. Budget the wood like money — because that is what it becomes.", learnMore: ["w011"] },
           },
           charcoal: {
@@ -8107,7 +8107,7 @@ const SCENARIOS = [
       },
       {
         id: "s2", title: "Stage 2 — Paper and Ink from Nothing",
-        situation: "The salvaged paper stock is finite and the books worth copying are not. Rag paper — from linen and cotton scraps — is the best you'll ever make, but rags run out. Plant fiber paper is renewable and labor-hungry. Parchment from hides is nearly indestructible and competes directly with clothing and shoes.",
+        situation: "The salvaged paper stock is finite and the books worth copying are not. Rag paper — from linen and cotton scraps — is the best you'll ever make, but rags run out. Plant fiber paper is renewable and labor-hungry. Parchment from hides is the most durable writing surface you'll ever make — centuries if kept dry — and it competes directly with clothing and shoes.",
         check: { stat: "knowledge", difficulty: 11, tag: "utility", label: "Papermaking" },
         randomEvents: [
           { chance: 0.2, text: "A cache of old cotton sheets is found in a ruined house — the papermakers' eyes go wide.", effect: { moraleMod: 8 } },
@@ -8477,7 +8477,7 @@ const SCENARIOS = [
         outcomes: {
           quarantine: {
             success: { narrative: "Strict separation holds. The sick three recover or don't, but the other nine never catch it. The routine becomes settlement law.", effects: { conditionAdd: "quarantine_protocol", xpBonus: 15 }, tip: "Quarantine works on three rules: separate animals, separate equipment, and the handler tends the sick last so nothing rides back on boots and hands.", learnMore: ["vt001"] },
-            failure: { narrative: "The quarantine pen shares a fence line and a water trough. It was separation in name only — five more goats are coughing.", effects: { conditionAdd: "herd_sick", moraleMod: -15 }, tip: "A quarantine that shares air, water, or handlers isn't a quarantine. Distance and dedicated equipment are the whole method.", learnMore: ["vt001"] },
+            failure: { narrative: "The quarantine pen shares a fence line and a water trough. It was separation in name only — five more goats are coughing.", effects: { conditionAdd: "herd_sick", moraleMod: -15 }, tip: "A quarantine that shares water, feed, or handlers with the sick pen isn't a quarantine. Distance and dedicated equipment are the whole method — and for airborne disease, shared air counts too.", learnMore: ["vt001"] },
           },
           cull: {
             success: { narrative: "Quick, clean, and final. The carcasses are burned deep away from the pens, and the coughing stops with the animals that carried it.", effects: { conditionAdd: "outbreak_contained", moraleMod: -8, xpBonus: 10 }, tip: "Culling is a herd decision, not an animal decision. Three animals sacrificed can be the price of nine — do the arithmetic before sentiment does it for you.", learnMore: ["vt001"] },
@@ -8513,7 +8513,7 @@ const SCENARIOS = [
           },
           natural: {
             success: { narrative: "The herd is small enough and the culling of weak kids ruthless enough that it muddles through. Not improvement — survival.", effects: { moraleMod: 5 }, tip: "Inbreeding is managed with written breeding records — who sired whom, rotated unrelated sires — not a single housing rule. And when birth weights or milk decline, rule out nutrition, parasites, disease, and dam age before blaming genetics.", learnMore: ["vt002"] },
-            failure: { narrative: "Three seasons of close breeding. Smaller kids, less milk, more stillbirths. The decline is slow enough to deny and real enough to measure.", effects: { conditionAdd: "herd_weakened", moraleMod: -12 }, tip: "Inbreeding doesn't announce itself — it erodes. If birth weights and milk yields are sliding year over year, the bloodlines are the cause.", learnMore: ["vt002"] },
+            failure: { narrative: "Three seasons of close breeding. Smaller kids, less milk, more stillbirths. The decline is slow enough to deny and real enough to measure.", effects: { conditionAdd: "herd_weakened", moraleMod: -12 }, tip: "Inbreeding doesn't announce itself — it erodes. If birth weights and milk yields are sliding year over year, bloodlines are a suspect — after you've ruled out nutrition, parasites, disease, and dam age.", learnMore: ["vt002"] },
           },
         },
       },
@@ -9207,7 +9207,7 @@ const SCENARIOS = [
             failure: { narrative: "You wet the towel but keep moving — tidying, checking the phone, pacing. The cooling can't keep up with the activity and by evening you're dizzy every time you stand.", effects: { conditionAdd: "heat_strain", moraleMod: -8 }, tip: "Cooling only works if you stop generating heat. Rest is part of the treatment.", learnMore: ["ds010", "m019"] },
           },
           fan: {
-            success: { narrative: "The fan helps — because you're also misting your skin with a spray bottle. Moving air over wet skin evaporates heat fast. Dry skin in front of a fan at 41°C would be a different story.", effects: { conditionAdd: "cooled", xpBonus: 10 }, tip: "Fans help only if your skin is wet or the air is below ~40°C. Above that, a fan on dry skin blows hot air over you like a convection oven.", learnMore: ["ds010", "wx013"] },
+            success: { narrative: "The fan helps — because you're also misting your skin with a spray bottle. Moving air over wet skin evaporates heat fast. Dry skin in front of a fan at 41°C would be a different story.", effects: { conditionAdd: "cooled", xpBonus: 10 }, tip: "Fans help only if your skin is wet — CDC's line for dry skin is the high 90s °F (~35–37°C). Above that, a fan on dry skin blows hot air over you like a convection oven.", learnMore: ["ds010", "wx013"] },
             failure: { narrative: "The fan roars all afternoon, blowing 41-degree air across dry skin. You feel breezy and keep working — and slide quietly from heat exhaustion toward something worse without noticing.", effects: { conditionAdd: "heat_strain", conditionAdd2: "dehydrated", moraleMod: -10 }, tip: "At extreme temperatures a fan gives false comfort. Wet the skin or don't count on it.", learnMore: ["ds010", "wx013"] },
           },
           shower: {
@@ -9248,13 +9248,13 @@ const SCENARIOS = [
         situation: "Day three. The taps still run but the pressure is dropping and nobody knows for how long. You have 6 litres stored. Mrs. Abernathy needs watching. It's 40°C again.",
         check: { stat: "endurance", difficulty: 10, tag: "water", label: "Rationing" },
         choices: [
-          { id: "ration", q: "sound", label: "Strict rationing + electrolytes", desc: "Measured sips through the day, pinch of salt and sugar in each litre. Nothing wasted.", statHint: "knowledge", tag: "water" },
+          { id: "ration", q: "sound", label: "Strict rationing + electrolytes", desc: "Measured sips through the day — 6 level teaspoons of sugar and half a level teaspoon of salt per litre of clean water. Nothing wasted.", statHint: "knowledge", tag: "water" },
           { id: "drink", q: "poor", label: "Drink freely while water flows", desc: "The taps work now. Hydrate hard today, worry about tomorrow tomorrow.", statHint: "endurance", tag: "water" },
           { id: "share", q: "poor", label: "Split everything with the neighbours", desc: "Pool all water on the floor. Nobody goes thirsty on your watch.", statHint: "composure", tag: "water" },
         ],
         outcomes: {
           ration: {
-            success: { narrative: "Two litres a day, steady, with salt and a spoon of sugar per litre. No cramps, no dizziness, and the stored water stretches to cover the worst days. Discipline tastes like nothing and works like everything.", effects: { conditionAdd: "ration_discipline", moraleMod: 8, xpBonus: 20 }, tip: "In heat, ration by schedule not thirst — and replace salt. Plain water without electrolytes, in volume, can dilute blood sodium.", learnMore: ["w020", "m006"] },
+            success: { narrative: "Two litres a day at minimum, steady, with a measured rehydration mix per litre — 6 level teaspoons of sugar, half a level teaspoon of salt. No cramps, no dizziness, and the stored water stretches to cover the worst days. Discipline tastes like nothing and works like everything.", effects: { conditionAdd: "ration_discipline", moraleMod: 8, xpBonus: 20 }, tip: "In heat, ration by schedule not thirst — and replace salt. Plain water without electrolytes, in volume, can dilute blood sodium.", learnMore: ["w020", "m006"] },
             failure: { narrative: "The rationing holds until the hottest hour, when thirst wins and you drink half a day's ration at once. The schedule breaks and doesn't quite recover.", effects: { conditionAdd: "ration_broken", moraleMod: -6 }, tip: "Binge drinking breaks rationing and risks hyponatremia. Small, frequent, scheduled sips.", learnMore: ["w020", "m006"] },
           },
           drink: {
@@ -9286,7 +9286,7 @@ const SCENARIOS = [
             failure: { narrative: "The breeze dies at 3am and the roof radiates the day's heat back up through your mat. You bake from below, exposed, and slink back inside at dawn unrested.", effects: { conditionAdd: "fatigued", moraleMod: -8 }, tip: "Roofs store solar heat and release it all night. Concrete roofs are radiators, not sanctuaries.", learnMore: ["ds010", "wx013"] },
           },
           fridge: {
-            success: { narrative: "The sniff test with a thermometer's discipline: anything above 4°C for 2+ hours goes. You cook the borderline meat thoroughly tonight, keep the condiments, and the food supply is safe.", effects: { conditionAdd: "food_secure", moraleMod: 8, xpBonus: 10 }, tip: "Fridge rule: 4°C+ for over two hours = toss it. 'Cook it and it'll be fine' doesn't kill all toxins.", learnMore: ["ep004", "f007"] },
+            success: { narrative: "The thermometer's discipline, no sniff-test mercy: after two days dead at 41°C, every perishable goes in the fire pit — all of it, no \"borderline\" exceptions. The hard cheese, the sealed condiments, the unopened jars stay. The food supply is safe because you threw out the danger, not because you cooked it.", effects: { conditionAdd: "food_secure", moraleMod: 8, xpBonus: 10 }, tip: "Fridge rule: 4°C+ for over two hours = toss it. 'Cook it and it'll be fine' doesn't kill all toxins.", learnMore: ["ep004", "f007"] },
             failure: { narrative: "You gamble on the chicken — it smelled okay-ish. At 4am your gut files a formal complaint and the heatwave gains a second front.", effects: { conditionAdd: "food_poisoning", conditionAdd2: "dehydrated", moraleMod: -16 }, tip: "Food poisoning plus heat plus limited water is a compound emergency. When in doubt, throw it out.", learnMore: ["ep004", "m006"] },
           },
         },
@@ -9370,11 +9370,11 @@ const SCENARIOS = [
         ],
         outcomes: {
           guide: {
-            success: { narrative: "Your voice cuts through the panic: 'Close your door! Towels under it — wet! Get on the floor by the window and wave!' The kid does it. The sealed room holds. The ladder truck arrives to a live, visible, reachable child.", effects: { conditionAdd: "kid_saved", moraleMod: 18, xpBonus: 20 }, tip: "A sealed room buys 10–15 minutes: closed door, gaps blocked with wet cloth, low, signalling at the window. It's the highest-survival trapped-in-place protocol.", learnMore: ["f010", "f042"] },
+            success: { narrative: "Your voice cuts through the panic: 'Close your door! Towels under it — wet! Get on the floor by the window and wave!' The kid does it. The sealed room holds. The ladder truck arrives to a live, visible, reachable child.", effects: { conditionAdd: "kid_saved", moraleMod: 18, xpBonus: 20 }, tip: "A sealed room buys time — minutes, not a guarantee: closed door, gaps blocked with wet cloth, low, signalling at the window. It's the highest-survival trapped-in-place protocol.", learnMore: ["f010", "f042"] },
             failure: { narrative: "The kid panics and can't follow — keeps standing, keeps screaming at the open door. You keep talking, keep it simple, one instruction at a time, until the firefighters' ladder reaches the window.", effects: { moraleMod: 2 }, tip: "Panicked people can't process sequences. One instruction. Repeat. Confirm. Next instruction.", learnMore: ["f010", "f042"] },
           },
           backin: {
-            success: { narrative: "Wet shirt over your face, low along the wall — you know this stairwell. You reach the kid's door, seal it behind you both, and ride out the two minutes until the ladder arrives. Heroic. Stupid. It worked.", effects: { conditionAdd: "smoke_inhalation", moraleMod: 12, xpBonus: 10 }, tip: "Re-entry kills more would-be rescuers than fire kills victims. If you go, it's low, fast, wet cover, and only when you know the layout blind.", learnMore: ["f010"] },
+            success: { narrative: "Wet shirt over your face, low along the wall — you make the second-floor landing before the smoke takes your legs and the heat folds you down. A firefighter drags you out by your belt as the stairwell flashes over behind you. You reach nobody, and the crew outside now has two victims. Heroic. Stupid. Never again.", effects: { conditionAdd: "smoke_inhalation", moraleMod: 12, xpBonus: 10 }, tip: "Re-entry kills more would-be rescuers than fire kills victims. NFPA's rule is absolute: once you're out, stay out — under no circumstances go back in. A wet cloth does not filter toxic smoke gases; it only filters your judgment. Talk victims through sealing the room; let firefighters do the entering.", learnMore: ["f010"] },
             failure: { narrative: "The stairwell you knew is gone — visibility zero, heat like an open oven door. Your lungs fill on the second-floor landing and your legs stop taking orders. Now there are two victims, and the crew arriving outside has to choose which one to carry out first.", effects: { fatal: true }, tip: "Firefighters have a saying: don't make two victims. Untrained re-entry into a working fire is how rescuers die — the kid needed instructions through the door, not a second body in the stairwell.", learnMore: ["f010", "m005"] },
           },
           ladder: {
@@ -9394,11 +9394,11 @@ const SCENARIOS = [
         ],
         outcomes: {
           airway: {
-            success: { narrative: "You sit him down, keep him calm and still, and flag the paramedics with the magic words: 'prolonged smoke exposure, grey sputum.' He's on oxygen in minutes. Smoke injuries bloom late — you caught the window.", effects: { conditionAdd: "neighbor_helped", moraleMod: 10, xpBonus: 20 }, tip: "Smoke inhalation worsens over 6–24 hours: swelling airways, delayed pulmonary edema. Anyone with heavy exposure needs medical evaluation even if they 'feel fine.'", learnMore: ["m005", "f018"] },
+            success: { narrative: "You sit him down, keep him calm and still, and flag the paramedics with the magic words: 'prolonged smoke exposure, soot-black (carbonaceous) sputum.' He's on oxygen in minutes. Smoke injuries bloom late — you caught the window.", effects: { conditionAdd: "neighbor_helped", moraleMod: 10, xpBonus: 20 }, tip: "Smoke inhalation worsens over 6–24 hours: swelling airways, delayed pulmonary edema. Anyone with heavy exposure needs medical evaluation even if they 'feel fine.'", learnMore: ["m005", "f018"] },
             failure: { narrative: "He waves you off — 'just a cough.' Three hours later at the shelter he's struggling to breathe and gets ambulanced out. You tried; adults get to refuse.", effects: { moraleMod: -8 }, tip: "You can't force care on a refusing adult. State the risk clearly once — 'this can kill you tonight' — and tell the medics.", learnMore: ["m005"] },
           },
           cat: {
-            success: { narrative: "The lobby is clear, the cat is under the mailboxes, and you're out in twenty seconds. The teenager stops crying. Sometimes the small rescues are the ones that matter.", effects: { moraleMod: 12, xpBonus: 10 }, tip: "Re-entry is only defensible when the space is verified clear and the time is seconds. The lobby qualified; the stairwell wouldn't have.", learnMore: ["f010"] },
+            success: { narrative: "The lobby is clear, the cat is under the mailboxes, and you're out in twenty seconds. The teenager stops crying. Sometimes the small rescues are the ones that matter.", effects: { moraleMod: 12, xpBonus: 10 }, tip: "Once you're out, stay out — under no circumstances go back into a burning building (NFPA). Conditions change in seconds; \"it was clear a minute ago\" is how re-entries go wrong. Give firefighters the pet's last known location instead.", learnMore: ["f010"] },
             failure: { narrative: "The lobby was clear when you entered. Then the stairwell door sighed open and smoke rolled down like water. You come out on hands and knees, no cat, lungs full of it.", effects: { conditionAdd: "smoke_inhalation", moraleMod: -16 }, tip: "Conditions change in seconds in a working fire. 'It was clear a minute ago' is how re-entries go wrong.", learnMore: ["f010", "f018"] },
           },
           account: {
@@ -9438,7 +9438,7 @@ const SCENARIOS = [
           failure: { narrative: "You stop the ascent, but the weather window you were chasing slams shut overnight and your food margin shrinks to nothing. Your partner stabilizes — no worse, no better. Right call, real price: the summit bid is now a maybe.", effects: { conditionAdd: "delayed", moraleMod: -6 }, tip: "A rest day costs time and supplies. Budget acclimatization days into the itinerary before the mountain — never as an afterthought.", learnMore: ["hz010", "s046"] },
         },
         "push-camp": {
-          success: { narrative: "Up you go, slow and steady, gear cached at 4,700 m — then back down to sleep at 4,200. Your partner's symptoms don't worsen. Climb high, sleep low: the oldest acclimatization trick in the book, executed cleanly.", effects: { conditionAdd: "cache_placed", xpBonus: 10 }, tip: "Climb high, sleep low is the classic pattern: stress the body at altitude by day, let it recover lower by night.", learnMore: ["hz010"] },
+          success: { narrative: "Up you go — and by 4,500 m your partner is vomiting again, head splitting, legs unsteady. You abort, drag them back down to 4,200, and burn the day's energy for nothing. Ascending with symptoms doesn't build toughness; it builds the conditions for HACE and HAPE.", effects: { conditionAdd: "cache_placed", xpBonus: 10 }, tip: "Climb high, sleep low applies only when everyone is symptom-free. With any AMS symptoms, the rule is absolute: cease ascending — never climb higher until every symptom has fully resolved.", learnMore: ["hz010"] },
           failure: { narrative: "Halfway to Camp 3 your partner's headache spikes and the nausea returns with interest. You abort, drag them back down to 4,200 m, and burn the evening's energy for nothing. The mountain just taught you the rule the hard way.", effects: { conditionAdd: "partner_worse", moraleMod: -8 }, tip: "Ascending with symptoms doesn't build toughness — it builds the conditions for HACE and HAPE. Symptoms mean stop.", learnMore: ["hz010"] },
         },
         "mask-climb": {
@@ -9518,7 +9518,7 @@ const SCENARIOS = [
         },
         "reascent": {
           success: { narrative: "You climb 300 m before the headache returns like a slammed door. You turn around — trip over, summit unclimbed, ego in tatters. The mountain gave you one warning you were smart enough to hear.", effects: { moraleMod: -8 }, tip: "No reascent before the patient feels completely well — and after HACE/HAPE, not on this trip at all. Feeling fine at 3,300 m is not the same as being fine at 4,200.", learnMore: ["hz010"] },
-          failure: { narrative: "At 3,900 m your partner is stumbling again, words slurring — the HACE is back, faster this time. The second descent is a stretcher built from trekking poles and rope, and this time the clinic keeps them for three days. Relapse doesn't negotiate either.", effects: { conditionAdd: "partner_critical", moraleMod: -16 }, tip: "Reascent after HACE risks rapid relapse — the brain remembers the swelling. One episode ends the trip; that's the rule that keeps people alive.", learnMore: ["hz010"] },
+          failure: { narrative: "At 3,900 m your partner is stumbling again, words slurring — the HACE is back, faster this time. The second descent is a stretcher built from trekking poles and rope, and this time the clinic keeps them for three days. Relapse doesn't negotiate either.", effects: { conditionAdd: "partner_critical", moraleMod: -16 }, tip: "Reascent after HACE risks rapid relapse — a brain that swelled once swells faster the second time. One episode ends the trip; that's the rule that keeps people alive.", learnMore: ["hz010"] },
         },
       },
     },
@@ -9564,7 +9564,7 @@ const SCENARIOS = [
     },
     {
       id: "s2", title: "Stage 2 — The Hollow, No Signal",
-      situation: "Two kilometres in, the trail dips into the hollow and your phone drops to zero bars. Her ankle is the size of a grapefruit. With your pen you circle the swelling's edge and write the time on her skin — the ER will dose antivenom off that timeline. The kit has soap, bandages, a marker. No antivenom exists in any pack on earth.",
+      situation: "Two kilometres in, the trail dips into the hollow and your phone drops to zero bars. Her ankle is the size of a grapefruit. With your pen you circle the swelling's edge and write the time on her skin — the ER will read those marks to judge how fast the envenomation is spreading. The kit has soap, bandages, a marker. Antivenom is hospital-only — given intravenously with monitoring for allergic reactions — so no field pack carries a substitute for it.",
       check: { stat: "endurance", difficulty: 12, tag: "utility", label: "The Carry" },
       randomEvents: [
         { chance: 0.2, text: "Your phone flickers: one bar, then nothing. Hope is a bad plan — keep moving toward signal.", effect: { moraleMod: -8 } },
@@ -9576,7 +9576,7 @@ const SCENARIOS = [
       ],
       outcomes: {
         litter: {
-          success: { narrative: "The litter works. Her leg stays level and still; you mark the swelling's new edge at 14:40 and it has climbed an inch. At the hollow's lip your phone finds two bars — 911, then Poison Control at 1-800-222-1222, both with the timed marks to report.", effects: { conditionAdd: "evac_on_track", conditionAdd2: "responders_called", moraleMod: 12, xpBonus: 20 }, tip: "Circle the swelling's leading edge and write the time on the skin. ER doctors use those marks to judge envenomation speed and dose antivenom.", learnMore: ["m042"] },
+          success: { narrative: "The litter works. Her leg stays level and still; you mark the swelling's new edge at 14:40 and it has climbed an inch. At the hollow's lip your phone finds two bars — 911, then Poison Control at 1-800-222-1222, both with the timed marks to report.", effects: { conditionAdd: "evac_on_track", conditionAdd2: "responders_called", moraleMod: 12, xpBonus: 20 }, tip: "Circle the swelling's leading edge and write the time on the skin. ER doctors use those marks to judge how fast the envenomation is spreading; antivenom dosing itself is by clinical severity.", learnMore: ["m042"] },
           failure: { narrative: "The litter holds but the hollow is longer than the map said. An hour in, a pole lashing snaps on a scree slope — you re-tie it, lose thirty minutes, keep moving. Slow is still moving.", effects: { conditionAdd: "delayed", moraleMod: -6 }, tip: "Improvised carries fail at the lashings. Test them under load before you commit the victim's weight.", learnMore: ["m042"] },
         },
         piggyback: {
@@ -9724,7 +9724,7 @@ const SCENARIOS = [
         },
         whiskey: {
           success: { narrative: "The whiskey burns going down and for a minute you feel warm — that's the blood vessels in your skin opening, dumping core heat into the cold air. You catch yourself, cap the flask, and strip the wet sweater anyway. The warmth was a lie; you stop listening to it.", effects: { conditionAdd: "wet_layers_off", moraleMod: -8 }, tip: "Alcohol feels warm because it dilates blood vessels in the skin — which accelerates heat loss from the core and impairs the judgment you need most. Warm, sweet, non-alcoholic drinks only.", learnMore: ["m018"] },
-          failure: { narrative: "The whiskey feels like warmth and you keep the soaked clothes on because moving feels like enough. Twenty minutes later your thinking is soup, your shivering is fading, and your friend has to make the decisions you can't. The flask is empty. So is your margin.", effects: { conditionAdd: "confusion", conditionAdd2: "shivering_fading", moraleMod: -16 }, tip: "That 'warmth' is vasodilation dumping your core heat into the cold air — plus impaired judgment on top of a cooling brain. No alcohol, no caffeine, in any cold emergency.", learnMore: ["m018"] },
+          failure: { narrative: "The whiskey feels like warmth and you keep the soaked clothes on because moving feels like enough. Twenty minutes later your thinking is soup, your shivering is fading, and your friend has to make the decisions you can't. The flask is empty. So is your margin.", effects: { conditionAdd: "confusion", conditionAdd2: "shivering_fading", moraleMod: -16 }, tip: "That 'warmth' is vasodilation dumping your core heat into the cold air — plus impaired judgment on top of a cooling brain. No alcohol in any cold emergency — it dilates skin vessels, dumps core heat, and impairs judgment. Caffeine buys nothing either; warm, sweet, non-caffeinated drinks are the standard.", learnMore: ["m018"] },
         },
       },
     },
@@ -9816,7 +9816,7 @@ const SCENARIOS = [
         },
         diveUnder: {
           success: { narrative: "You dive under and surface to the same seaward pull — there was nothing to swim under. The rip isn't an undertow. But the shock of the dive clears the panic fog, and you stop fighting the wrong enemy: turn sideways, float.", effects: { conditionAdd: "strength_spent", moraleMod: -8 }, tip: "Rips pull you out, not down — there is no 'under' to swim through. Duck-diving an outgoing current just spends breath and strength you need for the float.", learnMore: ["hz006", "hz005"] },
-          failure: { narrative: "You dive under, push hard, surface — and the rip is still carrying you out. So you dive again. Each dive costs breath and strength, and the panic builds with every surfacing that hasn't saved you. You're more tired and no closer to shore.", effects: { conditionAdd: "strength_spent", conditionAdd2: "panicking", moraleMod: -14 }, tip: "The undertow is a myth at surf beaches — the killer is the outward current. Every breath spent diving under is a breath stolen from the float that would actually save you.", learnMore: ["hz005"] },
+          failure: { narrative: "You dive under, push hard, surface — and the rip is still carrying you out. So you dive again. Each dive costs breath and strength, and the panic builds with every surfacing that hasn't saved you. You're more tired and no closer to shore.", effects: { conditionAdd: "strength_spent", conditionAdd2: "panicking", moraleMod: -14 }, tip: "Undertow isn't what's killing you at a surf beach — the killer is the outward current. Every breath spent diving under is a breath stolen from the float that would actually save you.", learnMore: ["hz005"] },
         },
       },
     },
@@ -11512,7 +11512,7 @@ const SCENARIOS = [
               moraleMod: 10,
               xpBonus: 20
             },
-            tip: "Cure at least four to six weeks in a dry, airy place — curing finishes the saponification and hardens the soap. Store leftover lye water sealed and clearly labeled, away from children and animals; it weakens over time as it absorbs carbon dioxide from the air, so keep it covered.",
+            tip: "Cure at least four to six weeks in a dry, airy place — saponification is mostly done within a day or two of mixing; the cure drives off water and hardens the bar. Store leftover lye water sealed and clearly labeled, away from children and animals; it weakens over time as it absorbs carbon dioxide from the air, so keep it covered.",
             learnMore: [
               "ch001",
               "w017"
@@ -11850,7 +11850,7 @@ const SCENARIOS = [
           failure: { narrative: "The wash starts, then stalls — the airlock goes quiet on day two. You warm the vessel, stir the sediment back up, and wait. It finishes slow and thin, and the lesson is about patience, not chemistry: a stalled ferment still needs to finish before it meets the still.", effects: { conditionAdd: "wash_slow", moraleMod: -4 }, tip: "A ferment is finished when the bubbling stops and the wash clears — never distill a cloudy, still-active wash. Suspended solids scorch in the boiler and taint everything that comes after.", learnMore: ["d035"] },
         },
         fruitMash: {
-          success: { narrative: "The apples go in — bruised ones trimmed, rotten ones out, vessel scrubbed first. It ferments hard and smells like a cider house. And before the first drop is ever distilled, the camp agrees on the rule out loud: this wash makes more methanol because fruit carries pectin, so its spirit is fuel and antiseptic, never drink. Decide the use before you ferment, not after you taste.", effects: { conditionAdd: "mash_quarantined", moraleMod: 6, xpBonus: 10 }, tip: "Pectin-rich fruit makes more methanol in the ferment — that is chemistry, not opinion. A fruit mash can still be useful, but its distillate is fuel and wound antiseptic, never a cup. Set that rule before the first drip falls.", learnMore: ["ch006", "d035"] },
+          success: { narrative: "The apples go in — bruised ones trimmed, rotten ones out, vessel scrubbed first. It ferments hard and smells like a cider house. And before the first drop is ever distilled, the camp agrees on the rule out loud: this wash makes more methanol because fruit carries pectin, so its spirit is fuel and antiseptic, never drink. Decide the use before you ferment, not after you taste.", effects: { conditionAdd: "mash_quarantined", moraleMod: 6, xpBonus: 10 }, tip: "Pectin-rich fruit makes more methanol in the ferment — that is chemistry, not opinion. A fruit mash can still be useful, but its distillate is fuel and tool disinfectant, never a cup — and never inside wounds. Set that rule before the first drip falls.", learnMore: ["ch006", "d035"] },
           failure: { narrative: "You left the vessel uncovered 'to let the wild yeast in' — and the wild everything got in. By day three the mash smells of vinegar: acetic acid bacteria found the alcohol before you did. The whole batch is fit for salad dressing and nothing else. You pour it out far from camp and start over, this time with a lid.", effects: { conditionAdd: "wash_soured", moraleMod: -10 }, tip: "Wild yeast ferments, but so does everything else in the air — including the bacteria that turn alcohol into vinegar. Keep the ferment covered, sanitize the vessel, and cut out the rotten fruit: the rot is where the spoilage lives.", learnMore: ["ch003", "d058"] },
         },
         dirtyMix: {
@@ -11915,13 +11915,13 @@ const SCENARIOS = [
       situation: "The jar sits on the camp table, clear and sharp-smelling, and the celebration has already started without it. Someone reaches for a cup. This is the whole scenario in one moment: a simple pot still cannot separate methanol from ethanol — the two ride the vapor together, and the foreshots rule is only partly true. What is in that jar is poison until proven otherwise, and out here there is no proving it.",
       check: { stat: "knowledge", difficulty: 13, tag: "medical", label: "Name the Poison" },
       choices: [
-        { id: "fuelAndMedicine", q: "sound", label: "Fuel, lamps, and the medicine kit — never a cup", desc: "The jar is labeled and put to work: stove fuel, lamp oil, antiseptic for tools and wounds. Nobody drinks a drop, because nobody can prove it safe.", statHint: "knowledge", tag: "medical" },
+        { id: "fuelAndMedicine", q: "sound", label: "Fuel, lamps, and the medicine kit — never a cup", desc: "The jar is labeled and put to work: stove fuel, lamp oil, antiseptic for tools and intact skin — never inside wounds. Nobody drinks a drop, because nobody can prove it safe.", statHint: "knowledge", tag: "medical" },
         { id: "smallShot", q: "risky", label: "One small celebratory shot", desc: "The run went well, the cuts were honest, the foreshots went to fuel. One small shot to mark the work — everyone did it back home.", statHint: "composure", tag: "medical" },
         { id: "drinkTrustFolk", q: "fatal", label: "Drink deep — the foreshots took the methanol", desc: "You discarded the foreshots by the book, so the methanol is gone — that's the rule everyone knows. Pour generously. Celebrate.", statHint: "perception", tag: "medical" },
       ],
       outcomes: {
         fuelAndMedicine: {
-          success: { narrative: "The jar is labeled — what it is, what it's for, and NOT FOR DRINKING — and put to work. The lamps burn clean and bright, the stove sips fuel instead of gulping firewood, and the medicine kit finally holds real antiseptic for tools and wounds. The still earns its keep for years, because nobody ever asked it to be something it isn't.", effects: { conditionAdd: "still_working", moraleMod: 12, xpBonus: 20 }, tip: "Strong spirit is a superb antiseptic and a clean fuel — those are the two jobs a camp still is for. The cleanest hearts go to wound care; everything else goes to lamps and stoves. The jar that never becomes a drink is the jar that keeps working.", learnMore: ["ch006", "tr008"] },
+          success: { narrative: "The jar is labeled — what it is, what it's for, and NOT FOR DRINKING — and put to work. The lamps burn clean and bright, the stove sips fuel instead of gulping firewood, and the medicine kit finally holds real antiseptic for tools and intact skin — never inside wounds. The still earns its keep for years, because nobody ever asked it to be something it isn't.", effects: { conditionAdd: "still_working", moraleMod: 12, xpBonus: 20 }, tip: "Strong spirit is a decent surface disinfectant for tools and intact skin — but never for open wounds: alcohol damages exposed tissue and delays healing, and a field still cannot verify its concentration. The cleanest hearts go to instruments and cleaning skin around wounds, never inside wounds; everything else goes to lamps and stoves. The jar that never becomes a drink is the jar that keeps working.", learnMore: ["ch006", "tr008"] },
           failure: { narrative: "Someone argues for a toast, and the argument ends with the jar shelved and unused for a week — labeled, at least, and undrunk. Then the lamps burn clean through a long dark evening and the argument dies on its own. A jar nobody will drink is still a jar full of fuel and antiseptic; value doesn't need a toast.", effects: { conditionAdd: "jar_shelved", moraleMod: -6 }, tip: "Label every jar: what it is, what it's for, and 'not for drinking.' Stored like any flammable — sealed, away from heat and living space, clearly marked. Fuel alcohol is a tool, not a trophy.", learnMore: ["ch006", "tr008"] },
         },
         smallShot: {
@@ -12094,7 +12094,7 @@ const SCENARIOS = [
       ],
       outcomes: {
         checkYourself: {
-          success: { narrative: "You make yourself stand still for one minute. Hands, head, legs — nothing bleeding, nothing broken, just adrenaline. Then the utilities, all from outside: the gas meter valve gets a quarter turn until the lever sits crosswise to the pipe, the breaker stays alone because the panel took a knock and you're not touching it wet-handed, and the water main gets closed because the house lines may have cracked. Only then do you look next door. Your house is now a damaged building with dead utilities instead of a damaged building with live ones — and that difference is the whole game.", effects: { conditionAdd: "utilities_dead", moraleMod: 10, xpBonus: 20 }, tip: "The order is fixed: yourself, then utilities, then other people, then property. Check yourself for injuries before helping others — a rescuer who becomes a casualty helps no one. Gas, power, water: isolate all three from outside before you enter a damaged building, and never enter one at all until the utilities are dead and the structure has been given time to settle.", learnMore: ["ds001", "ep016"] },
+          success: { narrative: "You make yourself stand still for one minute. Hands, head, legs — nothing bleeding, nothing broken, just adrenaline. Then the utilities, all from outside: the gas meter valve gets a quarter turn until the lever sits crosswise to the pipe, the breaker stays alone because the panel took a knock and you're not touching it wet-handed, and the water main gets closed because the house lines may have cracked. Only then do you look next door. Your house is now a damaged building with dead utilities instead of a damaged building with live ones — and that difference is the whole game.", effects: { conditionAdd: "utilities_dead", moraleMod: 10, xpBonus: 20 }, tip: "The order is fixed: yourself, then utilities, then other people, then property. Check yourself for injuries before helping others — a rescuer who becomes a casualty helps no one. Gas, power, water: before entering a damaged building, shut off the gas only if you smell gas or see a broken line — not as a routine, since only the gas company can restore service. Shut off electricity only if wiring is damaged. Never enter one at all until the utilities are dead and the structure has been given time to settle.", learnMore: ["ds001", "ep016"] },
           failure: { narrative: "You check yourself and find a gash on your forearm from flying glass you hadn't even felt — adrenaline is a liar. You press a cloth to it and work the utilities one-handed: gas off at the meter, water main closed, breaker left alone. It takes twice as long and your sleeve is soaked through, but the utilities are dead and you're not bleeding out in your own garden.", effects: { conditionAdd: "utilities_dead", conditionAdd2: "injured", moraleMod: -6 }, tip: "Adrenaline masks injuries — that's why the self-check comes first and why it's a real check, not a glance. Bleeding gets direct pressure with cloth before anything else. A one-handed utility shutoff beats a two-handed rescue attempt that collapses into a second casualty.", learnMore: ["ds001", "m003"] },
         },
         grabTheKit: {
@@ -12126,7 +12126,7 @@ const SCENARIOS = [
         },
         ventAndWait: {
           success: { narrative: "Every opening on the garden side stands open, the house is airing out, and you and the neighbours are gathered upwind at the end of the driveway with a clear view of the meter. Nobody touches a switch, nobody strikes a flame. An hour later the smell has thinned — the wind is doing the work the valve would have done faster. It's not isolated, but it's diluted and watched, and the utility is the next call.", effects: { conditionAdd: "gas_venting", moraleMod: 2, xpBonus: 10 }, tip: "Ventilation is dilution, not isolation: it lowers the concentration but the leak is still feeding gas into the structure, and a wind shift or a closed door can rebuild the pocket. If you can shut off at the meter safely from outside, do it — that's the only move that stops the source. Ventilate in passing, never by entering, and treat a vented-but-live leak as a guarded hazard until the utility arrives, not as a solved one.", learnMore: ["ds001", "ep004"] },
-          failure: { narrative: "You open everything up and pull everyone back — but the wind drops at dusk, and with no air moving, the smell near the meter thickens again instead of thinning. The leak is still live, the house is still filling from the garden side, and now it's dark and you can't see the valve you chose not to touch. You're guarding a hazard all night that a quarter-turn would have ended at 17:15.", effects: { conditionAdd: "gas_venting", conditionAdd2: "strength_spent", moraleMod: -12 }, tip: "Still air is the failure mode of ventilation-only: gas is heavier than air and pools in low spots, foundations, and basements when there's no wind to carry it off. That's why shutoff beats ventilation — one stops the source, the other negotiates with the weather. If you left the valve alone because you weren't sure of the direction: a quarter turn either way until the lever is crosswise to the pipe is off. Learn your valve before the quake, not during it.", learnMore: ["ds001"] },
+          failure: { narrative: "You open everything up and pull everyone back — but the wind drops at dusk, and with no air moving, the smell near the meter thickens again instead of thinning. The leak is still live, the house is still filling from the garden side, and now it's dark and you can't see the valve you chose not to touch. You're guarding a hazard all night that a quarter-turn would have ended at 17:15.", effects: { conditionAdd: "gas_venting", conditionAdd2: "strength_spent", moraleMod: -12 }, tip: "Still air is the failure mode of ventilation-only: pipeline natural gas is lighter than air and rises — it is propane that pools low — though a leak can still collect in enclosed spaces when there's no wind to carry it off. That's why shutoff beats ventilation — one stops the source, the other negotiates with the weather. If you left the valve alone because you weren't sure of the direction: a quarter turn either way until the lever is crosswise to the pipe is off. Learn your valve before the quake, not during it.", learnMore: ["ds001"] },
         },
         lightTheLantern: {
           success: { narrative: "You strike the lighter — and the smell hits you a half-second before the flame catches, sharp and chemical, and some older instinct slams your thumb down on the lighter before the flame is even born. You stand in the dark next to the meter with your heart hammering, the unlit lantern in your hand, understanding with total clarity that you were one breath away from finding out exactly how much gas had pooled around that cracked fitting. You shut the valve by feel and don't touch a flame again tonight.", effects: { conditionAdd: "gas_isolated", conditionAdd2: "shaken", moraleMod: -10 }, tip: "You got lucky: the odorant did its job a half-second before the flame did. Never count on that half-second. Any suspected gas leak means no open flames, no switches, no phones, no sparks of any kind — not to inspect, not for light, not for ten seconds. If you need to see the meter in the dark, use light from well clear of the building, or wait for daylight.", learnMore: ["ds001"] },
@@ -12277,7 +12277,7 @@ const SCENARIOS = [
       ],
       outcomes: {
         feed_and_bank: {
-          success: { narrative: "You feed the fire a steady armload through the evening — never smothering it, never starving it — and stack the remaining logs into a low wall on the windward side. Before sleep you push the coals together and bury them in ash. Hours later you wake, rake the ash back, and the coals glow alive on the first breath.", effects: { conditionAdd: "coals_banked", xpBonus: 25 }, tip: "Bank coals before sleep: push them together and cover with ash to insulate them from the air. A banked fire revives in minutes in the morning — a dead fire has to be built from nothing.", learnMore: ["f017", "f006"] },
+          success: { narrative: "You feed the fire a steady armload through the evening — never smothering it, never starving it — and stack the remaining logs into a low wall on the windward side. The watch takes turns through the night — someone always awake, the banked coals glowing under the ash, revived in minutes when a watch changes. At dawn the fire is drowned, stirred, and drowned again, and the camp wakes to a cold ring. Banking is a watch technique; sleep is for dead-out fires.", effects: { conditionAdd: "coals_banked", xpBonus: 25 }, tip: "Bank coals only while someone is awake to tend them: push them together and cover with ash to insulate them from the air. Banking is for the watch, not for sleep — before sleep the fire is drowned, stirred, and drowned again until cold. A banked fire revives in minutes; an unwatched banked fire is a fire out of control.", learnMore: ["f017", "f006"] },
           failure: { narrative: "The banking works, but you underestimated the night's damp: the coals are smaller come morning. They still revive with breath and dry bark — a banked fire bends, it doesn't break.", effects: { moraleMod: -5 }, tip: "Banking is insurance, not a guarantee — deep ash and tight coals make the difference between embers at dawn and a cold ring. Check the bank if you wake in the night.", learnMore: ["f017"] },
         },
         roar: {
@@ -12330,7 +12330,7 @@ const SCENARIOS = [
           },
           drink: {
             success: { narrative: "You cup your hands and drink. Cold, clean, refreshing — and this time, lucky. Nothing hits you today. But nothing about how that water looked told you it would be safe.", effects: { conditionAdd: "water_drank_raw", moraleMod: 5 }, tip: "Getting away with it is not data. Giardia and cryptosporidium are invisible and survive cold water for weeks. Clear and cold tells you nothing about pathogens.", learnMore: ["w026", "w040"] },
-            failure: { narrative: "Twelve hours later your stomach turns. Cramping, nausea, watery diarrhoea — the classic giardia signature, showing up a day or two after the drink. That crystal-clear stream had beaver upstream, and beaver means giardia.", effects: { conditionAdd: "water_sick", moraleMod: -25 }, tip: "Giardia's hallmark: cramping and diarrhoea 1–3 weeks after exposure (sometimes sooner with heavy contamination). It does not change the water's look, taste, or smell. Clear is not clean.", learnMore: ["w026", "w027"] },
+            failure: { narrative: "A week or two later your stomach turns. Cramping, nausea, watery diarrhoea — the classic giardia signature, showing up long after the drink. That crystal-clear stream had beaver upstream, and beaver country raises the odds of giardia.", effects: { conditionAdd: "water_sick", moraleMod: -25 }, tip: "Giardia's hallmark: cramping and diarrhoea 1–3 weeks after exposure (sometimes sooner with heavy contamination). It does not change the water's look, taste, or smell. Clear is not clean.", learnMore: ["w026", "w027"] },
           },
         },
       },
@@ -12486,7 +12486,7 @@ const SCENARIOS = [
           },
           ignore: {
             success: { narrative: "You work it hard and it survives on stubbornness. But the edges stay open and angry, and every night the palm aches where it shouldn't.", effects: { conditionAdd: "wound_dirty", moraleMod: -10 }, tip: "Working a wound like nothing happened grinds contamination in and reopens edges. Rest the hand, keep it clean and covered — the work waits.", learnMore: ["m007", "m002"] },
-            failure: { narrative: "Day two, the cut throbs. Day three, redness spreads outward from the wound, the skin is hot to the touch, and a red streak starts climbing toward your wrist. Dishwater and rough firewood ground camp grime straight into it. This is what infection looks like — redness, heat, streaks — and the only move is to reopen it, clean it properly, and re-cover.", effects: { conditionAdd: "infection_signs", conditionAdd2: "wound_reopened", moraleMod: -20 }, tip: "Infection signs: spreading redness, warmth, swelling, red streaks, pus, fever. At the first sign — reopen the wound, irrigate it with clean water, and re-cover with a dry dressing. Ignoring it is how a small cut becomes a real problem.", learnMore: ["m007", "m002"] },
+            failure: { narrative: "Day two, the cut throbs. Day three, redness spreads outward from the wound, the skin is hot to the touch, and a red streak starts climbing toward your wrist. Dishwater and rough firewood ground camp grime straight into it. This is what infection looks like — redness, heat, streaks — and this is the limit of field care: clean the skin around it, cover it, and get to a clinician. Do not cut or pry a sealed wound open yourself.", effects: { conditionAdd: "infection_signs", conditionAdd2: "wound_reopened", moraleMod: -20 }, tip: "Infection signs: spreading redness, warmth, swelling, red streaks, pus, fever. At the first sign of any of them, get medical care promptly: clean the skin around the wound, keep it covered, and do not cut or pry the wound open yourself. A suspected infection needs a clinician, not a field re-opening.", learnMore: ["m007", "m002"] },
           },
         },
       },
@@ -12515,7 +12515,7 @@ const SCENARIOS = [
           { chance: 0.2, text: "The wind shifts and smoke rolls straight into your eyes. You look away for a long moment.", effect: { moraleMod: -5 } },
         ],
         choices: [
-          { id: "cook_through", q: "sound", label: "Keep it on until no pink remains and juices run clear", desc: "Spend the fuel. Flake the thickest part with a stick and check the very center — no pink, no glass, juices clear.", statHint: "knowledge", tag: "food" },
+          { id: "cook_through", q: "sound", label: "Keep it on until the center hits 145°F", desc: "Spend the fuel. With a thermometer: 145°F (63°C) at the thickest part. Without one: flesh opaque all the way through and separating easily with a fork — color alone and clear juices are not reliable tests.", statHint: "knowledge", tag: "food" },
           { id: "rare_fuel",    q: "risky", label: "Eat it a little rare to save firewood",                    desc: "Browned outside, pink inside. Saves wood, gets dinner into you faster.", statHint: "endurance", tag: "food" },
           { id: "eat_raw",      q: "poor",  label: "Eat a strip raw — it was swimming this afternoon",            desc: "Fresh means clean, right? Skip the fire entirely for the first bite.", statHint: "knowledge", tag: "food" },
         ],
@@ -12811,7 +12811,7 @@ const SCENARIOS = [
             },
             grow: {
               success: { narrative: "Cold nights, layered sleep, everyone grumbling — and fresh greens in January, vitamins no stored grain can provide. Nobody gets sick all winter.", effects: { conditionAdd: "fresh_food", moraleMod: 5, xpBonus: 20 }, tip: "Fresh food in winter isn't about calories — it's micronutrients and morale. If the group can tolerate cold sleep, the greenhouse pays in health.", learnMore: ["ds029", "ds033"] },
-              failure: { narrative: "The lamps stay on and the sleepers get colder. By January two people have chest infections from sleeping at 8°C, and the kale can't fix that.", effects: { conditionAdd: "cold_sick", moraleMod: -20 }, tip: "There's a floor to cold sleeping. Below it, illness costs more than any crop gains. Know your group's limit before choosing food over heat.", learnMore: ["ds029"] },
+              failure: { narrative: "The lamps stay on and the sleepers get colder. By January two people are down with bad respiratory illnesses — viruses circulating in the crowded, cold shelter, and the kale can't fix that.", effects: { conditionAdd: "cold_sick", moraleMod: -20 }, tip: "There's a floor to cold sleeping. Below it, illness costs more than any crop gains. Know your group's limit before choosing food over heat.", learnMore: ["ds029"] },
             },
             split: {
               success: { narrative: "Half heat, half light — the bunkhouse at 12°C, the greenhouse dim but alive. Nobody thrives; everybody survives. The compromise holds because everyone agreed to it.", effects: { conditionAdd: "compromise_holds", moraleMod: 5 }, tip: "A split nobody agreed to is just two failures. A split the group chose is a shared burden — decide together, then don't revisit it weekly.", learnMore: ["ds029"] },
@@ -12963,7 +12963,7 @@ const SCENARIOS = [
           ],
           outcomes: {
             carry: {
-              success: { narrative: "You get her into the car — furious, dignified, alive. At the shelter she apologizes by dinner. The son calls back crying.", effects: { conditionAdd: "neighbor_saved", moraleMod: 12, xpBonus: 20 }, tip: "In a real evacuation, getting a vulnerable refuser out is an act of care, not kidnapping — but do it gently, explain constantly, and hand them to family or staff at the destination.", learnMore: ["ds015"] },
+              success: { narrative: "You get her into the car — furious, dignified, alive. At the shelter she apologizes by dinner. The son calls back crying.", effects: { conditionAdd: "neighbor_saved", moraleMod: 12, xpBonus: 20 }, tip: "In a real evacuation, do not use force on a competent adult who refuses to go: you have no legal authority to drag someone out, and it can be treated as assault or false imprisonment. Instead escalate early to the trained emergency personnel who do have evacuation authority, explain constantly, and hand them to family or staff at the destination.", learnMore: ["ds015"] },
               failure: { narrative: "She fights you — genuinely fights — and in the struggle she falls and breaks her wrist. Now you're evacuating with an injured, terrified 81-year-old who will never forgive you.", effects: { conditionAdd: "neighbor_injured", moraleMod: -22 }, tip: "Forced evacuation of the elderly risks exactly the injury you're trying to prevent. If they resist physically, stop — and escalate to authorities instead.", learnMore: ["ds015"] },
             },
             stay: {
@@ -13002,7 +13002,7 @@ const SCENARIOS = [
             { chance: 0.15, text: "The wind shifts a few degrees — away from your block. Minutes matter, and you just got some.", effect: { moraleMod: 8 } },
           ],
           choices: [
-            { id: "inside", label: "Go up and in, not out", desc: "Upper floors, interior rooms, HVAC off. Put the building's mass between you and the street.", statHint: "knowledge", tag: "shelter" },
+            { id: "inside", label: "In and down, not out", desc: "Basement or the middle of the building, away from walls and the roof, HVAC off. Put the building's mass between you and the dust — fallout collects on the roof and the street, so down and deep, not high.", statHint: "knowledge", tag: "shelter" },
             { id: "upwind", label: "Move upwind on foot, fast", desc: "Out the back, perpendicular to the wind, three blocks upwind before the dust settles. Speed over shelter.", statHint: "endurance", tag: "navigation" },
             { id: "crowd", label: "Follow the crowd down", desc: "Everyone is heading for the lobby and the street. There's safety in numbers — probably.", statHint: "composure", tag: "psychology" },
           ],
@@ -13031,7 +13031,7 @@ const SCENARIOS = [
           ],
           choices: [
             { id: "strip", label: "Strip at the threshold", desc: "At home: shoes off outside, outer layers into a bag at the door, straight to the shower. Nothing crosses the threshold.", statHint: "knowledge", tag: "utility" },
-            { id: "shake", label: "Shake off outside, then enter", desc: "Beat the dust out of the jacket on the porch, wipe down, come in. Faster, less thorough.", statHint: "endurance", tag: "utility" },
+            { id: "shake", label: "Remove clothing before entering", desc: "Outer layer off at the door, straight into a bag — shoes off, coat and shirt sealed. Never beat or shake dusty clothes: shaking resuspends radioactive dust into the air you breathe. Peel it away, don't shake it, and don't carry it inside.", statHint: "endurance", tag: "utility" },
             { id: "laundry", label: "Straight to the laundry", desc: "Clothes in the machine, hot wash, problem solved. Modern appliances handle this.", statHint: "composure", tag: "utility" },
           ],
           outcomes: {
@@ -13040,7 +13040,7 @@ const SCENARIOS = [
               failure: { narrative: "You strip at the door — then carry the bag through the house to the garage 'temporarily.' The bag leaks dust down the hallway.", effects: { conditionAdd: "indoor_contamination", moraleMod: -12 }, tip: "The bag stays at the threshold or goes straight outside. Carrying contamination through the house to store it is just distribution.", learnMore: ["ds032"] },
             },
             shake: {
-              success: { narrative: "Jacket beaten out downwind on the porch, shoes left outside, hands and face washed hard. Not the book, but the dust mostly stayed where it landed.", effects: { conditionAdd: "deconned_light", moraleMod: 5 }, tip: "Shaking out outer layers downwind, away from doors and windows, removes a meaningful share. Follow with a real wash at the first chance.", learnMore: ["ds032"] },
+              success: { narrative: "At the door the outer layer comes off and goes straight into a bag — no shaking, no beating. Shoes stay outside, hands and face washed hard. The dust stays out of the house because it never got back into the air.", effects: { conditionAdd: "deconned_light", moraleMod: 5 }, tip: "Removing outer clothing removes the great majority of contamination — but remove it gently and bag it. Shaking or beating contaminated clothing throws radioactive dust back into the air you breathe. Strip at the threshold, bag it, wash yourself — in that order, every time.", learnMore: ["ds032"] },
               failure: { narrative: "You shake the jacket on the porch — upwind of your own front door. The dust drifts inside ahead of you.", effects: { conditionAdd: "indoor_contamination", moraleMod: -15 }, tip: "Always shake out downwind of every opening. Wind direction at the porch matters as much as at the blast site.", learnMore: ["ds032"] },
             },
             laundry: {
@@ -13187,13 +13187,13 @@ const SCENARIOS = [
             { chance: 0.15, text: "A church ahead has a hand pump and a volunteer with a clipboard. An oasis with paperwork.", effect: { moraleMod: 10 } },
           ],
           choices: [
-            { id: "ration", label: "Ration ruthlessly, keep moving", desc: "Small sips on schedule, shade at midday, move at dawn and dusk. The three liters have to reach the farm.", statHint: "knowledge", tag: "water" },
+            { id: "ration", label: "Ration ruthlessly, keep moving", desc: "Small sips on schedule, shade at midday, move at dawn and dusk — a desperation gamble. In 38°C heat the body can need a liter or more an hour, so no discipline stretches three liters across sixty kilometers: the schedule has to be built around finding more water, not around stretching what you have.", statHint: "knowledge", tag: "water" },
             { id: "fountain", label: "Drink from the fountain", desc: "It's water. Filter it through cloth, hope for the best. Dehydration kills today; germs kill next week.", statHint: "endurance", tag: "water" },
             { id: "detour", label: "Detour to the church pump", desc: "Two kilometers off route for verified clean water. Time and distance for certainty.", statHint: "perception", tag: "water" },
           ],
           outcomes: {
             ration: {
-              success: { narrative: "Sips on schedule, midday in the shade of an overpass, moving in the cool hours. The three liters stretch — barely — to the farm's well.", effects: { conditionAdd: "hydrated_enough", moraleMod: 8, xpBonus: 15 }, tip: "In extreme heat, ration by schedule not thirst — small regular sips, rest in shade at midday, move at dawn and dusk. Thirst is a late signal.", learnMore: ["ds017"] },
+              success: { narrative: "Sips on schedule, midday in the shade of an overpass, moving in the cool hours — and the discipline is what keeps you alive long enough to reach the roadside standpipe you couldn't see from the start, topping up the bottles before the last stretch. Three liters alone would never have reached the farm's well.", effects: { conditionAdd: "hydrated_enough", moraleMod: 8, xpBonus: 15 }, tip: "In extreme heat, ration by schedule not thirst — small regular sips, rest in shade at midday, move at dawn and dusk. But rationing cannot conjure water: at 38°C you can need a liter an hour, so three liters cannot carry you sixty kilometers. Never start a desert crossing on a fixed supply — plan the route around confirmed water, and if you can't confirm it, don't go.", learnMore: ["ds017"] },
               failure: { narrative: "The schedule slips — big gulps at noon, nothing at dusk. By the second afternoon the headaches start, then the confusion. Heat illness doesn't negotiate.", effects: { conditionAdd: "heat_exhaustion", moraleMod: -22 }, tip: "Dehydration impairs judgment before it impairs the body — the confused person can't fix their own water plan. Decide the schedule while you're still thinking clearly.", learnMore: ["ds017"] },
             },
             fountain: {
@@ -13266,7 +13266,7 @@ const SCENARIOS = [
           ],
           outcomes: {
             dark: {
-              success: { narrative: "Batteries out, devices in the biscuit tin, tin in the pack. The group navigates by paper and memory — slow, silent, invisible to the one sensor that never sleeps.", effects: { conditionAdd: "emcon", moraleMod: 5, xpBonus: 20 }, tip: "Emission control is binary: a transmitting device is a flare. Airplane mode still pings; only powered-down — batteries out — is actually dark.", learnMore: ["ds017"] },
+              success: { narrative: "Batteries out, devices in the biscuit tin, tin in the pack. The group navigates by paper and memory — slow, silent, invisible to the one sensor that never sleeps.", effects: { conditionAdd: "emcon", moraleMod: 5, xpBonus: 20 }, tip: "Emission control is binary: a transmitting device is a flare. Airplane mode does stop the cellular radio by default, but Wi-Fi and Bluetooth can remain on depending on settings — check both, or go fully dark. Only powered-down — batteries out — is actually dark.", learnMore: ["ds017"] },
               failure: { narrative: "Batteries out — except the fitness tracker nobody thought about, syncing faithfully all night. The swarm doesn't care which device betrays you.", effects: { conditionAdd: "emissions_leak", moraleMod: -18 }, tip: "EMCON means every emitter: watches, earbuds, car key fobs, medical devices. Inventory every radio in the group, not just the phones.", learnMore: ["ds017"] },
             },
             airplane: {
@@ -13345,7 +13345,7 @@ const SCENARIOS = [
           ],
           choices: [
             { id: "treeline", label: "Run the treeline", desc: "Three hundred meters to real cover — canopy, terrain, room to disappear. If you make it, you're gone.", statHint: "endurance", tag: "security" },
-            { id: "culvert", label: "Shelter in the culvert", desc: "Forty meters to concrete overhead cover. Top-attack munitions can't reach you under it.", statHint: "composure", tag: "shelter" },
+            { id: "culvert", label: "Shelter in the culvert", desc: "Forty meters to concrete overhead cover. Top-attack munitions struggle to reach you under it — but the entrances are still open ground, and cover can be watched, waited on, or collapsed.", statHint: "composure", tag: "shelter" },
             { id: "split", label: "Split the group", desc: "Three and three — treeline and culvert. One strike can't take everyone.", statHint: "knowledge", tag: "security" },
           ],
           outcomes: {
@@ -13438,7 +13438,7 @@ const SCENARIOS = [
         },
         {
           id: "s3", title: "Stage 3 — The 7:10 Dash",
-          situation: "Day three. Dose rates are falling — every sevenfold increase in time since the detonations cuts the rate tenfold, and the math says the street is ten times safer than on day one. The bank vault is still better shelter, and the street is briefly, calculably crossable.",
+          situation: "Day three. Dose rates are falling — every sevenfold increase in time since the detonations cuts the rate tenfold, and the math says the street is roughly three times safer than on day one — ten times safer takes seven days, not three. The bank vault is still better shelter, and the street is briefly, calculably crossable.",
           check: { stat: "knowledge", difficulty: 14, tag: "utility", label: "The 7:10 Rule" },
           randomEvents: [
             { chance: 0.2, text: "The radio — still alive — confirms dose rates town-wide are dropping fast. The math is real.", effect: { moraleMod: 10 } },
@@ -13559,7 +13559,7 @@ const SCENARIOS = [
               failure: { narrative: "Your door is solid. The neighbor's isn't, and at 2am something tests it — the screaming lasts ten seconds and then there's only sirens, far away.", effects: { moraleMod: -25, conditionAdd: "haunted" }, tip: "A building is only as sealed as its weakest unit. If you hardened only your door, you made a correct decision with a known limit — own that limit.", learnMore: ["hz012"] },
             },
             roof: {
-              success: { narrative: "Six neighbors, sleeping bags, one guarded stairwell door. The night passes with distant sounds and nobody below them. High ground works when the threat can't climb well — and most of these can't.", effects: { xpBonus: 15, moraleMod: 10, conditionAdd: "roof_camp" }, tip: "Elevation defeats most ground predators, but the stairwell door is the whole plan. One unguarded access point and the roof is a trap, not a refuge.", learnMore: ["hz012", "hz015"] },
+              success: { narrative: "Six neighbors, sleeping bags, one guarded stairwell door. The night passes with distant sounds and nobody below them. High ground only works when nothing can climb or jump to you — and the cats here climb superbly, so the door and the windows are the plan, not the height.", effects: { xpBonus: 15, moraleMod: 10, conditionAdd: "roof_camp" }, tip: "Elevation defeats most ground predators, but the stairwell door is the whole plan. One unguarded access point and the roof is a trap, not a refuge.", learnMore: ["hz012", "hz015"] },
               failure: { narrative: "The stairwell door won't lock from the roof side. You spend the night in shifts holding it shut, listening to things move in the dark below.", effects: { moraleMod: -18, conditionAdd: "sleepless" }, tip: "Check the hardware before committing people to a position. A refuge you can't secure is just a high place to be afraid.", learnMore: ["hz012"] },
             },
           },
@@ -15732,7 +15732,7 @@ const SCENARIOS = [
             success: {
               narrative: "You run until the world is quiet — two hundred meters, lungs on fire. The last wasps peel away, unwilling to follow this far from the nest. You bend over, gasping, in blessed silence.",
               effects: "Clear | Exhausted",
-              tip: "Wasps rarely pursue beyond 50-100m. Outrun the radius and you outrun the swarm.",
+              tip: "Yellowjackets can pursue for hundreds of meters — chases of a quarter mile are documented. Run straight and do not stop until you cannot hear a single wasp; distance is only safe when the buzzing is gone.",
               learnMore: ["hz024"]
             },
             failure: {
@@ -15842,7 +15842,7 @@ const SCENARIOS = [
         check: "Medical: anaphylaxis signs are systemic — breathing, circulation, consciousness — not local pain.",
         choices: [
           { id: "assess-systemic", text: "Check for systemic signs: breathing, dizziness, spreading hives." },
-          { id: "remove-stingers", text: "Scrape the stingers out first, then assess." },
+          { id: "remove-stingers", text: "Brush off any remaining wasps, then assess breathing and anaphylaxis signs." },
           { id: "ignore-it", text: "It's just stings. Walk it off and get back to work." }
         ],
         outcomes: {
@@ -15864,13 +15864,13 @@ const SCENARIOS = [
             success: {
               narrative: "You scrape each stinger out sideways with your knife spine — no squeezing, which would pump more venom in. Then you assess: local swelling only. Cold water, rest, and watchfulness for the next few hours.",
               effects: "Stingers removed | Stable",
-              tip: "Scrape stingers out; don't pinch them. Every minute a stinger stays in, more venom enters.",
+              tip: "Yellowjackets keep their stingers — there is nothing embedded to scrape out. Brush wasps off with firm downward sweeps and keep moving; stinger-scraping is honeybee first aid, not wasp first aid.",
               learnMore: ["hz024"]
             },
             failure: {
               narrative: "You pinch the stingers out with your fingernails — squeezing venom sacs as you go. The swelling worsens noticeably. Then you notice your breathing is off, and realize you should have assessed first.",
               effects: "Increased swelling | Delayed assessment",
-              tip: "Pinching stingers injects more venom. Scrape, don't squeeze — and assess breathing first.",
+              tip: "Do not waste time hunting for stingers after wasp stings — wasps retain them. The priority is airway, anaphylaxis signs, and getting out of range.",
               learnMore: ["hz024"]
             }
           },
@@ -20147,7 +20147,7 @@ success: {narrative: "You swim a slow, steady sidestroke toward their arc and cl
 failure: {narrative: "You swim for five minutes and the boat looks no closer — the wind is winning. Your arms are lead. You stop and float, colder than before.", effects: "Exhausted | Colder", tip: "If the target isn't getting closer, stop. Every stroke in cold water spends heat you can't replace.", learnMore: ["ds051"]}
 },
 "help-float": {
-success: {narrative: "Knees up, arms crossed, head back — the HELP position. You're a compact, warm package riding the waves, easy to spot in the orange lifejacket.", effects: "Heat conserved | Visible", tip: "HELP (Heat Escape Lessening Posture) can double survival time in cold water. It's the single most important cold-water skill.", learnMore: ["ds051"]},
+success: {narrative: "Knees up, arms crossed, head back — the HELP position. You're a compact, warm package riding the waves, easy to spot in the orange lifejacket.", effects: "Heat conserved | Visible", tip: "HELP (Heat Escape Lessening Posture) can increase survival time by roughly half in cold water — about a 40–50% gain. It's the single most important cold-water skill.", learnMore: ["ds051"]},
 failure: {narrative: "You try HELP but the waves keep rolling you. You end up in a loose float instead — less efficient, but you're still conserving.", effects: "Partial HELP | Still floating", tip: "In rough water, any stable float beats a perfect HELP you can't hold. Adapt, don't fight.", learnMore: ["ds051"]}
 }
 },
